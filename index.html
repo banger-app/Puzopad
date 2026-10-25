@@ -162,7 +162,7 @@ main{max-width:690px!important;margin:auto!important;padding:10px 12px 34px!impo
 .v23-pet-art{font-size:62px;filter:drop-shadow(0 8px 8px #0009)}
 .v23-pet-art svg{width:105px;height:110px}
 </style></head><body><main>
-<style>.b29{padding:19px;margin:10px 0 16px;border-radius:22px;border:1px solid #85516c;background:radial-gradient(ellipse at 90% 0,#86346977,transparent 55%),linear-gradient(125deg,#10182a,#28192f);box-shadow:0 10px 30px #0006}.b29top{font-size:10px;color:#f4b9dc;letter-spacing:1.4px;font-weight:800;display:flex;justify-content:space-between}.b29top b{border:1px solid #a56b92;border-radius:7px;padding:3px 7px}.b29name{font-size:clamp(30px,8vw,52px);font-weight:1000;letter-spacing:-2px;margin:12px 0}.b29name span{color:#ff68b7}.b29foot{border-top:1px solid #ffffff30;padding-top:10px;font-size:10px;display:flex;justify-content:space-between;color:#d3b6d0}</style><header class="b29"><div class="b29top">✦ ПУЗОПАД / PERSONAL RPG <b>V37 · REFINED</b></div><div class="b29name">BANGER<span>VERSE</span><i style="color:#f6d78c">.</i></div><div class="b29foot"><span>NEONHAVEN ✧ ТВОЯ ИГРА</span><span style="color:#a1e9bf">● WEB</span></div></header>
+<style>.b29{padding:19px;margin:10px 0 16px;border-radius:22px;border:1px solid #85516c;background:radial-gradient(ellipse at 90% 0,#86346977,transparent 55%),linear-gradient(125deg,#10182a,#28192f);box-shadow:0 10px 30px #0006}.b29top{font-size:10px;color:#f4b9dc;letter-spacing:1.4px;font-weight:800;display:flex;justify-content:space-between}.b29top b{border:1px solid #a56b92;border-radius:7px;padding:3px 7px}.b29name{font-size:clamp(30px,8vw,52px);font-weight:1000;letter-spacing:-2px;margin:12px 0}.b29name span{color:#ff68b7}.b29foot{border-top:1px solid #ffffff30;padding-top:10px;font-size:10px;display:flex;justify-content:space-between;color:#d3b6d0}</style><header class="b29"><div class="b29top">✦ ПУЗОПАД / PERSONAL RPG <b>V38 · FOOD LOG</b></div><div class="b29name">BANGER<span>VERSE</span><i style="color:#f6d78c">.</i></div><div class="b29foot"><span>NEONHAVEN ✧ ТВОЯ ИГРА</span><span style="color:#a1e9bf">● WEB</span></div></header>
 <nav id="nav"><button data-tab="home">🏠 Штаб</button><button data-tab="city">🗺️ Город</button><button data-tab="diary">🍽️ Еда</button><button data-tab="fridge">🧊 Холодильник</button><button data-tab="store">🛒 Магазин</button><button data-tab="sleep">😴 Сон</button><button data-tab="loot">🎒 Лут</button><button data-tab="drinks">🥤 Напитки</button><button data-tab="quests">⚔️ Квесты</button><button data-tab="gym">🏋️ Зал</button><button data-tab="weight">⚖️ Вес</button><button data-tab="charts">📈 Графики</button><button data-tab="save">💾 Сейв</button><button data-tab="fuel">⛽ OKKO</button><button data-tab="wardrobe">🧥 Гардероб</button><button data-tab="companion">🐩 Суречка</button></nav>
 <section id="home" class="section active"><div class="v16-dashboard"><div class="v16-eyebrow">BANGER / ЛИЧНЫЙ ШТАБ</div><div class="v16-headline">ТВОЯ ЖИЗНЬ.<br><em>ТВОЙ ПЕРСОНАЖ.</em></div><p class="v16-intro">Один день — одно приключение. Данные настоящие, награды игровые.</p><div class="v16-resource-grid"><div class="v16-resource"><span>✦ УРОВЕНЬ</span><strong id="v16Level">1</strong><small id="v16Next">0 / 100 XP</small></div><div class="v16-resource"><span>🪙 МОНЕТЫ</span><strong id="v16Coins">0</strong><small>На экипировку</small></div><div class="v16-resource"><span>💧 МАНА</span><strong id="v16Mana">0</strong><small>Игровой ресурс</small></div></div><div class="v17-hp"><div class="v17-hp-top"><b>❤️ HP · восстановление героя</b><strong id="v17Hp">—</strong></div><div class="bar"><i id="v17HpBar" style="width:0%;background:linear-gradient(90deg,#e05a74,#ff9a76)"></i></div><p id="v17HpExplain" class="small">Сон и алкоголь меняют игровой HP. Это не медицинский показатель.</p></div><div class="v20-world" id="v20World">
 <div class="v20-world-top"><span id="v20Where">🏠 ДОМА</span><span id="v20Time">Смена 18:00–06:00</span></div>
@@ -741,5 +741,20 @@ if(!db.loot.some(x=>/шер.?а.?мі|шер.?а.?ми|шер.?а.?мі|шер.?
  db.loot.push({id:'banger_cake_sherami_stock_20261025',name:'Торт Шер-А-Мі',qty:null,k:null,p:null,f:null,c:null,where:'home',note:'В холодильнике. Остаток и калорийность не уточнены; не отмечено съеденным.'});
  persist();try{render()}catch(e){console.warn('cake refresh',e)}
 }
+})();
+</script><script id="banger-v38-food-timeline">
+(function(){
+const estimates={
+'r30-turkey':'20:15','r30-syrniki':'21:10','r30-pitas':'20:40',
+'r30-curd':'20:20','r30-kefir-remaining':'22:30',
+'r30-chicken-potatoes':'19:40'
+};
+let changed=false;for(const x of db.foods||[]){
+if(x.rebornSource&&estimates[x.rebornSource]&&(!x.time||x.time==='?')){x.time=estimates[x.rebornSource];x.note=((x.note||'')+' Время приблизительное, назначено для графиков.').trim();changed=true}
+}
+for(const x of db.water||[]){if(x.rebornSource&&estimates[x.rebornSource]&&(!x.time||x.time==='?')){x.time=estimates[x.rebornSource];x.note=((x.note||'')+' Время приблизительное.').trim();changed=true}}
+if(changed){persist();try{render()}catch(e){console.warn('v38 render',e)}}
+const d=document.getElementById('diary');
+if(d&&!document.getElementById('b38timeline')){const p=document.createElement('p');p.id='b38timeline';p.className='small';p.textContent='🕒 Если время не указано, для графиков ставится приблизительное. Записи с оценками калорий помечены как оценки; повторного добавления еды нет.';const panel=d.querySelector('.panel');if(panel)panel.prepend(p)}
 })();
 </script></body></html>
