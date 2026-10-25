@@ -943,7 +943,7 @@ status('✅ Голос распознан. Проверь текст и нажм
 voiceRecorder.start();$('bai-mic').textContent='■';$('bai-mic').setAttribute('aria-label','Остановить запись');status('🔴 Идёт запись. Говори, затем нажми «Остановить».');
 }catch(e){voiceStream?.getTracks().forEach(t=>t.stop());voiceStream=null;status('⚠️ '+e.message)}
 };
-$('bai-open').onclick=()=>{$('bai-modal').classList.add('open');session().then(()=>status('🟢 Аккаунт подключён')).catch(e=>status(e.message))};
+$('bai-open').onclick=()=>{$('bai-modal').classList.add('open');status('⏳ Проверяю подключение Gemini…');session().then(()=>status('🟢 Gemini подключён. Отправь сообщение для проверки.')).catch(e=>status('⚠️ '+e.message))};
 $('bai-close').onclick=()=>$('bai-modal').classList.remove('open');
 $('bai-modal').onclick=e=>{if(e.target===$('bai-modal'))$('bai-close').click()};
 $('bai-send').onclick=async()=>{
