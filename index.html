@@ -902,9 +902,9 @@ $('b46input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.
 <button id="bai-open" type="button">🎙️ Мой помощник</button>
 <div id="bai-modal" role="dialog" aria-modal="true" aria-label="BANGER AI">
 <div id="bai-panel">
-<div id="bai-top"><div><b>🧠 BANGER AI</b><div style="font-size:12px;color:#b6b9d3">Фото · Голос · Еда · Холодильник · Гараж</div></div><button id="bai-close" type="button">✕</button></div>
+<div id="bai-top"><div><b>✦ BANGER AI <span style="font-size:11px;color:#9da7bf;font-weight:400">· Личный помощник</span></b><div style="font-size:12px;color:#b6b9d3">Фото · Голос · Еда · Холодильник · Гараж</div></div><button id="bai-close" type="button">✕</button></div>
 <div id="bai-log"><div class="bai-msg bai-assistant">Привет! Напиши или надиктуй: «Добавь это в холодильник», «Я съел этот продукт», «Заправил машину». Прикрепи фото этикетки, чека или приборки. Я разберу данные и подготовлю запись; подтверждение пока выполняется отдельно.</div></div>
-<div id="bai-form"><textarea id="bai-input" placeholder="Скажи, что сделать: «Добавь в холодильник», «Съел», «Заправил»…"></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label style="border:1px solid #596079;border-radius:10px;padding:9px;background:#293149;color:white">📷 Фото / галерея <input id="bai-file" type="file" accept="image/*" style="display:block;max-width:200px;margin-top:5px"></label><button id="bai-mic" type="button" style="border:1px solid #ad70b9;border-radius:12px;background:#382647;color:white;padding:12px">🎙️ Надиктовать</button></div><div id="bai-status">Нужен вход через ☁️ BANGERVERSE ID</div><button id="bai-send" type="button">Отправить BANGER AI ✦</button></div>
+<div id="bai-form"><textarea id="bai-input" placeholder="Скажи, что сделать: «Добавь в холодильник», «Съел», «Заправил»…"></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label style="border:1px solid #596079;border-radius:10px;padding:9px;background:#293149;color:white">📷 Фото / галерея <input id="bai-file" type="file" accept="image/*" style="display:block;max-width:200px;margin-top:5px"></label><button id="bai-mic" type="button" style="border:1px solid #ad70b9;border-radius:12px;background:#382647;color:white;padding:12px">🎙️ Надиктовать</button></div><div id="bai-status">На iPhone нажми поле ввода и микрофон 🎙️ на клавиатуре для диктовки.</div><button id="bai-send" type="button">Отправить BANGER AI ✦</button></div>
 </div></div>
 <script id="banger-ai-client">
 (function(){
@@ -913,7 +913,7 @@ let sb=null,busy=false;let recognizer=null;
 function status(t){$('bai-status').textContent=t}
 function bubble(role,text){let e=document.createElement('div');e.className='bai-msg bai-'+role;e.textContent=text;$('bai-log').append(e);$('bai-log').scrollTop=$('bai-log').scrollHeight}
 async function session(){if(!window.supabase?.createClient)throw Error('Библиотека Supabase не загрузилась');if(!sb)sb=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});let {data:{session},error}=await sb.auth.getSession();if(error)throw error;if(!session)throw Error('Сначала войди через ☁️ Аккаунт');return session}
-$('bai-mic').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){status('В этом браузере нет распознавания речи. Используй микрофон на клавиатуре iPhone.');$('bai-input').focus();return}if(recognizer){recognizer.stop();recognizer=null;return}let r=new SR();recognizer=r;r.lang='ru-RU';r.interimResults=false;r.onresult=e=>{$('bai-input').value=($('bai-input').value+' '+e.results[0][0].transcript).trim();status('🎙️ Текст распознан. Проверь и отправь.')};r.onerror=e=>status('Микрофон: '+e.error+' · можно использовать диктовку клавиатуры');r.onend=()=>{recognizer=null;$('bai-mic').textContent='🎙️ Надиктовать'};$('bai-mic').textContent='⏹️ Остановить';try{r.start()}catch(e){status(e.message)}};
+$('bai-mic').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){$('bai-input').focus();status('На iPhone голосовой ввод через 🎙️ на системной клавиатуре. Safari не поддерживает этот способ распознавания речи.');return}if(recognizer){recognizer.stop();recognizer=null;return}let r=new SR();recognizer=r;r.lang='ru-RU';r.interimResults=false;r.onresult=e=>{$('bai-input').value=($('bai-input').value+' '+e.results[0][0].transcript).trim();status('Текст распознан. Проверь и отправь.')};r.onerror=e=>{status('Распознавание недоступно ('+e.error+'). Используй микрофон клавиатуры.');$('bai-input').focus()};r.onend=()=>{recognizer=null;$('bai-mic').textContent='🎙️'};$('bai-mic').textContent='⏹️';try{r.start()}catch(e){status('Используй диктовку клавиатуры iPhone.');$('bai-input').focus()}};
 $('bai-open').onclick=()=>{$('bai-modal').classList.add('open');session().then(()=>status('🟢 Аккаунт подключён')).catch(e=>status(e.message))};
 $('bai-close').onclick=()=>$('bai-modal').classList.remove('open');
 $('bai-modal').onclick=e=>{if(e.target===$('bai-modal'))$('bai-close').click()};
@@ -929,4 +929,24 @@ bubble('user',message||'📷 Фото');bubble('assistant',out.answer);$('bai-in
 }catch(e){status('⚠️ '+e.message)}finally{busy=false;$('bai-send').disabled=false}
 };
 })();
-</script></body></html>
+</script><style id="bai-chatgpt-redesign">
+#bai-modal{padding:0!important;background:#080b14!important}
+#bai-panel{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;border:0!important;border-radius:0!important;background:#111521!important}
+#bai-top{min-height:64px;padding:15px 18px!important;background:#151929!important;border-bottom:1px solid #313749!important}
+#bai-top b{font-size:18px;letter-spacing:-.3px}
+#bai-close{border-radius:50%!important;width:38px;height:38px}
+#bai-log{flex:1!important;min-height:0!important;padding:20px 14px!important;overflow-y:auto!important;display:flex;flex-direction:column;gap:16px;background:#111521}
+.bai-msg{max-width:91%!important;font-size:15px!important;line-height:1.55!important;padding:14px 16px!important;border-radius:20px!important;white-space:pre-wrap}
+.bai-user{align-self:flex-end!important;background:#30364a!important;border:0!important;border-bottom-right-radius:6px!important}
+.bai-assistant{align-self:flex-start!important;background:#1d2232!important;border:1px solid #33394d!important;border-bottom-left-radius:6px!important}
+#bai-form{padding:10px 12px calc(14px + env(safe-area-inset-bottom))!important;background:#151929!important;border-top:1px solid #303749!important;display:grid!important;grid-template-columns:1fr auto!important;gap:8px!important;align-items:end!important}
+#bai-input{grid-column:1/3!important;min-height:52px!important;max-height:140px!important;border-radius:22px!important;background:#262b3a!important;border:1px solid #51576a!important;resize:none!important;padding:14px 16px!important;font-size:16px!important}
+#bai-form>div:has(#bai-file){grid-column:1!important;gap:8px!important;flex-wrap:nowrap!important}
+#bai-form label{font-size:0!important;border-radius:50%!important;padding:8px!important;width:46px!important;height:46px!important;display:flex;align-items:center;justify-content:center}
+#bai-form label:before{content:'+';font-size:27px;font-weight:400;color:#fff}
+#bai-file{position:absolute!important;width:46px!important;height:46px!important;opacity:0!important;cursor:pointer}
+#bai-mic{border-radius:50%!important;width:46px;height:46px;padding:0!important;font-size:21px!important}
+#bai-send{grid-column:2!important;grid-row:2!important;border-radius:50%!important;width:48px;height:48px;font-size:0!important;padding:0!important}
+#bai-send:after{content:'↑';font-size:28px}
+#bai-status{grid-column:1/3!important;font-size:11px!important;line-height:1.3!important;min-height:0!important}
+</style></body></html>
