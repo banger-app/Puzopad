@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>БЭННИ · ПУЗОПАД v56</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#101322}#app{border:0;width:100%;height:100%;display:block}</style></head>
+<body><iframe id="app" src="./benny-v55.html" title="BANGERVERSE"></iframe>
+<script>
+document.getElementById("app").addEventListener("load",function(){
+const doc=this.contentDocument;
+if(!doc||doc.getElementById("benny-v56-addon"))return;
+const js=doc.createElement("script");
+js.id="benny-v56-addon";js.src="./benny-food-v56.js";
+doc.head.appendChild(js);
+});
+</script></body></html>
