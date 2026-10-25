@@ -6,6 +6,7 @@
 document.getElementById("app").addEventListener("load",function(){
 const doc=this.contentDocument;
 if(!doc||doc.getElementById("benny-v56-addon"))return;
+const header=doc.querySelector(".b29top");if(header)header.textContent=header.textContent.replace("V55","V56");
 const js=doc.createElement("script");
 js.id="benny-v56-addon";js.src="./benny-food-v56.js";
 doc.head.appendChild(js);
