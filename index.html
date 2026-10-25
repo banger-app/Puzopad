@@ -1032,7 +1032,7 @@ function init(){
 const header=document.querySelector('header.b29');if(!header)return;
 if(!document.getElementById('banger-language')){
 const bar=document.createElement('div');bar.id='banger-language';
-bar.innerHTML='<label for="banger-language-select">🌐 Мова / Language</label><select id="banger-language-select" aria-label="Мова інтерфейсу"><option value="uk">🇺🇦 Українська</option><option value="ru">🇷🇺 Русский</option><option value="en">🇬🇧 English</option></select>';
+bar.innerHTML='<label for="banger-language-select">🌐 Мова / Language</label><select id="banger-language-select" aria-label="Мова інтерфейсу"><option value="uk">🇺🇦 Українська</option><option value="ru">💩 Русский</option><option value="en">🇬🇧 English</option></select>';
 header.insertAdjacentElement('afterend',bar);
 bar.querySelector('select').addEventListener('change',e=>{lang=e.target.value;localStorage.setItem('banger_language',lang);translate()});
 }
