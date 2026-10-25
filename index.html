@@ -162,7 +162,7 @@ main{max-width:690px!important;margin:auto!important;padding:10px 12px 34px!impo
 .v23-pet-art{font-size:62px;filter:drop-shadow(0 8px 8px #0009)}
 .v23-pet-art svg{width:105px;height:110px}
 </style></head><body><main>
-<style>.b29{padding:19px;margin:10px 0 16px;border-radius:22px;border:1px solid #85516c;background:radial-gradient(ellipse at 90% 0,#86346977,transparent 55%),linear-gradient(125deg,#10182a,#28192f);box-shadow:0 10px 30px #0006}.b29top{font-size:10px;color:#f4b9dc;letter-spacing:1.4px;font-weight:800;display:flex;justify-content:space-between}.b29top b{border:1px solid #a56b92;border-radius:7px;padding:3px 7px}.b29name{font-size:clamp(30px,8vw,52px);font-weight:1000;letter-spacing:-2px;margin:12px 0}.b29name span{color:#ff68b7}.b29foot{border-top:1px solid #ffffff30;padding-top:10px;font-size:10px;display:flex;justify-content:space-between;color:#d3b6d0}</style><header class="b29"><div class="b29top">✦ ПУЗОПАД / PERSONAL RPG <b>V30 · REBORN</b></div><div class="b29name">BANGER<span>VERSE</span><i style="color:#f6d78c">.</i></div><div class="b29foot"><span>NEONHAVEN ✧ ТВОЯ ИГРА</span><span style="color:#a1e9bf">● WEB</span></div></header>
+<style>.b29{padding:19px;margin:10px 0 16px;border-radius:22px;border:1px solid #85516c;background:radial-gradient(ellipse at 90% 0,#86346977,transparent 55%),linear-gradient(125deg,#10182a,#28192f);box-shadow:0 10px 30px #0006}.b29top{font-size:10px;color:#f4b9dc;letter-spacing:1.4px;font-weight:800;display:flex;justify-content:space-between}.b29top b{border:1px solid #a56b92;border-radius:7px;padding:3px 7px}.b29name{font-size:clamp(30px,8vw,52px);font-weight:1000;letter-spacing:-2px;margin:12px 0}.b29name span{color:#ff68b7}.b29foot{border-top:1px solid #ffffff30;padding-top:10px;font-size:10px;display:flex;justify-content:space-between;color:#d3b6d0}</style><header class="b29"><div class="b29top">✦ ПУЗОПАД / PERSONAL RPG <b>V32 · CLOUD</b></div><div class="b29name">BANGER<span>VERSE</span><i style="color:#f6d78c">.</i></div><div class="b29foot"><span>NEONHAVEN ✧ ТВОЯ ИГРА</span><span style="color:#a1e9bf">● WEB</span></div></header>
 <nav id="nav"><button data-tab="home">🏠 Штаб</button><button data-tab="city">🗺️ Город</button><button data-tab="diary">🍽️ Еда</button><button data-tab="fridge">🧊 Холодильник</button><button data-tab="store">🛒 Магазин</button><button data-tab="sleep">😴 Сон</button><button data-tab="loot">🎒 Лут</button><button data-tab="drinks">🥤 Напитки</button><button data-tab="quests">⚔️ Квесты</button><button data-tab="gym">🏋️ Зал</button><button data-tab="weight">⚖️ Вес</button><button data-tab="charts">📈 Графики</button><button data-tab="save">💾 Сейв</button><button data-tab="fuel">⛽ OKKO</button><button data-tab="wardrobe">🧥 Гардероб</button><button data-tab="companion">🐩 Суречка</button></nav>
 <section id="home" class="section active"><div class="v16-dashboard"><div class="v16-eyebrow">BANGER / ЛИЧНЫЙ ШТАБ</div><div class="v16-headline">ТВОЯ ЖИЗНЬ.<br><em>ТВОЙ ПЕРСОНАЖ.</em></div><p class="v16-intro">Один день — одно приключение. Данные настоящие, награды игровые.</p><div class="v16-resource-grid"><div class="v16-resource"><span>✦ УРОВЕНЬ</span><strong id="v16Level">1</strong><small id="v16Next">0 / 100 XP</small></div><div class="v16-resource"><span>🪙 МОНЕТЫ</span><strong id="v16Coins">0</strong><small>На экипировку</small></div><div class="v16-resource"><span>💧 МАНА</span><strong id="v16Mana">0</strong><small>Игровой ресурс</small></div></div><div class="v17-hp"><div class="v17-hp-top"><b>❤️ HP · восстановление героя</b><strong id="v17Hp">—</strong></div><div class="bar"><i id="v17HpBar" style="width:0%;background:linear-gradient(90deg,#e05a74,#ff9a76)"></i></div><p id="v17HpExplain" class="small">Сон и алкоголь меняют игровой HP. Это не медицинский показатель.</p></div><div class="v20-world" id="v20World">
 <div class="v20-world-top"><span id="v20Where">🏠 ДОМА</span><span id="v20Time">Смена 18:00–06:00</span></div>
@@ -203,7 +203,7 @@ let realDb;try{realDb=JSON.parse(localStorage.getItem(KEY))||structuredClone(ini
 const TESTKEY=KEY+"_sandbox_v8";let testMode=false;let db=realDb;
 function toggleMode(){testMode=!testMode;db=testMode?(JSON.parse(localStorage.getItem(TESTKEY)||"null")||structuredClone(realDb)):realDb;render();updateMode();toast(testMode?"🧪 Песочница: действия не влияют на настоящий дневник":"🔒 Настоящий учёт включён")}
 function updateMode(){if(!n("testToggle"))return;n("testToggle").textContent=testMode?"🧪 ТЕСТ — включён":"🔒 РЕАЛЬНЫЙ УЧЁТ";n("modeStatus").textContent=testMode?"Можно смело проверять кнопки":"Все действия записываются в настоящий дневник"}
-function persist(){try{localStorage.setItem(testMode?TESTKEY:KEY,JSON.stringify(db));if(!testMode)realDb=db}catch(e){toast("Локальное сохранение недоступно: скачай JSON-сейв")}}
+function persist(){try{localStorage.setItem(testMode?TESTKEY:KEY,JSON.stringify(db));if(!testMode)realDb=db}catch(e){toast("Локальное сохранение недоступно: скачай JSON-сейв")}try{window.dispatchEvent(new Event("banger:local-save"))}catch(_e){}}
 function toast(t){let x=document.getElementById("toast");x.textContent=t;x.style.display="block";clearTimeout(window.tt);window.tt=setTimeout(()=>x.style.display="none",2800)}
 function go(t){document.querySelectorAll(".section").forEach(x=>x.classList.toggle("active",x.id===t));document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x.dataset.tab===t));render();window.scrollTo(0,0)}
 document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
@@ -615,7 +615,7 @@ window.rbSleepEnd=function(){let raw=localStorage.getItem(KEY);if(!raw)return;le
 <div style="display:flex;align-items:center;justify-content:space-between"><h2>☁️ BANGERVERSE ID</h2><button id="cloud31close" type="button">✕</button></div>
 <small>Твой аккаунт и персональное облачное сохранение. Друг регистрируется со своим email и получает отдельный профиль.</small>
 <div id="cloud31signedout"><input id="cloud31email" type="email" autocomplete="email" placeholder="Email"><input id="cloud31password" type="password" autocomplete="current-password" placeholder="Пароль (не менее 6 символов)"><button id="cloud31signup" class="primary" type="button">Создать аккаунт</button><button id="cloud31signin" type="button">Войти</button></div>
-<div id="cloud31signedin" style="display:none"><div id="cloud31who" style="font-size:13px;margin:10px 0"></div><button id="cloud31upload" class="primary" type="button">☁️ Сохранить прогресс в облако</button><button id="cloud31download" type="button">📥 Восстановить из облака</button><button id="cloud31signout" type="button">Выйти из аккаунта</button><small>Восстановление заменяет локальный прогресс только после твоего подтверждения. Перед заменой создаётся резервная копия на устройстве.</small></div>
+<div id="cloud31signedin" style="display:none"><div id="cloud31who" style="font-size:13px;margin:10px 0"></div><button id="cloud31upload" class="primary" type="button">☁️ Сохранить прогресс в облако</button><button id="cloud31download" type="button">📥 Восстановить из облака</button><button id="cloud32enable" class="primary" type="button">⚡ Включить автосохранение</button><button id="cloud32disable" type="button" style="display:none">⏸ Отключить автосохранение</button><small id="cloud32state">Автосохранение выключено. Включается отдельно для этого аккаунта и устройства.</small><button id="cloud31signout" type="button">Выйти из аккаунта</button><small>Восстановление заменяет локальный прогресс только после твоего подтверждения. Перед заменой создаётся резервная копия на устройстве.</small></div>
 <div id="cloud31status">Подключение к Supabase…</div>
 <small>Пароль не хранится в игре. Записи разных аккаунтов разделены правилами RLS. Пока синхронизация запускается кнопками, автоматическое объединение записей ещё в разработке.</small>
 </div></div>
@@ -644,15 +644,58 @@ if(!user)throw Error('Сначала войди');
 let old=await getSave();if(old&&!confirm('В облаке уже есть сохранение. Заменить его текущими данными с этого устройства?'))return;
 const payload={user_id:user.id,entry_type:'cloud_save',title:'BANGERVERSE — резервная копия',external_id:'bangerverse_full_save_v1',details:{schema:1,saved_at:new Date().toISOString(),data:JSON.parse(JSON.stringify(db))}};
 let r=old?await client.from('journal_entries').update({details:payload.details,title:payload.title}).eq('id',old.id).eq('user_id',user.id):await client.from('journal_entries').insert(payload);
-if(r.error)throw r.error;status('✅ Прогресс сохранён в облако: '+new Date().toLocaleString('ru-RU'))});
+if(r.error)throw r.error;localStorage.setItem(baseKey(),payload.details.saved_at);status('✅ Прогресс сохранён в облако: '+new Date().toLocaleString('ru-RU'))});
 el('cloud31download').onclick=()=>act(async()=>{
 if(!user)throw Error('Сначала войди');let old=await getSave();if(!old?.details?.data){status('Облачного сохранения пока нет. Сначала сохрани прогресс на основном устройстве.');return}
 if(!confirm('ВНИМАНИЕ: заменить данные этого устройства облачным сохранением? Локальная копия будет сохранена перед заменой.'))return;
-const key='puzopad_rpg_v4';localStorage.setItem('bangerverse_pre_cloud_restore_'+Date.now(),localStorage.getItem(key)||'{}');localStorage.setItem(key,JSON.stringify(old.details.data));status('✅ Восстановлено. Страница перезагрузится.');location.reload()});
+const key='puzopad_rpg_v4';localStorage.setItem('bangerverse_pre_cloud_restore_'+Date.now(),localStorage.getItem(key)||'{}');localStorage.setItem(key,JSON.stringify(old.details.data));if(user)localStorage.setItem(baseKey(),old.details.saved_at||'');status('✅ Восстановлено. Страница перезагрузится.');location.reload()});
+
+const C32='bangerverse_autosync32_', BASE='bangerverse_autosync32_base_';
+let timer32=null,working32=false,baseline32=null;
+const autoKey=()=>user?C32+user.id:null;
+const baseKey=()=>user?BASE+user.id:null;
+function autoEnabled(){return !!user&&localStorage.getItem(autoKey())==='1'}
+function cloud32Ui(){const enabled=autoEnabled();el('cloud32enable').style.display=enabled?'none':'inline-block';el('cloud32disable').style.display=enabled?'inline-block':'none';el('cloud32state').textContent=enabled?'Автосохранение включено для этого аккаунта. Сохраняются изменения, сделанные на этом устройстве.':'Автосохранение выключено. Твои данные не изменены.'}
+function cloud32Pause(reason){if(user)localStorage.removeItem(autoKey());cloud32Ui();status('⚠️ Автосохранение приостановлено: '+reason+'. Локальный прогресс не затронут.')}
+function cloud32Local(){try{return JSON.stringify(db)}catch(e){return null}}
+async function cloud32Push(){
+ if(!autoEnabled()||working32||busy||!client||!user)return;
+ working32=true;
+ try{
+  const local=cloud32Local();if(!local)throw Error('не удалось прочитать локальные данные');
+  const old=await getSave(),remote=old?.details?.saved_at||null;
+  const known=localStorage.getItem(baseKey())||null;
+  if(old&&(!known||remote!==known)){cloud32Pause('в облаке обнаружена другая версия сохранения');return}
+  const savedAt=new Date().toISOString();
+  const details={schema:1,saved_at:savedAt,data:JSON.parse(local)};
+  let result;
+  if(old){
+    // Optimistic update: if another device wrote meanwhile, update matches no rows.
+    result=await client.from('journal_entries').update({details}).eq('id',old.id).eq('user_id',user.id).eq('details->>saved_at',remote).select('id');
+    if(!result.error&&(!result.data||result.data.length!==1)){cloud32Pause('сохранение было изменено на другом устройстве');return}
+  }else{
+    result=await client.from('journal_entries').insert({user_id:user.id,entry_type:'cloud_save',title:'BANGERVERSE — резервная копия',external_id:'bangerverse_full_save_v1',details}).select('id');
+  }
+  if(result.error)throw result.error;
+  localStorage.setItem(baseKey(),savedAt);baseline32=local;
+  status('✅ Автосохранено: '+new Date().toLocaleTimeString('ru-RU'));
+ }catch(e){status('⚠️ Автосохранение не удалось: '+(e.message||e)+'. Данные на устройстве сохранены.')}finally{working32=false}
+}
+function cloud32Schedule(){if(!autoEnabled())return;clearTimeout(timer32);timer32=setTimeout(cloud32Push,2500)}
+window.addEventListener('banger:local-save',cloud32Schedule);
+el('cloud32enable').onclick=()=>act(async()=>{
+ if(!user)throw Error('Войди в аккаунт');
+ const old=await getSave();if(!old?.details?.saved_at)throw Error('Сначала нажми «Сохранить прогресс в облако», чтобы создать исходную копию.');
+ if(!confirm('Включить автоматическую отправку изменений этого устройства в облако? При изменении данных на другом устройстве отправка остановится для защиты от потери записей.'))return;
+ localStorage.setItem(baseKey(),old.details.saved_at);
+ localStorage.setItem(autoKey(),'1');baseline32=cloud32Local();cloud32Ui();status('⚡ Автосохранение включено. Следующие изменения будут сохраняться автоматически.');
+});
+el('cloud32disable').onclick=()=>{if(user)localStorage.removeItem(autoKey());clearTimeout(timer32);cloud32Ui();status('Автосохранение отключено. Локальный прогресс сохранён.')};
+window.addEventListener('pagehide',()=>{clearTimeout(timer32)});
 function init(){if(!window.supabase?.createClient){status('Библиотека Supabase не загрузилась. Попробуй обновить страницу.');return}
 client=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-client.auth.onAuthStateChange((_event,session)=>{user=session?.user||null;ui();if(user)status('☁️ Аккаунт подключён. Облачный прогресс можно сохранить или восстановить.');else status('Войди или создай аккаунт, чтобы включить облачные сохранения.')});
-client.auth.getSession().then(({data,error})=>{if(error)status('Ошибка авторизации: '+error.message);user=data?.session?.user||null;ui()}).catch(e=>status(e.message));
+client.auth.onAuthStateChange((_event,session)=>{user=session?.user||null;ui();cloud32Ui();if(user)status('☁️ Аккаунт подключён. Облачный прогресс можно сохранить или восстановить.');else status('Войди или создай аккаунт, чтобы включить облачные сохранения.')});
+client.auth.getSession().then(({data,error})=>{if(error)status('Ошибка авторизации: '+error.message);user=data?.session?.user||null;ui();cloud32Ui()}).catch(e=>status(e.message));
 }init();
 })();
 </script></body></html>
