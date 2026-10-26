@@ -1,7 +1,7 @@
 {
-  "build": "67",
+  "build": "69",
   "date": "2026-10-26",
   "assets": "puzopad-standalone-icon-v1",
   "stable_url": "/Puzopad/",
-  "changes": "arcade-end-replay-restore-meal-idempotent-fridge-edible-icons-settings-header-home"
+  "changes": "keep-supabase-session-signed-in-and-open-hq-immediately-no-recovery-gate"
 }
