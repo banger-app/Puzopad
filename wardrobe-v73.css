@@ -85,3 +85,9 @@
 #pz73 .pz76-event strong{font-size:14px}
 #pz73 .pz76-event small{font-size:11px;white-space:nowrap}
 @media(max-width:440px){#pz73 .pz73-grid{gap:8px}#pz73 .pz73-card{padding:9px}#pz73 .pz73-card-buttons button{font-size:11px!important}}
+
+/* v77: inspect a candidate without purchasing or changing the profile */
+#pz73 .pz73-species{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 15px}
+#pz73 .pz77-hero-choice{display:flex;gap:5px;align-items:stretch;min-width:0}
+#pz73 .pz77-hero-choice>.pz73-chip{min-width:0;flex:1;white-space:normal;font-size:11px!important;border-radius:12px!important}
+#pz73 .pz77-hero-choice>.pz73-secondary{flex:0 0 38px;min-width:38px;padding:8px!important}

@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import {makeHero,makeHamster} from "./premium-models-v76.js";
+import {PREMIUM_HERO,PREMIUM_PET} from "./model-sources-v77.js";
+import {clone as cloneRig} from "three/addons/utils/SkeletonUtils.js";
 const $=id=>document.getElementById(id);
 const loader=new GLTFLoader();
 const PET_FILES={dog:"pet-corgi-gobkit.glb",duck:"pet-duck-gobkit.glb",hippo:"pet-hippo-gobkit.glb",rhino:"pet-rhino-gobkit.glb",platypus:"pet-platypus-gobkit.glb",shark:"pet-shark-gobkit.glb",bat:"pet-bat-gobkit.glb",cat:"pet-cat.glb",hamster:"pet-hamster.glb",rabbit:"pet-rabbit.glb",fox:"pet-fox.glb",panda:"pet-panda.glb",parrot:"pet-parrot.glb",penguin:"pet-penguin.glb",fish:"pet-fish.glb",lion:"pet-lion.glb",tiger:"pet-tiger.glb"};
@@ -17,7 +19,7 @@ function preview(kind){
  const p=window.pzShopPreview;
  return p&&p.account===window.pzActiveUserId&&p.kind===kind?p.key:null;
 }
-function src(name){return "./assets/3d/"+name+"?v=76"}
+function src(name){return /^https:\/\//.test(name)?name:"./assets/3d/"+name+"?v=77"}
 function notice(view,msg){if(!view?.host)return;const x=view.host.querySelector(".pz3d-load-status")||document.createElement("p");x.className="pz3d-load-status";x.textContent=msg;view.host.append(x)}
 function clearNotice(view){view.host?.querySelector(".pz3d-load-status")?.remove()}
 function makeViewer(spec){
@@ -60,8 +62,8 @@ function makeViewer(spec){
  }catch(e){host.textContent="3D недоступне на цьому пристрої: "+e.message;host.dataset.viewer="error";return null}
 }
 function model(name){
- if(!loadCache.has(name))loadCache.set(name,loader.loadAsync(src(name)).then(r=>r.scene).catch(e=>{loadCache.delete(name);throw e}));
- return loadCache.get(name).then(x=>x.clone(true));
+ if(!loadCache.has(name))loadCache.set(name,loader.loadAsync(src(name)).catch(e=>{loadCache.delete(name);throw e}));
+ return loadCache.get(name).then(g=>({object:cloneRig(g.scene),animations:g.animations||[]}));
 }
 function material(col){return new THREE.MeshStandardMaterial({color:col,metalness:.12,roughness:.5})}
 function ball(parent,x,y,z,rx,ry,rz,color){const g=new THREE.Mesh(new THREE.SphereGeometry(1,20,12),material(color));g.position.set(x,y,z);g.scale.set(rx,ry,rz);parent.add(g);return g}
@@ -199,22 +201,38 @@ function v73Gear(root,kind,h){
 
 async function put(view,kind,x=0,z=0,scale=1){
  const d=store(),p=d?.profile||{},petKey=view.kind==="home"?(p.pet||"none"):getPetKey();
+ const pv=window.pzWardrobePreviewV73;
+ const heroKey=view.kind==="home"?(p.species||"frog"):(pv?.uid===window.pzActiveUserId&&pv.which==="species"?pv.id:(p.species||"frog"));
+ let anims=[];
  if(kind==="pet"&&petKey==="none")return;
  let obj;
  if(kind==="hero"){
   const previewState=window.pzWardrobePreviewV73;
   const hue=previewState?.uid===window.pzActiveUserId&&previewState.which==="palette"?Number(previewState.id):Number(preview("palette")??d?.heroStyle?.palette)||0;
-  obj=makeHero(p.species||"frog",hue);
+  if(PREMIUM_HERO[heroKey]){
+   try{const imported=await model(PREMIUM_HERO[heroKey]);obj=imported.object;anims=imported.animations}
+   catch(e){console.warn("KayKit model unavailable, local hero fallback",heroKey,e);obj=makeHero("human",hue)}
+  }else obj=makeHero(heroKey,hue);
  }else if(petKey==="hamster"){
   obj=makeHamster();
  }else{
-  const filename=PET_FILES[petKey];
-  if(filename){try{obj=await model(filename)}catch(e){console.warn("3D model failed",filename,e);obj=placeholderPet(petKey)}}
-  else obj=placeholderPet(petKey);
+  const filename=PREMIUM_PET[petKey]||PET_FILES[petKey];
+  if(filename){
+   try{const imported=await model(filename);obj=imported.object;anims=imported.animations}
+   catch(e){
+    console.warn("Imported pet unavailable, local backup",petKey,e);
+    try{const local=await model(PET_FILES[petKey]||"pet-dog.glb");obj=local.object;anims=local.animations}
+    catch(_){obj=placeholderPet(petKey)}
+   }
+  }else obj=placeholderPet(petKey);
  }
  const target=new THREE.Group();target.position.set(x,0,z);target.scale.setScalar(scale);
  const actual=normalize(obj,kind==="hero"?2.55:1.78);
  const rig=new THREE.Group();rig.add(obj);target.add(rig);
+ if(anims.length){
+  const idle=anims.find(c=>/idle|stand|breath/i.test(c.name))||anims[0];
+  const mixer=new THREE.AnimationMixer(obj);mixer.clipAction(idle).play();target.userData.mixer=mixer;
+ }
  if(d?.wardrobeV73){
   // No legacy layers: independently equipped pieces, preview is non-destructive.
   const activePet=store()?.profile?.pet||"none";
@@ -236,7 +254,7 @@ async function renderModels(view){
   const hero=view.kind!=="pet"?await put(view,"hero",view.kind==="home"?-.7:0,0,view.kind==="home"?.85:1):null;
   const pet=view.kind!=="hero"?await put(view,"pet",view.kind==="home"?.85:0,0,view.kind==="home"?.68:1):null;
   if(serial!==view.serial||window.pzActiveUserId!==identity.split("|")[0])return;
-  view.stage.clear();if(hero)view.stage.add(hero);if(pet)view.stage.add(pet);
+  view.stage.clear();view.mixers=[];if(hero){view.stage.add(hero);if(hero.userData.mixer)view.mixers.push(hero.userData.mixer)}if(pet){view.stage.add(pet);if(pet.userData.mixer)view.mixers.push(pet.userData.mixer)}
   if(view.kind==="home"&&hero){document.body.classList.add("pz-three-ready");}
   clearNotice(view);view.host.dataset.viewer="loaded";
  }catch(e){view.key="";view.host.dataset.viewer="failed";notice(view,"3D поки не завантажилось: "+String(e.message||e)+". Перевір інтернет і перезавантаж сторінку.");}
@@ -256,6 +274,8 @@ function loop(t){
  if(!document.body.classList.contains("pz-unlocked")||document.hidden)return;
  for(const v of renderers){
   if(!v.host.isConnected||!v.host.getClientRects().length)continue;
+  const delta=Math.min(.06,Math.max(0,(t-(v.lastFrame||t))/1000));v.lastFrame=t;
+  for(const mixer of v.mixers||[])mixer.update(delta);
   if(!v.drag)v.stage.rotation.y+=.0015;
   v.renderer.render(v.scene,v.camera);
  }

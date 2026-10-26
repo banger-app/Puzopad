@@ -74,7 +74,10 @@ const PETS=[
 ["otter","epic",225,"Видра","Выдра","Otter","🦦",0],
 ["dragon","legend",500,"Дракон","Дракон","Dragon","🐉",0],
 ["lion","legend",450,"Лев","Лев","Lion","🦁",1],
-["tiger","legend",450,"Тигр","Тигр","Tiger","🐅",1]
+["tiger","legend",450,"Тигр","Тигр","Tiger","🐅",1],
+["wolf","rare",185,"Вовк","Волк","Wolf","🐺",1],
+["husky","uncommon",95,"Хаскі","Хаски","Husky","🐕",1],
+["shiba","uncommon",95,"Сіба-іну","Сиба-ину","Shiba Inu","🐕",1]
 ];
 let tab="hero",mode="shop",filter="all",preview=null,message="",uid=null;
 const lang=()=>{const x=el("banger-language-select")?.value||el("pz-language")?.value||localStorage.getItem("banger_language")||"uk";return TEXT[x]?x:"uk"};
@@ -219,9 +222,14 @@ function render(){
  }
  if(tab==="hero"){
   const species=$node("div","pz73-species");
-  const names={frog:["🐸 Жабка","🐸 Лягушка","🐸 Frog"],human:["🧑 Людина","🧑 Человек","🧑 Human"],robot:["🤖 Робот","🤖 Робот","🤖 Robot"]};
-  for(const [kind,words] of Object.entries(names)){species.append($btn(words[lang()==="uk"?0:lang()==="ru"?1:2],()=>{d().profile.species=kind;message=T(27);save()},"pz73-chip"+((d().profile.species||"frog")===kind?" selected":"")))}
-  content.append(species);
+  const names={frog:["🐸 BANGER","🐸 BANGER","🐸 BANGER"],human:["🧑 Людина","🧑 Человек","🧑 Human"],robot:["🤖 Робот","🤖 Робот","🤖 Robot"],knight:["🛡️ Лицар 3D","🛡️ Рыцарь 3D","🛡️ Knight 3D"],mage:["🧙 Маг 3D","🧙 Маг 3D","🧙 Mage 3D"],rogue:["🥷 Розбійник 3D","🥷 Разбойник 3D","🥷 Rogue 3D"],barbarian:["⚔️ Варвар 3D","⚔️ Варвар 3D","⚔️ Barbarian 3D"]};
+  for(const [kind,words] of Object.entries(names)){
+   const option=$node("div","pz77-hero-choice");
+   option.append($btn(words[lang()==="uk"?0:lang()==="ru"?1:2],()=>{d().profile.species=kind;message=T(27);save()},"pz73-chip"+((d().profile.species||"frog")===kind?" selected":"")));
+   option.append($btn("👁",()=>viewPreview("species",kind),"pz73-secondary"));
+   species.append(option);
+  }
+  content.append($node("h3","pz73-subtitle",lang()==="en"?"Choose your 3D character":lang()==="ru"?"Выбери 3D-персонажа":"Обери 3D-персонажа"),species);
  }
  const nav=$node("div","pz73-switch");for(const a of ["shop","bag"])nav.append($btn(a==="shop"?"🛒 "+T(3):"🎒 "+T(4),()=>{mode=a;render()},"pz73-tab"+(mode===a?" selected":"")));content.append(nav);
  if(tab==="pet"){
