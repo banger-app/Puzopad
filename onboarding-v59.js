@@ -14,6 +14,34 @@ function show(stage){
  ["pz-login","pz-import","pz-create"].forEach(id=>$(id).hidden=id!=="pz-"+stage);
  if(stage==="login")$("pz-email")?.focus();
 }
+
+function applyGameUi(){
+ if(typeof db==="undefined")return;
+ const hero=db.profile||null;
+ const weight=document.getElementById("currentWeight");
+ if(weight?.parentElement){
+  const label=weight.parentElement.querySelector("small");
+  if(label)label.textContent=db.weights?.length?"Старт "+db.weights[0].kg+" кг · цель 90 → 85 кг":"Вес ещё не записан — начни с первого взвешивания";
+ }
+ const home=document.getElementById("home");
+ const summary=home?.querySelector(".v17-home-summary");
+ if(home&&summary&&!summary.dataset.pzMoved){home.insertBefore(summary,home.firstElementChild);summary.dataset.pzMoved="1"}
+ home?.querySelectorAll(".actionrow").forEach(el=>{if(el.querySelector("button[onclick*='store']"))el.classList.add("pz-hide-technical")});
+ home?.querySelectorAll(".v22-timeline").forEach(el=>el.classList.add("pz-hide-technical"));
+ const archive=document.getElementById("pz-archive");
+ if(archive)archive.onclick=()=>{const fn=typeof v20ExportAll==="function"?v20ExportAll:null;if(fn)fn();else alert("Архив пока недоступен — используй раздел «Сохранения»")};
+ if(!hero?.created)return;
+ const petLabel={dog:"🐩 Собака",cat:"🐈 Кот",turtle:"🐢 Черепаха",crocodile:"🐊 Крокодил",none:"✨ Без компаньона"}[hero.pet]||"🐾 Компаньон";
+ const comp=document.querySelector("#companion h2");if(comp)comp.textContent=petLabel+" · компаньон";
+ const petButtons=home?.querySelectorAll("button");
+ petButtons?.forEach(el=>{if(el.textContent.includes("Суречка"))el.textContent=petLabel});
+ const title=home?.querySelector(".v16-eyebrow");
+ if(title)title.textContent=(hero.name||"ГЕРОЙ").toUpperCase()+" / ШТАБ";
+ const avatar=document.getElementById("v20AvatarSlot");
+ if(avatar&&hero.species!=="frog"){
+  avatar.innerHTML='<div class="pz-avatar-standin" aria-label="Прототип персонажа">'+(hero.species==="robot"?"🤖":"🧑")+'<small>3D-модель в разработке</small></div>';
+ }
+}
 function unlock(){
  state.ready=true;document.body.classList.remove("pz-locked");document.body.classList.add("pz-unlocked");
  $("pz-entry").hidden=true;
@@ -22,7 +50,7 @@ function unlock(){
  const nickname=$("pz-account-name");if(nickname)nickname.textContent=profile?.name||"Игрок";
  const pets=document.querySelectorAll(".v20-pet");
  if(profile?.pet&&profile.pet!=="dog"){pets.forEach(el=>{el.title=profile.pet;el.innerHTML="<span style='font-size:60px'>"+({cat:"🐈",turtle:"🐢",crocodile:"🐊",none:"✨"}[profile.pet]||"🐾")+"</span>"})}
- try{render();if(typeof renderDiaryRange==="function")renderDiaryRange();}catch(err){console.warn("pz render",err)}
+ try{render();if(typeof renderDiaryRange==="function")renderDiaryRange();applyGameUi();}catch(err){console.warn("pz render",err)}
 }
 function snapshot(value){try{return JSON.stringify(value)}catch(_){return null}}
 function load(value,accountId){
@@ -151,6 +179,7 @@ function setup(){
  $("pz-old-new").onclick=newGame;
  $("pz-new-create").onclick=profileMade;
  $("pz-settings").onclick=()=>menu(!$("pz-menu").hidden);
+ $("pz-archive").onclick=()=>{if(typeof v20ExportAll==="function")v20ExportAll();else alert("Перейди в настройки резервных копий");};
  $("pz-settings-close").onclick=()=>menu(false);
  $("pz-open-account").onclick=()=>{menu(false);$("cloud31open")?.click()};
  $("pz-signout").onclick=async()=>{
