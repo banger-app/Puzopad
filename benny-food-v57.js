@@ -109,6 +109,6 @@ if(top){
   field.value='Я уже подтвердил, что съел последний показанный на фото приём пищи. Проверь последнюю оценку из нашей истории, верни список еды и примерные БЖУ для записи в дневник. Если данных не хватает, не выдумывай.';
   send.click();
  };
- top.insertBefore(recover,document.getElementById('bai-close'));
+ const log=document.getElementById('bai-log');if(log)log.insertBefore(recover,log.firstChild);
 }
 })();
