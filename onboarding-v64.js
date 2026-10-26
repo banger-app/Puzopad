@@ -221,7 +221,7 @@ async function restoreFile(file){
  if(file.size>15*1024*1024){say("Файл завеликий. Максимум 15 МБ.");return}
  try{
   const parsed=JSON.parse(await file.text());
-  const payload=parsed?.details?.data||parsed?.data||parsed?.real||parsed?.save?.real||parsed?.backup?.data||parsed;
+  const payload=parsed?.entries?.puzopad_rpg_v4||parsed?.details?.data||parsed?.data||parsed?.real||parsed?.save?.real||parsed?.backup?.data||parsed;
   if(!payload?.profile?.created||!payload.profile.name||!Array.isArray(payload.foods)||!Array.isArray(payload.weights))throw Error("Потрібен JSON-запис ПУЗОПАДА з героєм і журналами");
   if(!confirm("Імпортувати персонажа «"+payload.profile.name+"» в цей акаунт? Збереження на цьому пристрої буде скопійоване перед заміною."))return;
   const old=localStorage.getItem(SHARED);
