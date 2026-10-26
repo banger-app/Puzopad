@@ -1,0 +1,62 @@
+/* Benny v83 — single minimalist, voice-first chat surface. Dark iOS layout. */
+#bai-panel{background:#151922!important}
+#bai-top{background:#151923!important;min-height:60px!important;padding:calc(env(safe-area-inset-top) + 7px) 14px 9px!important}
+#bai-top .pz81-identity small{display:none!important}
+#bai-top .pz81-identity strong{letter-spacing:.02em;font-size:17px}
+#bai-top .pz81-avatar{width:37px;height:37px;border-radius:50%;border-color:#666f8c;background:#1b2033}
+#bai-top .pz81-voice-toggle{display:none!important}
+#bai-top #bai-close{background:transparent!important;border-color:#4f566c!important;border-radius:50%!important}
+#bai-log{background:#151923!important;padding:17px 13px 28px!important;gap:15px!important}
+#bai-log>.bai-msg.bai-assistant{border:0!important;background:transparent!important;border-radius:0!important;box-shadow:none!important;padding:6px 4px!important;max-width:100%!important;color:#e7e9ee;line-height:1.55}
+#bai-log>.bai-msg.bai-user{align-self:flex-end;background:#2e3344!important;border:0!important;border-radius:22px!important;box-shadow:none!important;color:#f8f9fd;padding:12px 15px!important;max-width:88%!important}
+#bai-log .pz81-typing{background:#252c3d!important;border-radius:14px!important;padding:12px 16px!important;max-width:75px!important}
+#bai-log .pz81-typing span{background:#f3a0cc!important}
+#bai-form{background:#151923!important;border-top:1px solid #252c3d!important;gap:0!important;padding:7px 10px calc(env(safe-area-inset-bottom) + 10px)!important}
+#bai-composer{width:100%!important;display:flex!important;align-items:flex-end;gap:5px;padding:6px!important;background:#2a2e3b!important;border:1px solid #454c61!important;border-radius:25px!important}
+#bai-composer #bai-input{flex:1;min-width:0;background:transparent!important;border:0!important;color:#f6f7fc!important;padding:10px 3px 9px!important;height:44px;min-height:42px;max-height:132px;line-height:22px!important;font-size:15px!important}
+#bai-composer #bai-input::placeholder{color:#adb4c5}
+#bai-composer #bai-attach{flex:0 0 38px;min-width:38px;height:40px;border-radius:50%;background:transparent!important;border:0;color:#f2f4f8;font-size:30px!important;padding:0!important}
+#bai-composer #bai-mic{flex:0 0 38px;width:38px;height:39px;min-width:38px;background:transparent!important;border:0;border-radius:50%;color:#e7ebf4;font-size:18px;padding:6px}
+#bai-composer #bai-mic.pz83-recording{background:#4a2a45!important;color:#ff8ac4!important}
+#bai-composer .pz81-camera-btn{display:none!important}
+#bai-composer #bai-send{background:#f6f8fd!important;color:#1b2233!important;border-radius:50%!important;min-width:39px!important;width:39px!important;height:39px!important;flex:0 0 39px!important;font-size:21px!important}
+#bai-composer #bai-send:disabled{opacity:.4}
+#bai-composer .pz83-call-launch{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;min-width:40px!important;padding:0!important;background:#e248a9;color:#fff;border-radius:50%;border:0;font-size:22px;line-height:1}
+#bai-form #pz803-voice-actions,#bai-form #bai-status,#bai-form #benny-v57-ready,#bai-form #benny-v57-recover{display:none!important}
+#bai-form .pz81-draft-attachments{padding:4px 2px 8px}
+#bai-form .pz81-image-tile{width:70px;height:70px;border-radius:13px;border-color:#6a6882}
+#bai-panel{position:relative;overflow:hidden}
+#bai-form .pz83-record-tray{border:1px solid #656c81;border-radius:19px;background:#22283a;margin-bottom:9px;display:flex;align-items:center;gap:8px;padding:9px 10px;flex-wrap:wrap}
+#bai-form .pz83-record-tray[hidden]{display:none!important}
+#bai-form .pz83-record-label{font-size:11px;color:#ffc1df;font-weight:700;flex:1;min-width:72px}
+#bai-form .pz83-time{font:700 13px ui-monospace,monospace;color:#dfe5f7}
+#bai-form .pz83-wave{height:25px;display:flex;align-items:center;gap:3px}
+#bai-form .pz83-wave i{display:block;width:3px;height:9px;background:#e75aac;border-radius:4px;animation:pz83-voicebeat .8s ease-in-out infinite}
+#bai-form .pz83-wave i:nth-child(2),#bai-form .pz83-wave i:nth-child(5){animation-delay:.1s;height:18px}
+#bai-form .pz83-wave i:nth-child(3),#bai-form .pz83-wave i:nth-child(7){animation-delay:.25s;height:13px}
+#bai-form .pz83-wave i:nth-child(4){animation-delay:.3s;height:24px}
+#bai-form .pz83-rec-controls{display:flex;gap:5px;align-items:center}
+#bai-form .pz83-rec-controls button{display:grid;place-items:center;min-width:36px;width:36px;min-height:36px;height:36px;padding:0;border-radius:50%;border:1px solid #606d86;background:#343e59;font-weight:900;font-size:18px;color:#f7f2fa}
+#bai-form .pz83-rec-controls button.pz83-rec-send{background:#e4489f;border-color:#ef78be}
+#bai-form .pz83-rec-controls button.pz83-rec-cancel{background:#352837;border-color:#72506b;color:#ffb4cb}
+#bai-form .pz83-rec-controls button:disabled{opacity:.35}
+#bai-form .pz83-voice-status{width:100%;font-size:11px;color:#e9bedc}
+#bai-form .pz83-voice-status:empty{display:none}
+#bai-form .pz83-record-tray.paused .pz83-wave i{animation-play-state:paused}
+@keyframes pz83-voicebeat{0%,100%{transform:scaleY(.55)}50%{transform:scaleY(1.3)}}
+#bai-panel .pz83-call-overlay{position:absolute;inset:75px 0 0;z-index:20;background:radial-gradient(ellipse at 50% 50%,#342644 0%,#171927 60%,#10141f 100%);display:flex;align-items:center;flex-direction:column;gap:18px;padding:21px 18px calc(env(safe-area-inset-bottom) + 32px)}
+#bai-panel .pz83-call-overlay[hidden]{display:none!important}
+#bai-panel .pz83-call-header{align-self:stretch;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;font-weight:800;letter-spacing:.03em}
+#bai-panel .pz83-call-close{background:#31354c;border:1px solid #505a73;border-radius:50%;width:43px;height:43px;min-height:43px;display:grid;place-items:center;color:#f6f8fd;font-size:19px}
+#bai-panel .pz83-call-orb{display:grid;place-items:center;flex:none;width:min(56vw,230px);height:min(56vw,230px);min-width:165px;min-height:165px;margin:auto 0 18px;border:1px solid #f7b4e1;border-radius:50%;background:radial-gradient(circle at 33% 26%,#e0a4e4 0,#b147a9 24%,#573970 49%,#19263f 75%,#0e1523 100%);color:white;font-size:66px;box-shadow:0 0 70px #b335a75c,0 0 0 12px #f175be17;transition:transform .2s}
+#bai-panel .pz83-call-orb.recording{box-shadow:0 0 95px #e950b688,0 0 0 22px #f175be28;animation:pz83-pulse 1.6s infinite}
+#bai-panel .pz83-call-orb.paused{opacity:.8}
+#bai-panel .pz83-call-caption{text-align:center;font-size:16px;color:#f3e6f4;max-width:300px}
+#bai-panel .pz83-call-buttons{display:flex;gap:14px;justify-content:center;margin:auto 0 12px}
+#bai-panel .pz83-call-buttons button{min-width:58px;width:58px;height:58px;min-height:58px;border:1px solid #677088;border-radius:50%;background:#303a55;color:white;font-size:24px}
+#bai-panel .pz83-call-buttons .pz83-call-send{background:#e947a6;border-color:#fc97d2}
+#bai-panel .pz83-call-buttons .pz83-call-cancel{background:#35283c}
+#bai-panel .pz83-call-buttons button:disabled{opacity:.3}
+@keyframes pz83-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+@media(max-width:380px){#bai-composer{gap:1px;padding:4px!important}#bai-composer #bai-mic,#bai-composer #bai-attach{flex-basis:33px;min-width:33px;width:33px}#bai-form .pz83-rec-controls{width:100%;justify-content:flex-end}}
+@media(prefers-reduced-motion:reduce){#bai-form .pz83-wave i,#bai-panel .pz83-call-orb.recording{animation:none}}
