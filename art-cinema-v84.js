@@ -37,7 +37,7 @@ function render(target,opts={}){
  const state=engine.current();
  if(!state)return base(target,opts);
  const file=qualify(state,opts);
- if(!file)return base(target,opts);
+ if(!file){target.classList.remove('pz84-cinematic-stage');return base(target,opts)}
  const url="./assets/scenes-v84/"+file;
  target.classList.add("pz84-cinematic-stage");
  target.innerHTML="";
