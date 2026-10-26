@@ -52,3 +52,6 @@
 /* Hide abandoned wardrobe/companion 2D overlays; preserve underlying real data and navigation. */
 #rbBangerStyle,#rbPetStyle,#pz-shop-root,#pz-pet-shop-root,#wardrobeWallet,#wardrobeItems,#v23WardrobeGuide,#rewardHistory,#v23PetLook{display:none!important}
 #companion #pz-pets-v61,#companion #pz-pet-rename,#companion #pz-pet-save{display:none!important}
+
+#companion>.panel:has(#pz73){background:#101522!important;border:0!important;padding:0!important;overflow:visible!important}
+#wardrobe .pz73-legacy,#companion .pz73-legacy{display:none!important}
