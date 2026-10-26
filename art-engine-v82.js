@@ -105,7 +105,48 @@ function outfitColors(wear,hero){
  if(torso==="wintercoat")return {cloth:"#d4e5fb",trim:"#65cfff",pants:"#5077a7"};
  return {cloth:hero==="kisyusha"||hero==="luna"?"#3e183e":"#181a29",trim:"#ef4b9d",pants:"#22263a"};
 }
+/* High-detail character illustrations from the original BANGERVERSE concept render.
+   Alpha WebP layers keep hero/pet interchangeable without a separate image per pair. */
+const PREMIUM_HERO={frog:"pepe",kisyusha:"kisyusha",robot:"bender"};
+const PREMIUM_PET={dog:"surechka",cat:"masya",robodog:"robodog",robotcat:"robodog"};
+const photo=n=>"./assets/art-v83/"+n+".webp?v=83.0";
+function premiumHeroArt(id,wear={}){
+ const file=PREMIUM_HERO[id];if(!file)return null;
+ const pos=id==="kisyusha"?[0,0,440,540]:id==="robot"?[8,0,418,540]:[40,0,352,550];
+ let part='<g class="pz83-premium-hero">';
+ part+='<ellipse cx="225" cy="555" rx="170" ry="22" fill="#080b1a" opacity=".43"/>';
+ part+='<image href="'+photo(file)+'" x="'+pos[0]+'" y="'+pos[1]+'" width="'+pos[2]+'" height="'+pos[3]+'" preserveAspectRatio="xMidYMax meet"/>';
+ const torso=wear?.torso||"starter",chest=torso==="gym"?"#15b4ce":torso==="work"?"#eac04a":torso==="pumpkincoat"?"#fa8629":torso==="void"?"#8c51c9":torso==="royal"?"#ffd062":torso==="wintercoat"?"#c4e7ff":null;
+ // Tint the garment silhouette only, not Pepe's green face or the poodle.
+ if(chest&&id==="frog"){
+  part+='<path d="M142 205Q187 174 282 190L338 261L317 353Q204 393 103 354L104 265Z" fill="'+chest+'" opacity=".28" style="mix-blend-mode:screen"/>';
+  if(torso==="pumpkincoat")part+='<text x="220" y="286" text-anchor="middle" font-size="49">🎃</text>';
+  if(torso==="wintercoat")part+='<path d="M160 196Q224 163 288 199" fill="none" stroke="#e6f9ff" stroke-width="22"/>';
+ }
+ if(wear?.head==="crown")part+='<path d="M142 51L153 4L190 26L219-11L262 28L301 5L310 57Z" fill="#f5d177" stroke="#ac733c" stroke-width="8"/>';
+ if(wear?.head==="cap")part+='<path d="M116 69Q218 5 325 71L343 87Q210 110 118 90Z" fill="#25263d" stroke="#eb60ab" stroke-width="7"/>';
+ if(wear?.head==="santahat")part+='<path d="M147 61L231-30L301 68Z" fill="#e52c47" stroke="white" stroke-width="14"/><circle cx="232" cy="-29" r="16" fill="white"/>';
+ if(wear?.head==="witchhat")part+='<path d="M133 66L251-60L291 61L348 78Q231 112 128 86Z" fill="#31104d" stroke="#fa61b7" stroke-width="8"/>';
+ if(wear?.aura==="halo")part+='<ellipse cx="229" cy="21" rx="138" ry="33" fill="none" stroke="#fbe38b" stroke-width="9"/>';
+ if(wear?.back==="wings"||wear?.back==="batcape")part+='<path d="M140 259L37 184L58 346L124 309M304 246L408 176L398 354L321 306" stroke="#bf64ff" stroke-width="10" fill="#9d55c5" fill-opacity=".34"/>';
+ part+='</g>';
+ return part;
+}
+function premiumPetArt(key,wear={}){
+ const file=PREMIUM_PET[key];if(!file)return null;
+ let part='<g class="pz83-premium-pet"><ellipse cx="175" cy="342" rx="128" ry="15" fill="#080b1c" opacity=".5"/>';
+ part+='<image href="'+photo(file)+'" x="28" y="0" width="292" height="337" preserveAspectRatio="xMidYMax meet"/>';
+ if(wear?.head==="bow")part+='<path d="M150 73Q115 26 136 25L175 55Q218 17 233 45L189 78Z" fill="#ff69bb" stroke="#a03686" stroke-width="6"/>';
+ if(wear?.head==="petcap")part+='<path d="M102 84Q170 25 250 84L269 95Q159 112 102 97Z" fill="#171c2e" stroke="#f77ec5" stroke-width="7"/>';
+ if(wear?.head==="petcrown")part+='<path d="M117 65L131 12L162 35L183-3L209 35L238 10L250 67Z" fill="#f9d37b" stroke="#a47335" stroke-width="8"/>';
+ if(wear?.head==="petwitch")part+='<path d="M107 80L180-26L242 80L274 92Q173 123 100 96Z" fill="#381847" stroke="#d55ba8" stroke-width="7"/>';
+ if(wear?.neck==="scarf"||wear?.neck==="collar")part+='<path d="M84 246Q179 280 271 239" fill="none" stroke="'+(wear.neck==="scarf"?"#fa61a8":"#4cfff3")+'" stroke-width="18"/>';
+ if(wear?.back==="petwings")part+='<path d="M112 221L9 144L42 267M257 220L339 138L307 273" fill="#815af0" stroke="#e589ee" stroke-width="9"/>';
+ if(wear?.aura==="petaura")part+='<ellipse cx="171" cy="350" rx="150" ry="31" fill="none" stroke="#f9c2ff" stroke-width="8"/>';
+ part+='</g>';return part;
+}
 function heroArt(id,wear={},mini=false){
+ const premium=premiumHeroArt(id,wear);if(premium)return premium;
  const who=HEROES.find(x=>x.id===id)||HEROES[0],type=who.type,c=outfitColors(wear,id),face=(type==="girl"?"#f4b6a8":type==="man"?"#bb8d74":"#79ba69");
  const origin=mini?0:0;
  let art='<g transform="translate(0,0)">';
@@ -166,6 +207,7 @@ function heroArt(id,wear={},mini=false){
  return art;
 }
 function petArt(key,wear={}){
+ const premium=premiumPetArt(key,wear);if(premium)return premium;
  if(key==="none")return "";
  const id=PET_INFO[key]?key:"dog";
  const robot=id.startsWith("robo"),cat=["cat","robotcat"].includes(id),dog=["dog","husky","shiba","robodog"].includes(id);
