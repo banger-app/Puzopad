@@ -77,7 +77,10 @@ const PETS=[
 ["tiger","legend",450,"Тигр","Тигр","Tiger","🐅",1],
 ["wolf","rare",185,"Вовк","Волк","Wolf","🐺",1],
 ["husky","uncommon",95,"Хаскі","Хаски","Husky","🐕",1],
-["shiba","uncommon",95,"Сіба-іну","Сиба-ину","Shiba Inu","🐕",1]
+["shiba","uncommon",95,"Сіба-іну","Сиба-ину","Shiba Inu","🐕",1],
+["robodog","rare",150,"Робопес","Робопёс","Robo dog","🤖",1],
+["robotcat","epic",250,"Робокіт","Робокот","Robo cat","🤖",1],
+["unicorn","legend",420,"Єдиноріг","Единорог","Unicorn","🦄",1]
 ];
 let tab="hero",mode="shop",filter="all",preview=null,message="",uid=null;
 const lang=()=>{const x=el("banger-language-select")?.value||el("pz-language")?.value||localStorage.getItem("banger_language")||"uk";return TEXT[x]?x:"uk"};
@@ -95,6 +98,7 @@ function setup(){
  const data=d();
  if(!data.wardrobeV73)data.wardrobeV73={owned:["starter"],wear:{torso:"starter"},petItems:[],petWear:{},pets:["none","dog","cat","hamster"],petNames:{},petWardrobes:{}};
  const w=data.wardrobeV73;w.owned ||= ["starter"];w.colors ||= [0];w.wear ||= {torso:"starter"};w.petItems ||= [];w.petWear ||= {};w.pets ||= ["none","dog","cat","hamster"];w.petNames ||= {};w.petWardrobes||={};
+ const heroKey=data.profile.species||"frog";w.heroWardrobes||={};if(!w.heroWardrobes[heroKey])w.heroWardrobes[heroKey]={...w.wear};w.wear=w.heroWardrobes[heroKey];
  const activePet=data.profile.pet||"none";
  if(!w.petWardrobes[activePet])w.petWardrobes[activePet]={...w.petWear};
  w.petWear=w.petWardrobes[activePet];
@@ -145,6 +149,11 @@ function chooseItem(x,kind){
  }
  save();
 }
+function chooseHero(kind){
+ const w=setup();if(!w||!window.pzArtV82?.HEROES?.some(x=>x.id===kind))return;
+ const old=d().profile.species||"frog";w.heroWardrobes||={};w.heroWardrobes[old]={...(w.wear||{})};
+ d().profile.species=kind;w.heroWardrobes[kind]||={torso:"starter"};w.wear=w.heroWardrobes[kind];message=T(27);save();
+}
 function chooseColor(x){
  const w=setup();if(!w)return;
  if(!w.colors.includes(x[0])){
@@ -176,28 +185,14 @@ function root(){
  const host=tab==="pet"?petHost:heroHost;
  let ui=el("pz73");
  if(ui){if(ui.parentElement!==host)host.append(ui);return ui;}
- let hero=el("pz3d-stage");if(hero)hero.remove();
- let pet=el("pz-pet3d-stage");if(pet)pet.remove();
- // Legacy IDs remain in concealed original panels for the main diary renderer.
  ui=$node("div","pz73-app");ui.id="pz73";
- const header=$node("header","pz73-head");header.append($node("small","","PUZOPAD / CHARACTER UNIVERSE"),$node("h2","pz73-heading"));const wallet=$node("strong","pz73-wallet");wallet.id="pz73-wallet";header.append(wallet);ui.append(header);
- const shell=$node("div","pz80-studio-shell");
- const showcase=$node("div","pz80-showcase"),catalogue=$node("div","pz80-market");
+ const header=$node("header","pz73-head");header.append($node("small","","BANGERVERSE / ART REBORN"),$node("h2","pz73-heading"));
+ const wallet=$node("strong","pz73-wallet");wallet.id="pz73-wallet";header.append(wallet);ui.append(header);
+ const shell=$node("div","pz80-studio-shell"),showcase=$node("div","pz80-showcase"),catalogue=$node("div","pz80-market");
  ui.append(shell);shell.append(showcase,catalogue);
  const tabs=$node("div","pz73-tabs");tabs.id="pz73-tabs";showcase.append(tabs);
- const frame=$node("div","pz73-frame");frame.id="pz73-frame";
- hero ||= $node("div","","");hero.id="pz3d-stage";
- pet ||= $node("div","","");pet.id="pz-pet3d-stage";
- const hidden=$node("div","");hidden.hidden=true;hidden.id="pz73-hidden";hidden.append(hero,pet);
- showcase.append(frame);
- const controls=$node("div","pz78-view-controls");
- controls.append(
-  $btn("−",()=>window.pz3dZoom?.(tab,-1),"pz73-secondary"),
-  $btn("＋",()=>window.pz3dZoom?.(tab,1),"pz73-secondary"),
-  $btn("⟲",()=>window.pz3dReset?.(tab),"pz73-secondary")
- );
- controls.setAttribute("aria-label","3D viewer controls");
- showcase.append(controls);ui.append(hidden);ui._hero=hero;ui._pet=pet;
+ const frame=$node("div","pz73-frame pz82-art-frame");frame.id="pz73-frame";showcase.append(frame);
+ const tray=$node("div","pz82-scene-tray");tray.id="pz82-scene-tray";showcase.append(tray);
  const content=$node("div","pz73-content");content.id="pz73-content";catalogue.append(content);
  const note=$node("p","pz73-notice");note.id="pz73-notice";note.setAttribute("role","status");catalogue.append(note);host.append(ui);
  return ui;
@@ -208,14 +203,20 @@ function card(x,kind,w){
  const worn=kind==="pettype"?d().profile.pet===key:(kind==="hero"?w.wear[x[1]]===key:w.petWear[x[1]]===key);
  const n=$node("article","pz73-card rarity-"+rar);
  n.append($node("div","pz73-icon",kind==="pettype"?x[6]:x[7]),$node("small","pz73-rarity",T(RARN[rar])), $node("strong","pz73-title",kind==="pettype"?petName(x):itemName(x)));
- if(kind==="pettype"&&!x[7])n.append($node("small","pz73-model-note",T(28)));
+ 
  const info=$node("div","pz73-price",worn?T(13):owned?T(15):(cost+" 🪙"));n.append(info);
  const row=$node("div","pz73-card-buttons");
  const main=$btn(worn?(kind==="pettype"?T(20):T(30)):owned?T(12):kind==="pettype"?T(19):T(11),()=>{if(kind==="pettype")choosePet(x);else chooseItem(x,kind)},"pz73-primary");
- if(kind==="pettype"&&!x[7]&&!owned){main.disabled=true;main.title=T(28)}
+ 
  row.append(main);
  if(!(kind==="pettype"&&key==="none"))row.append($btn("👁 "+T(14),()=>viewPreview(kind==="pettype"?"pettype":kind,key),"pz73-secondary"));
- n.append(row);return n;
+ n.append(row);
+ if(kind==="pettype"&&key!=="none"&&window.pzArtV82){
+  const box=$node("div","pz82-shop-thumbnail");
+  box.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 350">'+window.pzArtV82.defs+'<g transform="translate(18 0) scale(.88)">'+window.pzArtV82.petArt(key,{})+'</g></svg>';
+  n.prepend(box);
+ }
+ return n;
 }
 function render(){
  if(!can())return;
@@ -225,28 +226,30 @@ function render(){
  ui.querySelector(".pz73-heading").textContent=T(0);
  el("pz73-wallet").textContent=T(16)+": "+(Number(d().coins)||0)+" 🪙";
  const tabs=el("pz73-tabs");tabs.replaceChildren();for(const kind of ["hero","pet"])tabs.append($btn((kind==="hero"?"◈ ":"🐾 ")+T(kind==="hero"?1:2),()=>{tab=kind;filter="all";mode="shop";preview=null;window.pzWardrobePreviewV73=null;if(typeof go==="function")go(kind==="pet"?"companion":"wardrobe");render()},"pz73-tab"+(tab===kind?" selected":"")));
- const stage=tab==="hero"?ui._hero:ui._pet,other=tab==="hero"?ui._pet:ui._hero,frame=el("pz73-frame");
- if(stage.parentElement!==frame){frame.replaceChildren(stage);el("pz73-hidden").append(other);window.pz3dRefresh?.()}
+ window.pzArtV82?.renderScene(el("pz73-frame"));
+ const tray=el("pz82-scene-tray");tray.replaceChildren();
+ for(const scene of window.pzArtV82?.SCENES||[]){
+  tray.append($btn(scene.symbol+" "+(scene[lang()]||scene.ru),()=>window.pzArtV82?.chooseScene(scene.id),"pz82-scene-btn"+((d().artV82?.scene||"city")===scene.id?" selected":"")));
+ }
  const content=el("pz73-content");content.replaceChildren();
  if(halloween()&&mode==="shop"){
   const event=$node("div","pz76-event");event.append($node("strong","","🎃 "+T(32)),$node("small","",lang()==="uk"?"До 3 листопада":lang()==="ru"?"До 3 ноября":"Until November 3"));content.append(event);
  }
  if(tab==="hero"){
   const species=$node("div","pz73-species");
-  const names={frog:["🐸 BANGER","🐸 BANGER","🐸 BANGER"],human:["🧑 Людина","🧑 Человек","🧑 Human"],robot:["🤖 Робот","🤖 Робот","🤖 Robot"],knight:["🛡️ Лицар 3D","🛡️ Рыцарь 3D","🛡️ Knight 3D"],mage:["🧙 Маг 3D","🧙 Маг 3D","🧙 Mage 3D"],rogue:["🥷 Розбійник 3D","🥷 Разбойник 3D","🥷 Rogue 3D"],barbarian:["⚔️ Варвар 3D","⚔️ Варвар 3D","⚔️ Barbarian 3D"]};
-  for(const [kind,words] of Object.entries(names)){
-   const option=$node("div","pz77-hero-choice");
-   option.append($btn(words[lang()==="uk"?0:lang()==="ru"?1:2],()=>{d().profile.species=kind;message=T(27);save()},"pz73-chip"+((d().profile.species||"frog")===kind?" selected":"")));
-   option.append($btn("👁",()=>viewPreview("species",kind),"pz73-secondary"));
+  for(const hero of window.pzArtV82?.HEROES||[]){
+   const option=$node("div","pz82-hero-choice"+((d().profile.species||"frog")===hero.id?" selected":""));
+   const art=$node("div","pz82-hero-mini");art.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 -50 440 640">'+window.pzArtV82.defs+window.pzArtV82.heroArt(hero.id,w.heroWardrobes?.[hero.id]||{})+'</svg>';
+   option.append(art,$btn(hero[lang()]||hero.ru,()=>chooseHero(hero.id),"pz82-choose-btn"),$btn("👁",()=>viewPreview("species",hero.id),"pz82-preview-btn"));
    species.append(option);
   }
-  const fold=$node("details","pz80-fold");fold.append($node("summary","",lang()==="en"?"Choose a hero":lang()==="ru"?"Изменить персонажа":"Змінити героя"),species);content.append(fold);
+  const fold=$node("details","pz80-fold");fold.open=true;fold.append($node("summary","",lang()==="en"?"Choose a hero":lang()==="ru"?"Выбор героя":"Вибір героя"),species);content.append(fold);
  }
  const nav=$node("div","pz73-switch");for(const a of ["shop","bag"])nav.append($btn(a==="shop"?"🛒 "+T(3):"🎒 "+T(4),()=>{mode=a;render()},"pz73-tab"+(mode===a?" selected":"")));content.prepend(nav);
  if(tab==="pet"){
   content.append($node("h3","pz73-subtitle",T(18)));
   const chooser=$node("div","pz73-grid");for(const x of PETS)if((mode==="shop"||w.pets.includes(x[0]))&&(filter==="all"||x[1]===filter))chooser.append(card(x,"pettype",w));if(!chooser.childElementCount)chooser.append($node("p","pz73-empty",T(31)));
-  const petsFold=$node("details","pz80-fold");petsFold.append($node("summary","",lang()==="ru"?"Выбрать питомца":lang()==="en"?"Choose a companion":"Обрати компаньйона"),chooser);content.append(petsFold);
+  const petsFold=$node("details","pz80-fold");petsFold.open=true;petsFold.append($node("summary","",lang()==="ru"?"Выбрать питомца":lang()==="en"?"Choose a companion":"Обрати компаньйона"),chooser);content.append(petsFold);
  }
  const rarityBar=$node("div","pz73-filters");for(const r of ["all",...RAR])rarityBar.append($btn(T(r==="all"?10:RARN[r]),()=>{filter=r;render()},"pz73-chip"+(filter===r?" selected":"")));content.append(rarityBar);
  content.append($node("h3","pz73-subtitle",tab==="hero"?T(1):T(29)));
@@ -267,7 +270,7 @@ function render(){
  const list=tab==="hero"?HERO:PETITEMS,owned=tab==="hero"?w.owned:w.petItems;
  const filtered=list.filter(x=>available(x)&&(filter==="all"||x[2]===filter)&&(mode==="shop"||owned.includes(x[0])));
  const grid=$node("div","pz73-grid");for(const x of filtered)grid.append(card(x,tab,w));if(!filtered.length)grid.append($node("p","",T(25)));content.append(grid);
- if(preview?.uid===window.pzActiveUserId){
+ if(preview?.uid===window.pzActiveUserId){window.pzArtV82?.renderScene(el("pz73-frame"));
   const bar=$node("div","pz76-preview");
   bar.append($node("strong","", "👁 "+T(33)), $btn("✕ "+T(23),()=>{preview=null;window.pzWardrobePreviewV73=null;window.dispatchEvent(new Event("pz:style-change"));render()},"pz73-secondary"));
   content.prepend(bar);
@@ -299,6 +302,6 @@ function watchSections(){
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watchSections,{once:true});else watchSections();
 window.addEventListener("pz:unlocked",()=>setTimeout(render,40));
 window.addEventListener("banger:local-save",()=>{if(can()&&el("pz73-wallet"))el("pz73-wallet").textContent=T(16)+": "+(Number(d().coins)||0)+" 🪙"});
-window.pzWardrobeV73={render,setup,HERO,PETITEMS,PETS};
+window.pzWardrobeV73={render,setup,HERO,PETITEMS,PETS,chooseHero,choosePet};
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(render,700));else setTimeout(render,120);
 })();
