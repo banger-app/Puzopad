@@ -22,6 +22,49 @@ function fallback(s){
  return items.length?{type:'food_eaten',items}:null;
 }
 function norm(v){return String(v||'').toLowerCase().replace(/ё/g,'е').replace(/корден/g,'кордон').replace(/[-–]/g,' ').replace(/\b(куриный|вареная|вареные|свежая|готовая|отварная)\b/g,'').replace(/\s+/g,' ').trim()}
+const REFINE=/(уточн|пересчитай|скорректир|исправь|заменить\s+(?:старую|предыдущую)|етикетк|этикетк|nutrition label|correct previous)/i;
+const closeTo=(a,b)=>{const nums=[String(a||"").match(/\d+(?:[.,]\d+)?/)?.[0],String(b||"").match(/\d+(?:[.,]\d+)?/)?.[0]];return nums[0]&&nums[1]&&Math.abs(Number(nums[0].replace(",","."))-Number(nums[1].replace(",",".")))<.01};
+function offerRefinement(action,message){
+ if(!action?.items?.length||!Array.isArray(db?.foods)||!window.pzActiveUserId||typeof testMode!=="undefined"&&testMode)return;
+ const uid=window.pzActiveUserId;
+ const today=typeof currentDay==="function"?currentDay():null;
+ for(const proposed of action.items.slice(0,8)){
+  if(!proposed.name||!Number.isFinite(Number(proposed.k)))continue;
+  const candidate=db.foods.filter(x=>{
+   if(today&&typeof dayKey==="function"&&dayKey(x.date,x.time)!==today)return false;
+   const one=norm(x.name),two=norm(proposed.name);
+   const nameMatch=one===two||one.length>=5&&two.length>=5&&(one.includes(two)||two.includes(one));
+   return nameMatch&&closeTo(x.qty,proposed.qty);
+  }).slice(-3);
+  if(!candidate.length)continue;
+  const log=document.getElementById("bai-log");if(!log)continue;
+  const review=document.createElement("div");
+  review.className="pz803-food-revise";
+  review.style.cssText="border:1px solid #9d6db5;border-radius:14px;background:#23233a;padding:12px;display:grid;gap:7px;align-self:stretch;font-size:13px";
+  const heading=document.createElement("strong");heading.textContent="🧾 Похоже на уточнение: "+proposed.name+" · "+proposed.qty;
+  const help=document.createElement("small");help.textContent="Выбери прежний приём, чтобы заменить цифры. Ничего не меняется без подтверждения.";
+  review.append(heading,help);
+  for(const previous of candidate){
+   const actionBtn=document.createElement("button");actionBtn.type="button";
+   actionBtn.textContent=(previous.date||"")+" "+(previous.time||"")+" · "+previous.k+" → "+proposed.k+" ккал · уточнить";
+   actionBtn.style.cssText="border:1px solid #d989be;background:#532e54;padding:10px;border-radius:11px;text-align:left";
+   actionBtn.onclick=()=>{
+    if(window.pzActiveUserId!==uid){alert("Аккаунт изменился, открой свой журнал заново.");return}
+    const row=db.foods.find(x=>String(x.id)===String(previous.id));
+    if(!row){alert("Запись уже изменена или удалена");review.remove();return}
+    if(!confirm("Заменить "+row.k+" → "+proposed.k+" ккал для «"+row.name+"»? Это НЕ новый приём."))return;
+    row.revisions||=[];row.revisions.push({at:Date.now(),oldK:row.k,oldP:row.p,oldF:row.f,oldC:row.c,source:"benny_photo_refinement"});
+    row.k=Math.round(Number(proposed.k));
+    for(const key of ["p","f","c"])if(proposed[key]!==null&&proposed[key]!==undefined&&Number.isFinite(Number(proposed[key])))row[key]=Math.round(Number(proposed[key])*10)/10;
+    row.note=((row.note||"")+" · Бенни: уточнено по фото після підтвердження.").trim();
+    persist();render();if(typeof renderDiaryRange==="function")renderDiaryRange();if(typeof v17RenderDiary==="function")v17RenderDiary();
+    review.replaceChildren();const saved=document.createElement("strong");saved.textContent="✅ Уточнение сохранено без дублирования";review.append(saved);
+   };
+   review.append(actionBtn);
+  }
+  log.append(review);log.scrollTop=log.scrollHeight;
+ }
+}
 function commit(action,message){
  if(!action||action.type!=='food_eaten'||!Array.isArray(action.items))return null;
  if(typeof db==='undefined'||!Array.isArray(db.foods)||!Array.isArray(db.loot))throw Error('Журнал не загружен');
@@ -66,8 +109,9 @@ window.fetch=async function(input,init){
  let message='';try{message=String(JSON.parse(init?.body).message||'')}catch(_){}
  const remote=await oldFetch(input,init);
  let data;try{data=await remote.clone().json()}catch(_){return remote}
- const saving=foodRequest(message);
+ const saving=foodRequest(message)&&!REFINE.test(message);
  if(data.action?.type==='food_estimate'&&Array.isArray(data.action.items))remember(data.action);
+ if(data.action?.type==="food_estimate"&&Array.isArray(data.action.items))setTimeout(()=>offerRefinement(data.action,message),0);
  if(!saving){
    if(/записал(?:а)?(?:\s+в\s+дневник)?|уже\s+сохранен[оа]|добавил(?:а)?\s+в\s+журнал/i.test(data.answer||'')){
      data.answer=String(data.answer||'').replace(/записал(?:а)?|сохранен[оа]|добавил(?:а)?/gi,'подготовил');
