@@ -1,7 +1,7 @@
 {
-  "build": "60",
+  "build": "61",
   "date": "2026-10-26",
   "assets": "puzopad-standalone-icon-v1",
   "stable_url": "/Puzopad/",
-  "changes": "Google OAuth availability check with recognisable button"
+  "changes": "3d hero in hub and wardrobe; arcade; pet roster; readable stats; settings"
 }
