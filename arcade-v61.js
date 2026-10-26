@@ -3,7 +3,7 @@
 const $=id=>document.getElementById(id);
 const W=400,H=520;
 let cv,ctx,playing=false,balls=[],blocks=[],paddle={x:160,y:470,w:84,h:13},score=0,lives=3,anim=0,move=200;
-let startTime=0;
+let startTime=0,lastWin=false;
 function user(){return typeof db!=="undefined"?db:null}
 function day(){return typeof currentDay==="function"?currentDay():new Date().toISOString().slice(0,10)}
 function message(t){const el=$("pz-arc-status");if(el)el.textContent=t}
@@ -22,9 +22,12 @@ function draw(){
  for(const b of balls){ctx.fillStyle="#ff4db4";ctx.beginPath();ctx.arc(b.x,b.y,8,0,2*Math.PI);ctx.fill();}
  ctx.shadowBlur=0;
  if(!playing){
- ctx.fillStyle="#cbd5ed";ctx.font="bold 20px system-ui";ctx.textAlign="center";
- ctx.fillText(score?"Раунд завершён":"Нажми «Начать игру»",W/2,300);
- ctx.font="13px system-ui";ctx.fillText("Веди платформу пальцем",W/2,323);ctx.textAlign="left";
+ ctx.fillStyle="rgba(10,13,26,.83)";ctx.fillRect(28,192,W-56,163);
+ ctx.fillStyle="#fff";ctx.textAlign="center";ctx.font="bold 25px system-ui";
+ ctx.fillText(score?(lastWin?"🏆 ПЕРЕМОГА!":"РАУНД ЗАВЕРШЕНО"):"NEON BREAKER",W/2,240);
+ ctx.font="bold 20px system-ui";
+ ctx.fillText(score?"Результат: "+score+" очок":"Натисни ▶ Почати гру",W/2,281);
+ ctx.font="15px system-ui";ctx.fillText("Зіграємо ще раз?",W/2,320);ctx.textAlign="left";
  }
 }
 function reward(victory){
@@ -40,7 +43,13 @@ function reward(victory){
  if(typeof updateDashboardV16==="function")updateDashboardV16();
  if(typeof pz3dRefresh==="function")pz3dRefresh();
 }
-function finish(win){if(!playing)return;playing=false;cancelAnimationFrame(anim);reward(win);draw()}
+function finish(win){
+ if(!playing)return;
+ playing=false;lastWin=win;cancelAnimationFrame(anim);balls=[];
+ reward(win);draw();
+ const button=$("pz-arc-start");if(button){button.textContent="↻ Зіграти ще раз";button.focus({preventScroll:true});}
+ const status=$("pz-arc-status");if(status)status.scrollIntoView({block:"nearest",behavior:"smooth"});
+}
 function step(t){
  if(!playing)return;
  const dt=Math.min((t-startTime||16)/16,2.4);startTime=t;
@@ -64,7 +73,7 @@ function step(t){
 function begin(){
  if(playing)return;
  if(!user()){message("Сначала войди в аккаунт");return}
- score=0;lives=3;move=W/2;paddle.x=160;
+ score=0;lives=3;move=W/2;paddle.x=160;lastWin=false;const button=$("pz-arc-start");if(button)button.textContent="⏹ Гра триває";
  balls=[{x:200,y:390,vx:3.7,vy:-4.6}];setupBlocks();playing=true;startTime=performance.now();
  message("Разбивай блоки, зарабатывай монеты на одежду. Не больше 20 монет за игровые сутки.");
  anim=requestAnimationFrame(step);
