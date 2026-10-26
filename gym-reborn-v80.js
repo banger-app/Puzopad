@@ -11,6 +11,10 @@ const DAY=[
  {id:"legs",uk:"Ноги · корпус",ru:"Ноги · корпус",en:"Legs · core",e:[
  ["warm","Степпер / Stepper warm-up",8,"min"],["squat","Жим ногами / Leg press",3,"8–12"],["hinge","Румынская тяга / Romanian deadlift",3,"8–12"],["calves","Подъём на носки / Calf raises",3,"12–15"],["plank","Планка / Plank",3,"20–40 s"],["cool","Заминка / Cooldown",5,"min"]]}
 ];
+const FULL=[
+ {id:"fullA",uk:"Усе тіло · A",ru:"Всё тело · A",en:"Full body · A",e:[["warm","Разминка / Warm-up",7,"min"],["legpress","Жим ногами / Leg press",3,"8–12"],["chest","Жим гантелей / Dumbbell press",3,"8–12"],["row","Тяга блока / Seated row",3,"8–12"],["stepper","Степпер / Stepper",15,"min"],["cool","Заминка / Cooldown",5,"min"]]},
+ {id:"fullB",uk:"Усе тіло · B",ru:"Всё тело · B",en:"Full body · B",e:[["warm","Степпер / Stepper warm-up",8,"min"],["hinge","Румынская тяга / Romanian deadlift",3,"8–12"],["shoulder","Жим гантелей вверх / Shoulder press",3,"8–12"],["pulldown","Тяга верхнего блока / Lat pulldown",3,"8–12"],["plank","Планка / Plank",3,"20–40 s"],["cool","Заминка / Cooldown",5,"min"]]}
+];
 const rec={uk:{ready:"Сьогодні твій план",start:"▶ Почати тренування",finish:"✅ Завершити й записати",cancel:"Скасувати без запису",done:"Зроблено",skip:"Пропустити",next:"Далі",tune:"Налаштування",save:"Зберегти програму",sets:"Підходи",weight:"Вага, кг",time:"Хвилини",log:"Історія",empty:"Тренування не записувалися",recorded:"Записано лише підтверджені вправи",question:"Записати виконану частину тренування?",warning:"Потрібно підтвердити хоча б одну вправу.",goal:"Ціль",days:"Тренувань на тиждень"},
 ru:{ready:"Твоя тренировка сегодня",start:"▶ Начать тренировку",finish:"✅ Завершить и записать",cancel:"Отменить без записи",done:"Выполнено",skip:"Пропустить",next:"Далее",tune:"Настроить программу",save:"Сохранить программу",sets:"Подходы",weight:"Вес, кг",time:"Минуты",log:"История",empty:"Записей пока нет",recorded:"Записаны только подтверждённые упражнения",question:"Записать выполненную часть тренировки?",warning:"Подтверди хотя бы одно упражнение.",goal:"Цель",days:"Тренировок в неделю"},
 en:{ready:"Your workout today",start:"▶ Start workout",finish:"✅ Finish and log",cancel:"Cancel without logging",done:"Completed",skip:"Skip",next:"Next",tune:"Customize program",save:"Save program",sets:"Sets",weight:"Weight, kg",time:"Minutes",log:"History",empty:"No workouts logged yet",recorded:"Only completed exercises were logged",question:"Log the exercises you completed?",warning:"Complete at least one exercise first.",goal:"Goal",days:"Sessions per week"}};
@@ -40,7 +44,13 @@ function stampNow(){
  if(typeof stamp==="function")return stamp();
  const x=new Date();return {date:x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0"),time:String(x.getHours()).padStart(2,"0")+":"+String(x.getMinutes()).padStart(2,"0")};
 }
-const planFor=g=>DAY[g.rotation%DAY.length];
+const plansFor=g=>g.weekly<=2?FULL:DAY;
+const planFor=g=>{const arr=plansFor(g);return arr[g.rotation%arr.length]};
+function adjustedSteps(g,plan){
+ const items=plan.e.map(x=>[...x]);
+ if(g.goal==="conditioning"&&!items.some(x=>x[0]==="stepper"))items.splice(Math.max(1,items.length-1),0,["stepper","Степпер / Stepper cardio",15,"min"]);
+ return items;
+}
 function make(g){
  const root=$("pz-gym-zone");if(!root)return;
  root.replaceChildren();if(!g)return;
@@ -65,11 +75,12 @@ function make(g){
    root.append(editor);
   }
  }else{
-  const workout=DAY.find(x=>x.id===session.plan)||plan;
-  const stepIndex=Math.min(workout.e.length-1,Math.max(0,session.index||0));
-  const [id,label,sets,rep]=workout.e[stepIndex];
+  const workout=[...DAY,...FULL].find(x=>x.id===session.plan)||plan;
+  const exerciseList=adjustedSteps(g,workout);
+  const stepIndex=Math.min(exerciseList.length-1,Math.max(0,session.index||0));
+  const [id,label,sets,rep]=exerciseList[stepIndex];
   const card=el("div","pz80-gym-current");
-  card.append(el("span","pz80-progress",""+(stepIndex+1)+" / "+workout.e.length),el("h3","",label),el("p","pz80-muted",sets+(rep==="min"?" min":" × "+rep)));
+  card.append(el("span","pz80-progress",""+(stepIndex+1)+" / "+exerciseList.length),el("h3","",label),el("p","pz80-muted",sets+(rep==="min"?" min":" × "+rep)));
   const timer=el("div","pz80-gym-timer","00:00:00");timer.id="pz80-gym-clock";card.append(timer);
   const inputs=el("div","pz80-gym-fields");
   const count=el("input");count.type="number";count.min="0";count.max="15";count.value=rep==="min"?"0":String(sets);count.inputMode="numeric";
@@ -81,13 +92,13 @@ function make(g){
     const n=Number(count.value),kg=Number(mass.value);
     if(!Number.isFinite(n)||n<=0||n>15||!Number.isFinite(kg)||kg<0||kg>500){status("⚠️ Укажи фактические подходы/минуты и корректный вес.");return}
     if(!session.done.some(x=>x.id===id))session.done.push({id,label,sets:n,reps:repetitions.value.slice(0,26),kg,at:Date.now()});
-    session.index=Math.min(workout.e.length-1,stepIndex+1);
+    session.index=Math.min(exerciseList.length-1,stepIndex+1);
     store();make(g);
   },"pz80-main"),
-  btn("↷ "+T("skip"),()=>{if(!session.skipped.includes(id))session.skipped.push(id);session.index=Math.min(workout.e.length-1,stepIndex+1);store();make(g)},"pz80-quiet"));
+  btn("↷ "+T("skip"),()=>{if(!session.skipped.includes(id))session.skipped.push(id);session.index=Math.min(exerciseList.length-1,stepIndex+1);store();make(g)},"pz80-quiet"));
   card.append(row);root.append(card);
   const done=el("div","pz80-gym-checklist");
-  workout.e.forEach((st,i)=>{
+  exerciseList.forEach((st,i)=>{
    const yes=session.done.some(x=>x.id===st[0]),no=session.skipped.includes(st[0]);
    done.append(btn((yes?"✓ ":no?"– ":"○ ")+st[1],()=>{
     session.index=i;store();make(g);
@@ -110,7 +121,7 @@ function status(s){let node=$("pz-gym-status");if(node)node.textContent=s}
 function history(){
  const box=$("pz-gym-history"),d=data();if(!box)return;box.replaceChildren();
  box.append(el("h3","",T("log")));
- const workouts=(d?.workouts||[]).filter(x=>x?.id?.toString().startsWith("gymv80_"));
+ const workouts=(d?.workouts||[]).filter(x=>x&&x.date);
  if(!workouts.length){box.append(el("p","pz80-muted",T("empty")));return}
  workouts.slice(-6).reverse().forEach(x=>box.append(el("div","pz80-gym-history-row",x.date+" · "+x.name+" · "+x.sets+" ✓ · "+x.reps+" min")));
 }
