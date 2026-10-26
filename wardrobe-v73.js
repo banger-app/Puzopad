@@ -140,7 +140,9 @@ function card(x,kind,w){
  if(kind==="pettype"&&!x[7])n.append($node("small","pz73-model-note",T(28)));
  const info=$node("div","pz73-price",worn?T(13):owned?T(15):(cost+" 🪙"));n.append(info);
  const row=$node("div","pz73-card-buttons");
- row.append($btn(worn?T(20):owned?T(12):kind==="pettype"?T(19):T(11),()=>{if(kind==="pettype")choosePet(x);else chooseItem(x,kind)},"pz73-primary"));
+ const main=$btn(worn?T(20):owned?T(12):kind==="pettype"?T(19):T(11),()=>{if(kind==="pettype")choosePet(x);else chooseItem(x,kind)},"pz73-primary");
+ if(kind==="pettype"&&!x[7]&&!owned){main.disabled=true;main.title=T(28)}
+ row.append(main);
  if(kind!=="pettype"&&!owned)row.append($btn(T(14),()=>viewPreview(kind,key),"pz73-secondary"));
  n.append(row);return n;
 }
@@ -155,6 +157,12 @@ function render(){
  const stage=tab==="hero"?ui._hero:ui._pet,other=tab==="hero"?ui._pet:ui._hero,frame=el("pz73-frame");
  if(stage.parentElement!==frame){frame.replaceChildren(stage);el("pz73-hidden").append(other);window.pz3dRefresh?.()}
  const content=el("pz73-content");content.replaceChildren();
+ if(tab==="hero"){
+  const species=$node("div","pz73-species");
+  const names={frog:["🐸 Жабка","🐸 Лягушка","🐸 Frog"],human:["🧑 Людина","🧑 Человек","🧑 Human"],robot:["🤖 Робот","🤖 Робот","🤖 Robot"]};
+  for(const [kind,words] of Object.entries(names)){species.append($btn(words[lang()==="uk"?0:lang()==="ru"?1:2],()=>{d().profile.species=kind;message=T(27);save()},"pz73-chip"+((d().profile.species||"frog")===kind?" selected":"")))}
+  content.append(species);
+ }
  const nav=$node("div","pz73-switch");for(const a of ["shop","bag"])nav.append($btn(a==="shop"?"🛒 "+T(3):"🎒 "+T(4),()=>{mode=a;render()},"pz73-tab"+(mode===a?" selected":"")));content.append(nav);
  if(tab==="pet"){
   content.append($node("h3","pz73-subtitle",T(18)));
