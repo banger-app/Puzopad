@@ -115,6 +115,55 @@ function addAccessories(root,style,height,type,shirt,skin){
   const bag=new THREE.Mesh(new THREE.BoxGeometry(.57,.64,.25),material(0x8c6bdd));bag.position.set(0,defaultHeight*.40,-.46);root.add(bag);
  }
 }
+
+function v73Gear(root,kind,h){
+ const d=store(),state=d?.wardrobeV73;if(!state)return;
+ const who=kind==="hero"?"hero":"pet";
+ const equipped=who==="hero"?state.wear||{}:state.petWear||{};
+ const p=window.pzWardrobePreviewV73;
+ const shown={...equipped};
+ if(p&&p.uid===window.pzActiveUserId&&p.which===who){
+  const slots={cap:"head",helmet:"head",crown:"head",glasses:"face",visor:"face",sneakers:"feet",boots:"feet",cape:"back",wings:"back",halo:"aura",
+   bow:"head",petcap:"head",petcrown:"head",scarf:"neck",collar:"neck",petglasses:"face",backpack:"back",petwings:"back",petaura:"aura",starter:"torso",work:"torso",gym:"torso",knight:"torso",void:"torso",royal:"torso"};
+  if(slots[p.id])shown[slots[p.id]]=p.id;
+ }
+ const y=h||2.4;
+ const mat=(col,em=0)=>new THREE.MeshStandardMaterial({color:col,metalness:.16,roughness:.42,emissive:em,emissiveIntensity:em?.30:0});
+ const mag=mat(0xf549ad),gold=mat(0xffc24c),silver=mat(0xb2d6ff),dark=mat(0x242944),aura=mat(0x8e68ff,0x7e2dff);
+ const geo=(shape,m,x,yy,z,sx=1,sy=1,sz=1)=>{const o=new THREE.Mesh(shape,m);o.position.set(x,yy,z);o.scale.set(sx,sy,sz);root.add(o);return o};
+ const sphere=(m,x,yy,z,sx,sy,sz)=>geo(new THREE.SphereGeometry(1,18,12),m,x,yy,z,sx,sy,sz);
+ const head=shown.head,face=shown.face,feet=shown.feet,back=shown.back,glow=shown.aura,neck=shown.neck;
+ const hy=who==="hero"?y*.92:y*.94;
+ if(head==="cap"||head==="petcap"||head==="helmet"){
+  geo(new THREE.CylinderGeometry(.36,.37,.2,20),head==="helmet"?silver:mag,0,hy,0);
+  geo(new THREE.CylinderGeometry(.49,.49,.045,24),head==="helmet"?silver:dark,0,hy-.10,.12);
+ }
+ if(head==="crown"||head==="petcrown"){
+  geo(new THREE.CylinderGeometry(.36,.46,.18,10),gold,0,hy,0);
+  for(let i=0;i<7;i++){const t=i*2*Math.PI/7;geo(new THREE.ConeGeometry(.093,.25,5),gold,Math.sin(t)*.36,hy+.2,Math.cos(t)*.36)}
+ }
+ if(head==="bow"){sphere(mag,-.17,hy-.10,.44,.19,.14,.09);sphere(mag,.17,hy-.10,.44,.19,.14,.09);sphere(gold,0,hy-.10,.48,.1,.1,.09)}
+ if(face==="glasses"||face==="petglasses"){
+  for(const side of [-1,1])geo(new THREE.TorusGeometry(.18,.035,8,22),silver,side*.21,y*.67,.5);
+  geo(new THREE.BoxGeometry(.15,.035,.05),dark,0,y*.67,.5);
+ }
+ if(face==="visor")geo(new THREE.BoxGeometry(.88,.25,.17),mat(0x30a6d4,0x1d6fcc),0,y*.7,.43);
+ if(feet==="sneakers"||feet==="boots")for(const side of [-1,1])sphere(feet==="boots"?silver:mag,side*.32,.12,.23,.30,feet==="boots"?.29:.16,.32);
+ if(back==="cape"||back==="wings"||back==="petwings"){
+  if(back==="cape")geo(new THREE.ConeGeometry(.6,y*.55,5,1,true),mag,0,y*.38,-.46).rotation.x=Math.PI;
+  else for(const side of [-1,1])geo(new THREE.ConeGeometry(.34,y*.5,4),mat(0xae80ff,0x5d20dd),side*.55,y*.54,-.29).rotation.z=side*.35;
+ }
+ if(back==="backpack")geo(new THREE.BoxGeometry(.61,.60,.29),mat(0x9d75ed),0,y*.40,-.49);
+ if(neck==="scarf"||neck==="collar")geo(new THREE.TorusGeometry(.48,.10,9,24),neck==="collar"?gold:mag,0,y*.58,.05).rotation.x=Math.PI/2;
+ if(glow==="halo"||glow==="petaura")geo(new THREE.TorusGeometry(.55,.055,11,36),aura,0,y+0.32,0).rotation.x=Math.PI/2;
+ if(who==="hero"&&shown.torso){
+  const variant={starter:0x252b49,work:0x496970,gym:0xe33a91,knight:0x809ac5,void:0x2e2452,royal:0xbf944c}[shown.torso]||0x252b49;
+  const plate=geo(new THREE.SphereGeometry(1,18,14),mat(variant),0,y*.4,.35,.49,.27,.16);
+  if(shown.torso==="royal")sphere(gold,0,y*.39,.51,.14,.14,.05);
+  if(shown.torso==="void")sphere(aura,0,y*.39,.51,.14,.14,.05);
+ }
+}
+
 async function put(view,kind,x=0,z=0,scale=1){
  const d=store(),p=d?.profile||{},name=kind==="hero"?getHero():PET_FILES[getPetKey()];
  if(kind==="pet"&&getPetKey()==="none")return;
@@ -129,6 +178,7 @@ async function put(view,kind,x=0,z=0,scale=1){
  const target=new THREE.Group();target.position.x=x;target.position.z=z;target.scale.setScalar(scale);
  const actual=normalize(obj,kind==="hero"?2.65:1.8);
  const rig=new THREE.Group();rig.add(obj);target.add(rig);
+ v73Gear(target,kind,actual);
  if(kind==="pet")addAccessories(target,preview("pet")||p.petStyle||"plain",actual*scale,"pet");
  else addAccessories(target,preview("outfit")||d?.heroStyle?.outfit||"casual",actual,"hero",[0x252b49,0x496970,0xe33a91,0x7c5ff2][["casual","work","gym","hero"].indexOf(preview("outfit")||d?.heroStyle?.outfit||"casual")]||0x252b49);
  // Apply owned palette to frog model's green skin, while preserving eye white/black.
@@ -144,7 +194,7 @@ async function renderModels(view){
  if(!view?.host?.isConnected)return;
  const d=store(),p=d?.profile;
  if(!p?.created)return;
- const identity=[window.pzActiveUserId,p.species,p.pet,p.petStyle,p.petName,d.heroStyle?.palette,d.heroStyle?.outfit,preview("palette"),preview("outfit"),preview("pet"),view.kind].join("|");
+ const identity=[window.pzActiveUserId,p.species,p.pet,p.petStyle,p.petName,d.heroStyle?.palette,d.heroStyle?.outfit,JSON.stringify(d.wardrobeV73?.wear||{}),JSON.stringify(d.wardrobeV73?.petWear||{}),window.pzWardrobePreviewV73?.uid,window.pzWardrobePreviewV73?.id,preview("palette"),preview("outfit"),preview("pet"),view.kind].join("|");
  if(identity===view.key)return;
  view.key=identity;const serial=++view.serial;notice(view,"Завантажуємо справжню 3D модель…");
  try{
