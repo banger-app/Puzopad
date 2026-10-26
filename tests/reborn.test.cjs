@@ -298,7 +298,7 @@ test("v83: original raster image assets are checked into the app and used as ind
   assert.ok(voice.includes(s),s+" missing in voice module");
  }
  assert.ok(html.includes('./art-raster-v83.js?v=84.0'));
- assert.ok(html.includes('./benny-voice-v83.js?v=84.0'));
+ assert.ok(html.includes('./benny-voice-v83.js?v=85.1'));
  assert.ok(read("sw.js").includes('art-v83'));
 });
 
