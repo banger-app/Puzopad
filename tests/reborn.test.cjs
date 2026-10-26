@@ -8,19 +8,19 @@ const read=file=>fs.readFileSync(file,"utf8");
 const html=read("index.html");
 const version=JSON.parse(read("version.json"));
 test("all v80 production scripts & styles exist and build matches",()=>{
- assert.equal(version.build,"81");
- for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-v81.css"]){
+ assert.equal(version.build,"82");
+ for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-v81.css","art-engine-v82.js","art-v82.css"]){
   assert.ok(fs.existsSync(path),"missing "+path);
  }
- for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=80.3","./three-studio-v72.js?v=80.3","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
+ for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=82.0","./art-engine-v82.js?v=82.0","./art-v82.css?v=82.0","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
  assert.ok(read("onboarding-v69.js").includes("./gym-reborn-v80.js?v=80.3"));
- assert.ok(read("interface-v61.js").includes('V81 · '));
- assert.ok(html.includes('V81 · ПУЗОПАД'));
- assert.ok(read("sw.js").includes("puzopad-v81-20261026"));
+ assert.ok(read("interface-v61.js").includes('V82 · '));
+ assert.ok(html.includes('V82 · ПУЗОПАД'));
+ assert.ok(read("sw.js").includes("puzopad-v82-20261026"));
  assert.ok(html.includes('window.pzBennyContextV80?.()'));
 });
 test("classic JavaScript modules parse",()=>{
- for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-food-v57.js"]){
+ for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-food-v57.js","art-engine-v82.js"]){
   assert.doesNotThrow(()=>new vm.Script(read(f),{filename:f}));
  }
 });
@@ -89,7 +89,7 @@ test("photo scan requires quantity, does not auto-eat, respects locations and in
 test("wardrobe uses fixed viewer and independent scrolling inventory",()=>{
  const src=read("wardrobe-v73.js"),css=read("reborn-v80.css");
  assert.ok(src.includes("pz80-studio-shell")&&src.includes("pz80-market"));
- assert.ok(src.includes('viewPreview("species",kind)'));
+ assert.ok(src.includes('viewPreview("species",hero.id)'));
  assert.ok(css.includes("overflow-y:auto")&&css.includes("pz80-showcase"));
  assert.ok(src.includes('if(!spend(x[3]))'),"purchase protection remains");
 });
@@ -103,7 +103,7 @@ test("illustrated guided gym and safe diary deletion have release hooks",()=>{
  assert.ok(gym.includes("pz803-workout-art")&&gym.includes("pz803-step-thumb"));
  assert.ok(index.includes('data-pz-food-id=')&&index.includes('data-pz-refine-id='));
  assert.ok(index.includes('decodeURIComponent(remove.dataset.pzFoodId)'));
- assert.ok(read("three-studio-v72.js").includes('!PREMIUM_HERO[heroKey]'),"imported armor must not be obscured");
+ assert.ok(!index.includes('type="module" src="./three-studio-v72.js'),"3D engine must be disabled");
  assert.ok(index.includes("lastVoiceBlob")&&index.includes("retryVoice.onclick"),"recording must remain retryable");
 });
 
@@ -167,4 +167,57 @@ test("v81 local photographic bundle has all 30 licensed assets",()=>{
  }
  assert.ok(gallery.includes("./assets/exercises-v81/"));
  assert.ok(read("sw.js").includes('caches.open(REV+"-gym")'));
+});
+
+test("ART REBORN: all hero/pet pairs render independently, switching scenes preserves profile",()=>{
+ const events=new Map();
+ const data={profile:{created:true,name:"BANGER",species:"frog",pet:"dog",petName:"Суречка"},coins:30,foods:[{k:503}],sleep:[1],wardrobeV73:{wear:{torso:"starter"},petWear:{head:"bow"}}};
+ const window={pzActiveUserId:"acct-A",addEventListener:(event,fn)=>events.set(event,fn),dispatchEvent:()=>{}};
+ const document={readyState:"loading",addEventListener(){},getElementById:()=>null,body:{classList:{contains:()=>true}}};
+ let saves=0;
+ vm.runInNewContext(read("art-engine-v82.js"),{window,document,db:data,localStorage:{getItem:()=>"ru"},setTimeout:()=>{},persist:()=>saves++,Event:class Event{},console});
+ const art=window.pzArtV82;
+ const pairs=[["frog","dog"],["robot","dog"],["kisyusha","panda"],["kisyun","cat"],["robot","dragon"],["luna","robodog"]];
+ for(const [hero,pet] of pairs){
+  data.profile.species=hero;data.profile.pet=pet;data.profile.petName=pet;
+  const host={dataset:{},setAttribute(name,value){this[name]=value}};
+  art.renderScene(host);
+  assert.ok(host.innerHTML.startsWith('<svg '),"must render full SVG");
+  assert.ok(host.innerHTML.includes("BANGERVERSE"));
+  assert.ok(host.innerHTML.includes(pet));
+  assert.ok(host.innerHTML.length>5000);
+ }
+ const first=JSON.stringify({profile:data.profile,coins:data.coins,foods:data.foods,sleep:data.sleep});
+ art.chooseScene("halloween");assert.equal(data.artV82.scene,"halloween");
+ assert.equal(JSON.stringify({profile:data.profile,coins:data.coins,foods:data.foods,sleep:data.sleep}),first,"scenes must not touch user records");
+ assert.equal(saves,1);
+ assert.ok(art.HEROES.length>=8);
+ assert.ok(Object.keys(art.PET_INFO).length>=20);
+ assert.equal(art.SCENES.length,7);
+});
+test("ART REBORN wardrobe switching never locks a companion to a hero",()=>{
+ const data={coins:300,profile:{created:true,name:"BANGER",species:"frog",pet:"dog",petName:"Суречка"},foods:[{id:"food1",k:100}],wardrobeV73:{owned:["starter"],wear:{torso:"starter"},petItems:["bow","scarf"],pets:["none","dog","cat","hamster"],petNames:{dog:"Суречка"},petWardrobes:{dog:{head:"bow"},cat:{neck:"scarf"}}}};
+ const window={pzActiveUserId:"acct-A",addEventListener(){},dispatchEvent(){},pzArtV82:{HEROES:[{id:"frog"},{id:"robot"},{id:"kisyusha"},{id:"kisyun"}]}};
+ const document={readyState:"loading",addEventListener(){},getElementById:()=>null};
+ let saves=0;
+ const code=read("wardrobe-v73.js").replace('function render(){','function render(){return;');
+ vm.runInNewContext(code,{db:data,document,window,localStorage:{getItem:()=>"ru"},Event:class Event{},persist:()=>saves++,updateDashboardV16:()=>{},console});
+ const api=window.pzWardrobeV73;api.setup();
+ api.chooseHero("robot");
+ assert.equal(data.profile.pet,"dog","robot keeps same Surachka");
+ assert.equal(data.profile.species,"robot");
+ const cat=api.PETS.find(x=>x[0]==="cat");
+ api.choosePet(cat);
+ assert.equal(data.profile.species,"robot","pet switching must not replace robot");
+ assert.equal(data.profile.pet,"cat");
+ assert.equal(data.wardrobeV73.petWear.neck,"scarf","cat has own outfit");
+ const dog=api.PETS.find(x=>x[0]==="dog");
+ api.choosePet(dog);
+ assert.equal(data.profile.pet,"dog");
+ assert.equal(data.wardrobeV73.petWear.head,"bow","Surachka's own clothes survived");
+ api.chooseHero("frog");
+ assert.equal(data.profile.pet,"dog");
+ assert.deepEqual(data.foods,[{id:"food1",k:100}]);
+ assert.equal(data.coins,300);
+ assert.ok(saves>=4);
 });
