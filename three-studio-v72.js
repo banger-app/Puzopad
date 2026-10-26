@@ -178,9 +178,14 @@ async function put(view,kind,x=0,z=0,scale=1){
  const target=new THREE.Group();target.position.x=x;target.position.z=z;target.scale.setScalar(scale);
  const actual=normalize(obj,kind==="hero"?2.65:1.8);
  const rig=new THREE.Group();rig.add(obj);target.add(rig);
- v73Gear(target,kind,actual);
- if(kind==="pet")addAccessories(target,preview("pet")||p.petStyle||"plain",actual*scale,"pet");
- else addAccessories(target,preview("outfit")||d?.heroStyle?.outfit||"casual",actual,"hero",[0x252b49,0x496970,0xe33a91,0x7c5ff2][["casual","work","gym","hero"].indexOf(preview("outfit")||d?.heroStyle?.outfit||"casual")]||0x252b49);
+ if(d?.wardrobeV73){
+  // Single source of truth: V73 per-character equipment. Never draw legacy gear again.
+  v73Gear(target,kind,actual);
+ }else if(kind==="pet"){
+  addAccessories(target,preview("pet")||p.petStyle||"plain",actual*scale,"pet");
+ }else{
+  addAccessories(target,preview("outfit")||d?.heroStyle?.outfit||"casual",actual,"hero",[0x252b49,0x496970,0xe33a91,0x7c5ff2][["casual","work","gym","hero"].indexOf(preview("outfit")||d?.heroStyle?.outfit||"casual")]||0x252b49);
+ }
  // Apply owned palette to frog model's green skin, while preserving eye white/black.
  if(kind==="hero"&&p.species!=="human"&&p.species!=="robot"){
   const col=COLORS[Number(preview("palette")??d?.heroStyle?.palette)||0]||COLORS[0];
