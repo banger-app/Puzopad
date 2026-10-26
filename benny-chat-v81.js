@@ -112,6 +112,7 @@ function loading(on){
  send.disabled=on;input.disabled=on;cameraButton.disabled=on;
 }
 function voiceSpeak(text){
+ if(window.pzBennyVoiceV83?.onAnswer?.(text))return;
  if(!replyVoice||!("speechSynthesis" in window)||!text)return;
  try{
   window.speechSynthesis.cancel();
@@ -146,6 +147,7 @@ async function deliver(){
   statusBox.textContent="";
  }catch(e){
   loading(false);
+  window.pzBennyVoiceV83?.onError?.(e);
   const row=informative("⚠️ "+String(e.message||e)+" · сообщение и фотографии остались в поле ввода.");
   row.append(button("↻ "+T("tryAgain"),()=>{row.remove();deliver()},"pz81-retry"));
  }finally{sending=false;send.disabled=false;input.disabled=false;cameraButton.disabled=false}
@@ -169,6 +171,9 @@ window.addEventListener("pz:unlocked",()=>{
  const next=window.pzActiveUserId;
  if(uid&&next&&uid!==next){uid=next;historyLoaded=false;clearLog();for(const item of draft)URL.revokeObjectURL(item.url);draft=[];updatePreview()}
 });
-window.pzBennyV81={getAttachmentCount:()=>draft.length,open:()=>{$("bai-open").click()}};
+window.pzBennyV81={getAttachmentCount:()=>draft.length,open:()=>{$("bai-open").click()},
+ sendText:(text)=>{if(typeof text==="string")input.value=[input.value.trim(),text.trim()].filter(Boolean).join(" ").trim();return deliver()},
+ getBusy:()=>sending,readAloud:(enabled)=>{replyVoice=!!enabled}};
+
 updatePreview();
 })();
