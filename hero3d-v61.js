@@ -115,7 +115,7 @@ function init(){
  if(!document.body.classList.contains("pz-unlocked"))return;
  const d=state();if(!d?.profile?.created)return;
  const area=Q("pz3d-area");if(!area)return;
- const old=Q("v20AvatarSlot");if(old){old.style.opacity="0";old.style.pointerEvents="none";}
+ const old=Q("v20AvatarSlot");if(old){old.style.opacity="1";}
  const hero=Q("pz3d-home");if(hero){hero.hidden=false;hero.textContent="🎮 "+(d.profile.name||"Герой")+" · 3D студія";hero.onclick=()=>{if(typeof go==="function")go("wardrobe");area.scrollIntoView({behavior:"smooth",block:"start"})};}
  sceneStart();renderOptions();build();
 }
