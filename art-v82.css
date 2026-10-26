@@ -1,0 +1,37 @@
+/* BANGERVERSE ART REBORN v82 — original illustrated collection */
+#pz73{min-height:0}
+#pz73 .pz80-studio-shell{grid-template-rows:minmax(325px,55fr) minmax(210px,45fr);height:clamp(595px,calc(100dvh - 184px),900px)}
+#pz73 .pz80-showcase{background:linear-gradient(155deg,#090e25,#251a38);border-color:#f050ac;box-shadow:0 5px 35px #eb43ac28}
+#pz73 .pz73-frame.pz82-art-frame{position:relative;display:block;flex:1;min-height:0!important;background:transparent!important;overflow:hidden}
+#pz73 .pz73-frame.pz82-art-frame svg{display:block;width:100%;height:100%;object-fit:contain}
+#pz73 .pz82-scene-tray{display:flex;gap:5px;overflow-x:auto;padding:9px 8px 10px;background:#0f1527;border-top:1px solid #4c3861;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#pz73 .pz82-scene-tray::-webkit-scrollbar{display:none}
+#pz73 .pz82-scene-btn{flex:0 0 auto;white-space:nowrap!important;padding:7px 10px!important;font-size:11px!important;min-height:36px!important;border:1px solid #5d5472!important;background:#263047!important;border-radius:10px!important;color:#ece6f8!important}
+#pz73 .pz82-scene-btn.selected{background:#71345f!important;border-color:#ff77c7!important;color:#fff!important}
+#pz73 .pz82-hero-choice{position:relative;display:flex;align-items:center;flex-direction:column;gap:4px;min-width:0;background:linear-gradient(155deg,#31304d,#171b2f);border:1px solid #505b81;border-radius:12px;padding:5px}
+#pz73 .pz82-hero-choice.selected{border-color:#fa65b5;box-shadow:0 0 0 1px #fa65b555}
+#pz73 .pz73-species{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+#pz73 .pz82-hero-mini{width:100%;height:100px;overflow:hidden;border-radius:8px;background:radial-gradient(ellipse,#71416e,#1e233e 70%)}
+#pz73 .pz82-hero-mini svg{display:block;width:100%;height:100%;object-fit:contain}
+#pz73 .pz82-choose-btn{width:100%;min-height:35px!important;font-size:11px!important;padding:5px 2px!important;border-radius:9px!important;color:#fff!important;background:#493753!important}
+#pz73 .pz82-hero-choice.selected .pz82-choose-btn{background:#b53b8d!important}
+#pz73 .pz82-preview-btn{position:absolute;right:3px;top:3px;min-height:25px!important;min-width:27px!important;font-size:13px!important;padding:2px!important;background:#151e32c9!important;border:1px solid #596488!important;border-radius:8px!important}
+#pz73 .pz82-shop-thumbnail{width:100%;height:86px;border-radius:11px;background:radial-gradient(ellipse,#4e355f,#171d34);overflow:hidden}
+#pz73 .pz82-shop-thumbnail svg{width:100%;height:100%;display:block}
+#pz73 .pz73-card:has(.pz82-shop-thumbnail)>.pz73-icon{display:none}
+#pz73 .pz73-card{transition:border-color .15s,transform .15s}
+#pz73 .pz73-card:active{transform:scale(.98)}
+#pz73 .pz73-frame:after{content:none!important}
+#pz73 .pz73-head h2{font-size:22px!important}
+body.pz-art-ready #v20AvatarSlot,body.pz-art-ready #v17Avatar,body.pz-art-ready .v20-pet,body.pz-art-ready #v20Prop{visibility:hidden!important;pointer-events:none!important}
+#v20World .v20-scene-art{height:clamp(300px,50vw,410px);overflow:hidden}
+#v20World .v20-scene-art #pz3d-home-stage{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border:0!important;background:transparent!important;left:0!important;top:0!important;z-index:5!important;pointer-events:auto!important;touch-action:auto!important}
+#v20World .v20-scene-art #pz3d-home-stage svg{display:block;width:100%;height:100%;object-fit:cover}
+#v20World .v20-scene-art:after{z-index:0}
+#pz3d-area .pz3d-small{font-size:12px}
+#pz73 #pz73-hidden,#pz73 .pz78-view-controls,#pz73 .pz73-model-note,body.pz-art-ready .pz3d-home,body.pz-art-ready #pz-3d-status{display:none!important}
+#pz73 .pz82-art-frame{border:0!important}
+#pz73 .pz80-market{border-color:#525272}
+@media (min-width:840px){#pz73 .pz80-studio-shell{grid-template-columns:minmax(0,55fr) minmax(0,45fr);grid-template-rows:1fr;height:min(720px,75dvh)}#pz73 .pz73-species{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:380px){#pz73 .pz80-studio-shell{height:clamp(525px,calc(100dvh - 135px),790px);grid-template-rows:minmax(282px,53fr) minmax(200px,47fr)}#pz73 .pz82-hero-mini{height:77px}#pz73 .pz82-hero-choice{padding:3px}}
+@media(prefers-reduced-motion:reduce){#pz73 .pz73-card{transition:none}}
