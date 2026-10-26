@@ -134,3 +134,11 @@ body.pz80-scan-open{overflow:hidden!important}
 #pz-gym-zone .pz803-step-thumb svg{width:100%;height:100%;object-fit:cover;display:block}
 #pz-gym-zone .pz80-gym-fields:has(> :only-child){grid-template-columns:1fr}
 @media(max-width:440px){#pz-gym-zone .pz803-workout-art{min-height:140px;max-height:220px}#pz-gym-zone .pz803-step-thumb{flex-basis:68px}}
+
+/* v80.3 · voice retry button and food diary inline corrections */
+#pz803-voice-actions{display:flex;flex-wrap:wrap;gap:7px;padding:5px 2px 1px}
+#pz803-voice-actions button{color:#f9e5f3;line-height:1.2;white-space:normal}
+#foodRows button[data-pz-food-id],#foodRows button[data-pz-refine-id]{margin:6px 7px 4px 0;padding:9px 12px;font-size:12px;border-radius:10px;min-height:39px}
+#foodRows button[data-pz-refine-id]{background:#2d3d5c;border-color:#7092c5;color:#deecff}
+#foodRows button[data-pz-food-id]{background:#4e2947;border-color:#b3628a}
+#bai-log .pz803-food-revise button{min-height:42px;color:#fff}

@@ -8,19 +8,19 @@ const read=file=>fs.readFileSync(file,"utf8");
 const html=read("index.html");
 const version=JSON.parse(read("version.json"));
 test("all v80 production scripts & styles exist and build matches",()=>{
- assert.equal(version.build,"80.2");
- for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js"]){
+ assert.equal(version.build,"80.3");
+ for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js"]){
   assert.ok(fs.existsSync(path),"missing "+path);
  }
- for(const ref of ["./reborn-v80.css?v=80.2","./benny-reborn-v80.js?v=80.2","./onboarding-v69.js?v=80.2","./wardrobe-v73.js?v=80.0","./three-studio-v72.js?v=80.0"])assert.ok(html.includes(ref),"missing index ref "+ref);
- assert.ok(read("onboarding-v69.js").includes("./gym-reborn-v80.js?v=80.2"));
- assert.ok(read("interface-v61.js").includes('V80 · '));
- assert.ok(html.includes('V80 · ПУЗОПАД'));
- assert.ok(read("sw.js").includes("puzopad-v80-20261026c"));
+ for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=80.3","./three-studio-v72.js?v=80.3","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
+ assert.ok(read("onboarding-v69.js").includes("./gym-reborn-v80.js?v=80.3"));
+ assert.ok(read("interface-v61.js").includes('V80.3 · '));
+ assert.ok(html.includes('V80.3 · ПУЗОПАД'));
+ assert.ok(read("sw.js").includes("puzopad-v803-20261026"));
  assert.ok(html.includes('window.pzBennyContextV80?.()'));
 });
 test("classic JavaScript modules parse",()=>{
- for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js"]){
+ for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js","exercise-visuals-v803.js","benny-food-v57.js"]){
   assert.doesNotThrow(()=>new vm.Script(read(f),{filename:f}));
  }
 });
@@ -92,4 +92,17 @@ test("wardrobe uses fixed viewer and independent scrolling inventory",()=>{
  assert.ok(src.includes('viewPreview("species",kind)'));
  assert.ok(css.includes("overflow-y:auto")&&css.includes("pz80-showcase"));
  assert.ok(src.includes('if(!spend(x[3]))'),"purchase protection remains");
+});
+
+// Visual QA: a distinct motion diagram for each programmed exercise and explicit menu/food actions.
+test("illustrated guided gym and safe diary deletion have release hooks",()=>{
+ const gym=read("gym-reborn-v80.js"),visual=read("exercise-visuals-v803.js"),index=read("index.html");
+ for(const exercise of ["warm","cool","incline","shoulder","triceps","pulldown","row","biceps","legpress","hinge","plank","stepper"]){
+  assert.ok(visual.includes(exercise+':')||visual.includes(exercise+'[')||visual.includes(exercise+'"'),"missing illustrated pose "+exercise);
+ }
+ assert.ok(gym.includes("pz803-workout-art")&&gym.includes("pz803-step-thumb"));
+ assert.ok(index.includes('data-pz-food-id=')&&index.includes('data-pz-refine-id='));
+ assert.ok(index.includes('decodeURIComponent(remove.dataset.pzFoodId)'));
+ assert.ok(read("three-studio-v72.js").includes('!PREMIUM_HERO[heroKey]'),"imported armor must not be obscured");
+ assert.ok(index.includes("lastVoiceBlob")&&index.includes("retryVoice.onclick"),"recording must remain retryable");
 });
