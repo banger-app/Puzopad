@@ -1,0 +1,157 @@
+/* BANGERVERSE v85 · NEON GLASS WORLD.
+ * One global visual language for HQ, city, wardrobe, shop, real-life tools and Benny.
+ * Existing data and business logic untouched. Mobile Safari-safe widths and inputs.
+ */
+:root{
+ --bg:#080a19;--panel:#161b30;--line:#475176;--pink:#ff3fac;--gold:#ffd071;
+ --green:#85f4c0;--muted:#aab4d0;
+ --pz85-edge:#8559b1;--pz85-panel:rgba(21,24,50,.76);
+ --pz85-glass:linear-gradient(133deg,rgba(60,52,95,.76),rgba(18,22,48,.8));
+ --pz85-magenta:#ef4bb9;--pz85-cyan:#52e9f3;
+}
+html{width:100%;max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;overscroll-behavior-x:none}
+body{width:100%;max-width:100%;min-width:0;overflow-x:clip;overscroll-behavior-x:none;background:
+ radial-gradient(ellipse at 95% -12%,#51215b88,transparent 49%),
+ radial-gradient(ellipse at 2% 40%,#112b5070,transparent 58%),#090d1e;color:#edf2ff}
+body,main,.section,.panel,#v20World,#pz73{min-width:0}
+main{width:min(100%,1050px);max-width:100%;padding-inline:clamp(10px,3vw,20px)!important;box-sizing:border-box}
+img,svg,canvas{max-width:100%}
+button,input,textarea,select{touch-action:manipulation;max-width:100%}
+input,select,textarea{font-size:16px!important;min-width:0;border-radius:13px}
+button{font-family:inherit;-webkit-tap-highlight-color:transparent}
+.section,.section>.panel{min-width:0;max-width:100%}
+#nav{top:0;z-index:1200!important;padding:10px 5px!important;gap:8px!important;
+ border-bottom:1px solid #a95cb065!important;
+ background:rgba(13,17,38,.81)!important;backdrop-filter:blur(23px) saturate(1.35);
+ -webkit-backdrop-filter:blur(23px) saturate(1.35);overscroll-behavior-x:contain}
+#nav button[data-tab]{background:linear-gradient(145deg,#252443e8,#121a35d9)!important;border:1px solid #6d668c!important;
+ border-radius:15px!important;box-shadow:inset 0 1px 0 #ffffff1d,0 4px 15px #01051277!important}
+#nav button[data-tab].active{background:linear-gradient(130deg,#b52b94,#55205a)!important;border-color:#fa8bd0!important;
+ box-shadow:0 0 21px #ff48ab65,inset 0 1px 0 #ffe7ff44!important}
+#nav button[data-tab] .pz84-nav-ico{color:#8ef5f7!important}
+#nav button[data-tab].active .pz84-nav-ico{color:white!important}
+.panel,.v16-dashboard,#pz73 .pz73-app,#pz73 .pz80-market,#gym>.panel{
+ border:1px solid #8b6098aa!important;
+ background:var(--pz85-glass)!important;
+ box-shadow:0 12px 35px #0307158e,inset 0 1px 0 #ffffff1b!important;
+ backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);
+ border-radius:22px!important}
+.panel{overflow-wrap:anywhere;isolation:isolate}
+.panel h2,.panel h3,#pz73 .pz73-head h2{letter-spacing:.006em;color:#fff1fa;text-shadow:0 0 17px #f763ab31}
+.panel button:not(.bang-pin),.actionrow button,.v16-dashboard button{
+ border-radius:14px;border-color:#735987;background:linear-gradient(155deg,#384064,#201e3e);
+ box-shadow:inset 0 1px 0 #ffffff20}
+.panel button.primary,button.pz-primary,.actionrow button.primary{
+ background:linear-gradient(120deg,#e94ba2,#a632a0)!important;border:1px solid #ff9dde!important;
+ box-shadow:0 5px 17px #c7268755!important}
+.panel .stat,#home .v16-resource{background:linear-gradient(140deg,#192039dc,#12182cdd)!important;border:1px solid #505e84!important;
+ border-radius:17px;box-shadow:inset 0 1px 0 #a5c5ef18}
+/* Health and mana are internal old game mechanics, not useful wellness KPIs. */
+#home .v16-resource:has(#v16Mana),#home .v17-hp{display:none!important}
+#drinks .stat:has(#manaAmount){display:none!important}
+#home .v16-resource-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px}
+#home #pz-game-explainer,#home .v16-intro,#home .v22-timeline{display:none!important}
+#home .v16-dashboard{overflow:hidden!important;padding:15px!important}
+#home .v16-eyebrow{font-weight:850;letter-spacing:.14em;color:#f4a3d7!important}
+#home .v16-headline{font-size:clamp(25px,5.7vw,44px)!important;line-height:1.08}
+#home .v16-resource-grid .v16-resource{min-width:0;padding:13px!important}
+#home .v16-resource-grid .v16-resource span{font-size:11px!important;letter-spacing:.09em}
+#home .v16-resource-grid strong{font-size:clamp(22px,6vw,39px)!important}
+#home #v20World{border:1px solid #d25aada6!important;border-radius:22px!important;overflow:hidden!important;
+ box-shadow:0 14px 35px #060719a1!important;background:#141728}
+#v20World .v20-scene-art{min-height:290px;max-height:min(62dvh,560px);height:clamp(295px,65vw,520px)!important;border:0!important}
+#v20World .v20-scene-art #pz3d-home-stage{width:100%!important;height:100%!important;max-width:100%!important}
+#v20World .v20-scene-art .pz84-cinematic-image{object-fit:cover;object-position:center 58%;image-rendering:auto}
+#v20World .v20-world-top{position:relative;z-index:6!important;background:linear-gradient(90deg,#211633db,#2c2044a6)!important;
+ backdrop-filter:blur(14px);border-bottom:1px solid #ec6bb24f}
+#v20World .v20-world-top span{font-weight:800;color:#fee3f4}
+#v20World .v20-scene-object,#v20World .v20-pet{pointer-events:none!important}
+#home .v17-home-summary{border-color:#9960a0!important;background:linear-gradient(120deg,#2f254cdd,#131b32da)!important}
+/* City is an illustrated interactable district rather than a flat road diagram. */
+#city>.panel{padding:13px!important;overflow:hidden}
+#city>.panel>h2{font-size:clamp(21px,5vw,31px);margin:3px 2px 7px}
+#city>.panel>p.small{display:none}
+#city .bang-map{width:100%;height:clamp(390px,68dvh,620px)!important;border:1px solid #da7ed2!important;
+ border-radius:23px!important;overflow:hidden!important;position:relative!important;isolation:isolate;
+ background:linear-gradient(0deg,#080d23bb,#080d2309 42%,#150e2b35),
+ url("./assets/scenes-v84/banger_surechka_city.webp") center 50%/cover no-repeat!important;
+ box-shadow:0 14px 44px #060817b2,0 0 25px #b8318b3a!important}
+#city .bang-map:before{content:"";position:absolute;inset:0;background:
+ linear-gradient(180deg,#05091a55,transparent 25%,#090b2691 93%),
+ linear-gradient(90deg,#100b27b1,transparent 40%,#140c2950);
+ pointer-events:none;z-index:1}
+#city .bang-map:after{content:"BANGERVERSE  /  NEONHAVEN";position:absolute;z-index:3;pointer-events:none;
+ bottom:12px;left:14px;font-size:10px;font-weight:900;letter-spacing:.17em;color:#fbbce7;
+ text-shadow:0 3px 10px #050511}
+#city .bang-map>svg{display:none!important}
+#city .bang-map .district{position:absolute;z-index:2!important;left:auto!important;top:auto!important;display:inline-block;
+ color:#fff0f9!important;text-shadow:0 2px 8px #080617;background:#140e2ac9;
+ border:1px solid #c968b0b8;border-radius:9px;padding:6px 9px;backdrop-filter:blur(8px)}
+#city .bang-map .district:nth-of-type(1){top:15px!important;left:14px!important}
+#city .bang-map .district:nth-of-type(2){top:15px!important;left:auto!important;right:14px!important}
+#city .bang-map .district:nth-of-type(3){display:none!important}
+#city .bang-map .bang-pin{z-index:5!important;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ min-width:79px;min-height:68px;padding:10px!important;border-radius:17px!important;
+ border:1px solid #ee8cdb!important;background:linear-gradient(135deg,#30254ce8,#161c36e5)!important;
+ color:#fff!important;box-shadow:0 6px 19px #080719ce,0 0 18px #eb2fab5b,inset 0 1px 0 #fff4!important;
+ backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+ transform:translate(-50%,-50%)!important;text-shadow:0 2px 6px #060812!important;font-size:22px!important}
+#city .bang-pin small{font-size:12px!important;font-weight:900!important;letter-spacing:.01em;color:#f8ebff!important}
+#city .bang-pin:active{transform:translate(-50%,-50%) scale(.95)!important}
+#city .bang-pin:focus-visible{outline:3px solid #8ceaff;outline-offset:3px}
+#city .bang-pin[data-destination="home"]{left:22%!important;top:29%!important}
+#city .bang-pin[data-destination="work"]{left:76%!important;top:29%!important}
+#city .bang-pin[data-destination="shop"]{left:48%!important;top:55%!important}
+#city .bang-pin[data-destination="gym"]{left:22%!important;top:78%!important}
+#city .bang-pin[data-destination="fuel"]{left:78%!important;top:78%!important}
+#city #travelStatus{margin:12px 0 3px;padding:11px 15px;border:1px solid #734b7f;border-radius:14px;
+ background:linear-gradient(110deg,#292145,#171c36);color:#f1d9ec}
+/* Wardrobe remains usable while stage + filters feel like one studio. */
+#pz73 .pz80-studio-shell{border:1px solid #ae67ab!important;border-radius:19px!important;background:#0c1023!important}
+#pz73 .pz80-showcase{background:linear-gradient(150deg,#140b30,#29234e)!important}
+#pz73 .pz73-head{background:linear-gradient(110deg,#271b42db,#1e213cdb)!important}
+#pz73 .pz73-tabs{gap:7px}
+#pz73 .pz73-tabs button{border-radius:12px!important}
+#pz73 .pz82-scene-tray{background:#131426f0!important}
+#pz73 .pz82-scene-tray button.selected{box-shadow:0 0 16px #f24ba35e}
+#pz73 .pz82-hero-choice{background:linear-gradient(140deg,#31234d,#11192d)!important}
+#pz73 .pz73-card{background:linear-gradient(155deg,#2b2443,#131b30)!important}
+#pz73 .pz84-cinematic-image{image-rendering:auto;filter:saturate(1.12) contrast(1.045)}
+/* Shop, arcades, logs and dashboards adopt the same dark-glass palette. */
+#store>.panel,#arcade>.panel,#gym>.panel,#quests>.panel,#fridge>.panel,#fuel>.panel,
+#weight>.panel,#charts>.panel,#save>.panel,#companion>.panel{
+ border-color:#945da1a6!important;background:var(--pz85-glass)!important}
+#arcade button,#gym button,.pz73-content button{font-weight:750}
+#bai-panel{background:radial-gradient(ellipse at 60% -20%,#41305266,transparent 56%),#101426!important}
+#bai-top{background:linear-gradient(115deg,#1f2039,#17152d)!important;border-color:#593d70!important}
+#bai-log{background:radial-gradient(ellipse at 50% -30%,#42315755,transparent 55%),#121628!important}
+#bai-log>.bai-msg.bai-assistant{position:relative;padding-left:9px!important}
+#bai-log>.bai-msg.bai-user{background:linear-gradient(130deg,#453754,#292e48)!important;border:1px solid #675a7f!important}
+#bai-composer{background:rgba(39,35,64,.91)!important;border-color:#966caf!important;box-shadow:inset 0 1px 0 #ffffff1a}
+#bai-composer #bai-send,#bai-composer .pz83-call-launch{box-shadow:0 0 17px #f44aa363!important}
+#bai-panel .pz83-call-overlay{background:
+ radial-gradient(ellipse at 50% 43%,#5d2565e5,#211b3de8 67%,#111629ee)!important;
+ border-color:#ed80c7!important;box-shadow:0 10px 45px #060817cc,0 0 23px #d530a453!important}
+#bai-panel .pz83-call-orb{background:radial-gradient(circle at 32% 18%,#ffd0fa,#fa6bd4 18%,#9b32b1 47%,#2f1e70 75%,#170b37 100%)!important;
+ box-shadow:0 0 37px #ff5dc599,0 0 0 9px #fa54b526!important}
+#bai-form .pz83-wave i{background:#ff82d1!important}
+/* Auth state: one clean loading sheet while Supabase restores a remembered session. */
+body.pz-locked.pz-checking #pz-entry{background:#080d20!important}
+body.pz-locked.pz-checking #pz-authbox{border:0!important;box-shadow:none!important;
+ background:transparent!important;text-align:center;max-width:340px}
+body.pz-locked.pz-checking #pz-authbox h1{font-size:35px!important}
+body.pz-locked.pz-checking #pz-authbox>p{display:none!important}
+body.pz-locked.pz-checking #pz-loading{display:block!important;color:#dac2f6!important;opacity:.8}
+body.pz-locked.pz-checking #pz-login,body.pz-locked.pz-checking #pz-import,body.pz-locked.pz-checking #pz-create,body.pz-locked.pz-checking #pz-recover{display:none!important}
+@media(max-width:550px){
+  main{padding-inline:9px!important}
+  .panel{padding:12px!important}
+  #nav{padding:7px 2px!important}
+  #nav button[data-tab]{padding:9px 12px!important;min-height:49px!important}
+  #v20World .v20-scene-art{height:clamp(265px,85vw,400px)!important}
+  #city .bang-map{height:min(68dvh,510px)!important;min-height:390px}
+  #city .bang-pin{min-width:69px;min-height:65px;padding:6px!important;font-size:20px!important}
+  #home .v16-headline{font-size:26px!important}
+  #pz73 .pz80-studio-shell{max-width:100%}
+}
+@media(prefers-reduced-motion:reduce){#nav button,.bang-pin{transition:none!important}}
