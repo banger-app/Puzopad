@@ -106,3 +106,28 @@ test("illustrated guided gym and safe diary deletion have release hooks",()=>{
  assert.ok(read("three-studio-v72.js").includes('!PREMIUM_HERO[heroKey]'),"imported armor must not be obscured");
  assert.ok(index.includes("lastVoiceBlob")&&index.includes("retryVoice.onclick"),"recording must remain retryable");
 });
+
+test("Benny string ID: delete works; calorie clarification updates only one existing portion",()=>{
+ const source=read("index.html");
+ const begin=source.indexOf("function removeFood(id){");
+ const end=source.indexOf("function addLoot(){",begin);
+ assert.ok(begin>0&&end>begin);
+ const code=source.slice(begin,end);
+ const records=[
+ {id:"benny_2026-10-26_cracker_1",name:"Крекеры с семечками",qty:"5 штук",k:450,p:12,f:20,c:55},
+ {id:"benny_2026-10-26_cracker_2",name:"Крекеры с семечками",qty:"5 штук",k:503,p:12,f:20,c:55},
+ {id:999,name:"Другая еда",qty:"1 штука",k:75}
+ ];
+ const d={foods:records.slice()};let saves=0,rerenders=0;
+ const fn=new Function("db","persist","render","renderDiaryRange","v17RenderDiary","toast","confirm","prompt","document",code+";return {removeFood,refineFood};");
+ const ops=fn(d,()=>saves++,()=>rerenders++,()=>rerenders++,()=>rerenders++,()=>{},()=>true,()=>"503",{addEventListener(){}});
+ assert.equal(ops.refineFood("benny_2026-10-26_cracker_1"),true);
+ assert.equal(d.foods.length,3,"clarifying food must never append new meal");
+ assert.equal(d.foods[0].k,503,"calories updated in place");
+ assert.equal(d.foods[0].revisions[0].oldK,450);
+ assert.equal(ops.removeFood("benny_2026-10-26_cracker_1"),true);
+ assert.equal(d.foods.length,2,"delete only the selected string ID");
+ assert.ok(d.foods.some(x=>x.id==="benny_2026-10-26_cracker_2"),"other duplicate preserved for manual choice");
+ assert.ok(d.foods.some(x=>x.id===999));
+ assert.ok(saves===2&&rerenders===6,"save and all diary views refreshed");
+});
