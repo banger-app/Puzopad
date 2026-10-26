@@ -27,4 +27,4 @@ jobs:
           node --check premium-models-v76.js
           node --check model-sources-v77.js
       - name: Run REBORN regressions
-        run: node --test tests/reborn.test.cjs
+        run: node --test tests/*.test.cjs
