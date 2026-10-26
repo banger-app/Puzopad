@@ -208,6 +208,7 @@ body.pz-locked>main,body.pz-locked>#cloud31,body.pz-locked>#cloud31modal,body.pz
 #cloud31{display:none!important}
 nav#nav button[hidden]{display:none!important}
 @media(max-width:450px){#pz-authbox{padding:19px}#pz-entry{padding:12px}#pz-menu{right:0}#pz-settings{font-size:12px}}
+#home .pz-hide-technical{display:none!important}.pz-avatar-standin{height:170px;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:95px;gap:3px}.pz-avatar-standin small{color:#aeb3c8;font-size:12px}
 </style></head><body class="pz-locked">
 <section id="pz-entry" aria-label="Вход и создание героя">
 <div id="pz-authbox">
@@ -239,6 +240,7 @@ nav#nav button[hidden]{display:none!important}
 <strong id="pz-account-name">Игрок</strong><small id="pz-account-email"></small>
 <label for="pz-language">Язык интерфейса</label><select id="pz-language"><option value="uk">🇺🇦 Українська</option><option value="ru">Русский</option><option value="en">English</option></select>
 <button id="pz-open-account" type="button">☁️ Сохранения и настройки облака</button>
+<button id="pz-archive" type="button">⬇ Скачать резервную копию</button>
 <button id="pz-signout" type="button">Выйти из аккаунта</button>
 </div></div>
 <style>.b29{padding:19px;margin:10px 0 16px;border-radius:22px;border:1px solid #85516c;background:radial-gradient(ellipse at 90% 0,#86346977,transparent 55%),linear-gradient(125deg,#10182a,#28192f);box-shadow:0 10px 30px #0006}.b29top{font-size:10px;color:#f4b9dc;letter-spacing:1.4px;font-weight:800;display:flex;justify-content:space-between}.b29top b{border:1px solid #a56b92;border-radius:7px;padding:3px 7px}.b29name{font-size:clamp(30px,8vw,52px);font-weight:1000;letter-spacing:-2px;margin:12px 0}.b29name span{color:#ff68b7}.b29foot{border-top:1px solid #ffffff30;padding-top:10px;font-size:10px;display:flex;justify-content:space-between;color:#d3b6d0}</style><header class="b29"><div class="b29top">✦ ПУЗОПАД / PERSONAL RPG <b>V59 · ПУЗОПАД</b></div><div class="b29name">BANGER<span>VERSE</span><i style="color:#f6d78c">.</i></div><div class="b29foot"><span>NEONHAVEN ✧ ТВОЯ ИГРА</span><span style="color:#a1e9bf">● WEB</span></div></header>
@@ -1191,4 +1193,4 @@ if((t.startsWith('✅ Ответ')||t.startsWith('Ответ получен')) &
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)check()});
 })();
 </script>
-<script src="./onboarding-v59.js?v=59" id="pz-v59-gate"></script></body></html>
+<script src="./onboarding-v59.js?v=59.1" id="pz-v59-gate"></script></body></html>
