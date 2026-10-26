@@ -51,6 +51,18 @@ function unlock(){
  const pets=document.querySelectorAll(".v20-pet");
  if(profile?.pet){pets.forEach(el=>{el.title=profile.petName||profile.pet;el.innerHTML="<span class='pz-personal-pet' style='font-size:57px'>"+(window.pzPetEmoji?.(profile.pet)||"🐾")+"</span>"+"<small>"+(profile.petName||"")+"</small>"})}
  try{render();if(typeof renderDiaryRange==="function")renderDiaryRange();applyGameUi();}catch(err){console.warn("pz render",err)}
+ if(!document.getElementById("pz-gym-main")){
+  const legacy=document.querySelector("#gym>.panel");
+  if(legacy){
+   const root=document.createElement("div");root.id="pz-gym-main";
+   root.innerHTML='<h2>🏋️ Тренувальний зал</h2><p>Візуальні тренування: обери план, почни таймер та підтверди фактично зроблене.</p><div id="pz-gym-zone"></div><p id="pz-gym-status" role="status"></p><div id="pz-gym-history"></div>';
+   legacy.insertBefore(root,legacy.firstChild);
+   const style=document.createElement("style");style.id="pz-gym-v62-css";
+   style.textContent='#gym>.panel>:not(#pz-gym-main){display:none!important}.pz-gym-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}.pz-gym-card{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;min-height:155px;padding:16px!important;border:1px solid #845b8b!important;border-radius:19px!important;background:linear-gradient(155deg,#2b2541,#131b2d)!important}.pz-gym-card.selected{border-color:#fb53b0!important;background:linear-gradient(140deg,#6b2456,#2c2139)!important}.pz-gym-emoji{font-size:52px}.pz-gym-card strong{font-size:17px}.pz-gym-card small{font-size:12px;color:#c5c6da}.pz-gym-steps{display:grid;gap:8px;margin:13px 0}.pz-gym-steps button{text-align:left;white-space:normal}.pz-gym-active{padding:14px;border:1px solid #d45aa6;background:#1d2438;border-radius:19px;margin:12px 0}.pz-gym-clock{font-size:41px;text-align:center;font-weight:900;letter-spacing:2px;margin:15px}.pz-gym-history-row{padding:9px;background:#252b3e;border-radius:9px;font-size:13px}#pz-gym-status{color:#c2bbd9;font-size:13px}';
+   document.head.appendChild(style);
+   const script=document.createElement("script");script.id="pz-gym-v62-loader";script.src="./gym-v62.js?v=62";document.body.append(script);
+  }
+ }
  window.dispatchEvent(new CustomEvent("pz:unlocked",{detail:{userId:state.user?.id||null}}));
 }
 function snapshot(value){try{return JSON.stringify(value)}catch(_){return null}}
