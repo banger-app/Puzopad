@@ -70,7 +70,7 @@ function unlock(){
    const style=document.createElement("style");style.id="pz-gym-v62-css";
    style.textContent='#gym>.panel>:not(#pz-gym-main){display:none!important}.pz-gym-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}.pz-gym-card{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;min-height:155px;padding:16px!important;border:1px solid #845b8b!important;border-radius:19px!important;background:linear-gradient(155deg,#2b2541,#131b2d)!important}.pz-gym-card.selected{border-color:#fb53b0!important;background:linear-gradient(140deg,#6b2456,#2c2139)!important}.pz-gym-emoji{font-size:52px}.pz-gym-card strong{font-size:17px}.pz-gym-card small{font-size:12px;color:#c5c6da}.pz-gym-steps{display:grid;gap:8px;margin:13px 0}.pz-gym-steps button{text-align:left;white-space:normal}.pz-gym-active{padding:14px;border:1px solid #d45aa6;background:#1d2438;border-radius:19px;margin:12px 0}.pz-gym-clock{font-size:41px;text-align:center;font-weight:900;letter-spacing:2px;margin:15px}.pz-gym-history-row{padding:9px;background:#252b3e;border-radius:9px;font-size:13px}#pz-gym-status{color:#c2bbd9;font-size:13px}';
    document.head.appendChild(style);
-   const script=document.createElement("script");script.id="pz-gym-v62-loader";script.src="./gym-reborn-v80.js?v=80.2";document.body.append(script);
+   const script=document.createElement("script");script.id="pz-gym-v62-loader";script.src="./gym-reborn-v80.js?v=80.3";document.body.append(script);
   }
  }
  window.dispatchEvent(new CustomEvent("pz:unlocked",{detail:{userId:state.user?.id||null}}));

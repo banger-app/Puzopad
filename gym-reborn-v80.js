@@ -80,13 +80,19 @@ function make(g){
   const stepIndex=Math.min(exerciseList.length-1,Math.max(0,session.index||0));
   const [id,label,sets,rep]=exerciseList[stepIndex];
   const card=el("div","pz80-gym-current");
-  card.append(el("span","pz80-progress",""+(stepIndex+1)+" / "+exerciseList.length),el("h3","",label),el("p","pz80-muted",sets+(rep==="min"?" min":" × "+rep)));
+  card.append(el("span","pz80-progress",""+(stepIndex+1)+" / "+exerciseList.length),el("h3","",label));
+  const guide=window.pzExerciseVisuals?.meta?.[id];
+  if(guide){
+    const art=el("div","pz803-workout-art");art.innerHTML=window.pzExerciseVisuals.render(id);card.append(art);
+    card.append(el("strong","pz803-target",guide[2]),el("p","pz803-cue",guide[1]));
+  }
+  card.append(el("p","pz80-muted",sets+(rep==="min"?" мин":" × "+rep)));
   const timer=el("div","pz80-gym-timer","00:00:00");timer.id="pz80-gym-clock";card.append(timer);
   const inputs=el("div","pz80-gym-fields");
-  const count=el("input");count.type="number";count.min="0";count.max="15";count.value=rep==="min"?"0":String(sets);count.inputMode="numeric";
+  const count=el("input");count.type="number";count.min="0";count.max="15";count.value=String(sets);count.inputMode="numeric";
   const mass=el("input");mass.type="number";mass.min="0";mass.max="500";mass.step=".5";mass.value="0";mass.inputMode="decimal";
   const repetitions=el("input");repetitions.type="text";repetitions.maxLength=26;repetitions.value=rep==="min"?"min":rep;
-  for(const [label,input] of [[rep==="min"?T("time"):T("sets"),count],["Reps",repetitions],[T("weight"),mass]]){const wrapper=el("label","pz80-gym-field");wrapper.append(el("span","",label),input);inputs.append(wrapper)}card.append(inputs);
+  for(const [label,input] of (rep==="min"?[[T("time"),count]]:[[T("sets"),count],["Повторы",repetitions],[T("weight"),mass]])){const wrapper=el("label","pz80-gym-field");wrapper.append(el("span","",label),input);inputs.append(wrapper)}card.append(inputs);
   const row=el("div","pz80-gym-actions");
   row.append(btn("✓ "+T("done"),()=>{
     const n=Number(count.value),kg=Number(mass.value);
@@ -100,9 +106,14 @@ function make(g){
   const done=el("div","pz80-gym-checklist");
   exerciseList.forEach((st,i)=>{
    const yes=session.done.some(x=>x.id===st[0]),no=session.skipped.includes(st[0]);
-   done.append(btn((yes?"✓ ":no?"– ":"○ ")+st[1],()=>{
+   const stepButton=btn((yes?"✓ ":no?"– ":"○ ")+st[1],()=>{
     session.index=i;store();make(g);
-   },i===stepIndex?"pz80-step-current":yes?"pz80-step-done":"pz80-step"));
+   },i===stepIndex?"pz80-step-current":yes?"pz80-step-done":"pz80-step");
+   if(window.pzExerciseVisuals?.meta?.[st[0]]){
+     const thumb=el("span","pz803-step-thumb");thumb.innerHTML=window.pzExerciseVisuals.render(st[0]);
+     stepButton.insertBefore(thumb,stepButton.firstChild);
+   }
+   done.append(stepButton);
   });root.append(done);
   const finish=btn(T("finish"),()=>{
    if(!session.done.length){status("⚠️ "+T("warning"));return}

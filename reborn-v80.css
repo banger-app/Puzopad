@@ -122,3 +122,15 @@ body.pz80-scan-open{overflow:hidden!important}
 #pz80-dock .pz80-dock-summary{display:flex;flex-wrap:wrap;gap:6px;margin:-1px 0 9px;font-variant-numeric:tabular-nums}
 #pz80-dock .pz80-dock-summary span{border:1px solid #4a5774;background:#1a2237;border-radius:9px;padding:7px 10px;color:#e4d8ef;font-size:11px}
 #pz80-stock-root .pz80-stock-actions button[disabled]{cursor:not-allowed}
+
+/* v80.3 — full-width illustrated exercise coach, BANGER studio visual language */
+#pz-gym-zone .pz803-workout-art{width:100%;aspect-ratio:1.8;min-height:158px;max-height:310px;overflow:hidden;border-radius:18px;background:#17213a;border:1px solid #485e81;box-shadow:0 14px 40px #05091b44}
+#pz-gym-zone .pz803-workout-art svg{width:100%;height:100%;display:block}
+#pz-gym-zone .pz803-target{display:block;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:#f5b2db}
+#pz-gym-zone .pz803-cue{margin:0;padding:9px 12px;background:#25324e;color:#e9efff;font-size:13px;line-height:1.45;border-left:3px solid #e579b9;border-radius:8px}
+#pz-gym-zone .pz80-gym-checklist{display:grid;gap:7px}
+#pz-gym-zone .pz80-gym-checklist button{display:flex;align-items:center;gap:10px;min-height:64px;font-size:13px!important}
+#pz-gym-zone .pz803-step-thumb{display:inline-flex;flex:0 0 76px;height:48px;border-radius:8px;overflow:hidden;border:1px solid #445f86;background:#192a42}
+#pz-gym-zone .pz803-step-thumb svg{width:100%;height:100%;object-fit:cover;display:block}
+#pz-gym-zone .pz80-gym-fields:has(> :only-child){grid-template-columns:1fr}
+@media(max-width:440px){#pz-gym-zone .pz803-workout-art{min-height:140px;max-height:220px}#pz-gym-zone .pz803-step-thumb{flex-basis:68px}}
