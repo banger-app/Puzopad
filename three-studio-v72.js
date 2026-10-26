@@ -12,6 +12,10 @@ const VIEWS=[
 ];
 let initialized=false,framesStarted=false,renderers=[],loadCache=new Map(),lastUid=null;
 const store=()=>typeof db==="undefined"?null:db;
+function preview(kind){
+ const p=window.pzShopPreview;
+ return p&&p.account===window.pzActiveUserId&&p.kind===kind?p.key:null;
+}
 function src(name){return "./assets/3d/"+name+"?v=72"}
 function notice(view,msg){if(!view?.host)return;const x=view.host.querySelector(".pz3d-load-status")||document.createElement("p");x.className="pz3d-load-status";x.textContent=msg;view.host.append(x)}
 function clearNotice(view){view.host?.querySelector(".pz3d-load-status")?.remove()}
@@ -125,11 +129,11 @@ async function put(view,kind,x=0,z=0,scale=1){
  const target=new THREE.Group();target.position.x=x;target.position.z=z;target.scale.setScalar(scale);
  const actual=normalize(obj,kind==="hero"?2.65:1.8);
  const rig=new THREE.Group();rig.add(obj);target.add(rig);
- if(kind==="pet")addAccessories(target,p.petStyle||"plain",actual*scale,"pet");
- else addAccessories(target,d?.heroStyle?.outfit||"casual",actual,"hero",[0x252b49,0x496970,0xe33a91,0x7c5ff2][["casual","work","gym","hero"].indexOf(d?.heroStyle?.outfit||"casual")]||0x252b49);
+ if(kind==="pet")addAccessories(target,preview("pet")||p.petStyle||"plain",actual*scale,"pet");
+ else addAccessories(target,preview("outfit")||d?.heroStyle?.outfit||"casual",actual,"hero",[0x252b49,0x496970,0xe33a91,0x7c5ff2][["casual","work","gym","hero"].indexOf(preview("outfit")||d?.heroStyle?.outfit||"casual")]||0x252b49);
  // Apply owned palette to frog model's green skin, while preserving eye white/black.
  if(kind==="hero"&&p.species!=="human"&&p.species!=="robot"){
-  const col=COLORS[Number(d?.heroStyle?.palette)||0]||COLORS[0];
+  const col=COLORS[Number(preview("palette")??d?.heroStyle?.palette)||0]||COLORS[0];
   target.traverse(node=>{if(!node.isMesh||!node.material)return;
    if(["body","head","eye_bulb","hand","foot"].includes(node.name)){node.material=node.material.clone();node.material.color.setHex(col)}
   });
@@ -140,7 +144,7 @@ async function renderModels(view){
  if(!view?.host?.isConnected)return;
  const d=store(),p=d?.profile;
  if(!p?.created)return;
- const identity=[window.pzActiveUserId,p.species,p.pet,p.petStyle,p.petName,d.heroStyle?.palette,d.heroStyle?.outfit,view.kind].join("|");
+ const identity=[window.pzActiveUserId,p.species,p.pet,p.petStyle,p.petName,d.heroStyle?.palette,d.heroStyle?.outfit,preview("palette"),preview("outfit"),preview("pet"),view.kind].join("|");
  if(identity===view.key)return;
  view.key=identity;const serial=++view.serial;notice(view,"Завантажуємо справжню 3D модель…");
  try{
