@@ -93,7 +93,7 @@ function moveMenu(){
 }
 function actions(){
  const rename=$("pz-pet-save");if(rename&&!rename.dataset.ready){rename.dataset.ready="1";rename.onclick=()=>{const d=bank();if(!d?.profile)return;d.profile.petName=($("pz-pet-rename").value||"").trim().slice(0,40);save();identity();companionPanel()}}
- const renameHero=$("pz-name-save");if(renameHero&&!renameHero.dataset.ready){renameHero.dataset.ready="1";renameHero.onclick=()=>{const d=bank();if(!d?.profile)return;const val=$("pz-hero-rename").value.trim().slice(0,40);if(!val)return;d.profile.name=val;d.characterName=val;save();identity();if(typeof render==="function")render();identity();window.pz3dRefresh?.()}}
+ const renameHero=$("pz-name-save");if(renameHero&&!renameHero.dataset.ready){renameHero.dataset.ready="1";renameHero.onclick=()=>{const d=bank();if(!d?.profile)return;const val=$("pz-hero-rename").value.trim().slice(0,40);if(!val)return;d.profile.name=val;d.profile.provisional=false;d.characterName=val;save();identity();if(typeof render==="function")render();identity();window.pz3dRefresh?.()}}
 }
 function tweaks(){
  const d=bank();if(!d?.profile?.created)return;
