@@ -55,3 +55,11 @@
 
 #companion>.panel:has(#pz73){background:#101522!important;border:0!important;padding:0!important;overflow:visible!important}
 #wardrobe .pz73-legacy,#companion .pz73-legacy{display:none!important}
+
+.pz73-colors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:10px 0 17px}
+.pz73-color{display:flex!important;align-items:center!important;gap:9px!important;min-height:65px!important;background:#283045!important;border:1px solid #596680!important;border-radius:13px!important;text-align:left!important;padding:10px!important;color:#fff!important;font-size:12px!important}
+.pz73-color.selected{border-color:#ff59b2!important;background:#573456!important}
+.pz73-color-dot{width:32px;height:32px;flex:0 0 32px;border-radius:10px;border:2px solid #ffffff85;box-shadow:inset 0 2px 5px #0003}
+.pz73-color small{font-size:11px;color:#ffe1a3;margin-left:auto;line-height:1.1}
+.pz73-primary:disabled{opacity:.55;filter:grayscale(.7);cursor:not-allowed}
+#companion>.panel>#v23PetLook,#companion>.panel>#pz-pets-v61{display:none!important}
