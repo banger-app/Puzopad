@@ -51,13 +51,16 @@ function makeRecovery(){
  const body=document.createElement("p");body.textContent="Гречка (весь судочок), 2 кордон-блю та 3 яйця — ≈1035 ккал. Тільки якщо запис зник, без дублів.";
  const button=document.createElement("button");button.type="button";button.textContent="↺ Повернути з'їдене в щоденник";button.onclick=restoreMeal;
  const status=document.createElement("p");status.id="pz-fix-status";status.setAttribute("role","status");
- wrap.append(heading,body,button,status);target.prepend(wrap);syncMealPanel();
+ const dismiss=document.createElement("button");dismiss.type="button";dismiss.textContent="✕ Приховати нагадування";
+ dismiss.onclick=()=>{if(!window.pzActiveUserId)return;localStorage.setItem("pz_hide_meal_reminder_v72_"+window.pzActiveUserId,"yes");syncMealPanel()};
+ wrap.append(heading,body,button,dismiss,status);target.prepend(wrap);syncMealPanel();
 }
 function syncMealPanel(){
  const holder=$("pz-repair-meal");if(!holder)return;
  const complete=typeof db!=="undefined"&&Array.isArray(db.foods)&&meal.every(item=>db.foods.some(row=>matchItem(row,item)));
- holder.hidden=!!complete;
- if(complete)holder.setAttribute("aria-hidden","true");
+ const hiddenForAccount=!!window.pzActiveUserId&&localStorage.getItem("pz_hide_meal_reminder_v72_"+window.pzActiveUserId)==="yes";
+ holder.hidden=!!complete||hiddenForAccount;
+ if(complete||hiddenForAccount)holder.setAttribute("aria-hidden","true");
  else holder.removeAttribute("aria-hidden");
 }
 function itemIcon(name){
