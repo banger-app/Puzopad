@@ -63,5 +63,6 @@ function init(){
  ui();history();status("Тренування не записується автоматично. Обери план, запусти таймер, відзнач виконане.");
 }
 window.addEventListener("pz:unlocked",init);
+if(document.body?.classList.contains("pz-unlocked"))setTimeout(init,0);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&active?.started)loopClock()});
 })();
