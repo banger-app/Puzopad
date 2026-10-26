@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta name="application-name" content="ПУЗОПАД · BANGERVERSE v67"><meta name="theme-color" content="#080a11"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="ПУЗОПАД"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" sizes="180x180" href="./icons/puzopad-180.png?v=1"><link rel="icon" type="image/png" sizes="192x192" href="./icons/puzopad-192.png?v=1"><link rel="manifest" href="./manifest.webmanifest?v=1"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ПУЗОПАД RPG · Пузополіс</title>
+<!doctype html><html lang="ru"><head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta name="application-name" content="ПУЗОПАД · BANGERVERSE v69"><meta name="theme-color" content="#080a11"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="ПУЗОПАД"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" sizes="180x180" href="./icons/puzopad-180.png?v=1"><link rel="icon" type="image/png" sizes="192x192" href="./icons/puzopad-192.png?v=1"><link rel="manifest" href="./manifest.webmanifest?v=1"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ПУЗОПАД RPG · Пузополіс</title>
 <style>
 :root{--bg:#080a11;--panel:#171b29;--line:#353a50;--pink:#ff2699;--gold:#ffcf64;--green:#79eaa5;--muted:#b1b7c8}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% 0,#35203c,#080a11 55%);color:#f6f5fa;font:15px system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:15px}h1{font-size:clamp(30px,6vw,52px);margin:0;font-weight:1000;letter-spacing:-2px}h1 span{color:var(--pink)}h2{margin:0 0 12px;font-size:22px}h3{margin:0 0 10px}p{line-height:1.5}.muted,.small{color:var(--muted)}.small{font-size:12px}.hero{display:grid;grid-template-columns:170px 1fr;gap:16px;align-items:center}.avatar{width:100%;max-height:210px;object-fit:contain;border-radius:18px;background:#242638}.panel{background:linear-gradient(145deg,#1d2232,#10131e);border:1px solid var(--line);border-radius:17px;padding:17px;margin:12px 0;box-shadow:0 8px 20px #0005}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.stat{padding:12px;border:1px solid var(--line);border-radius:12px}.stat b{font-size:25px;display:block;color:var(--green)}nav{display:flex;gap:7px;overflow:auto;padding:8px 0;position:sticky;top:0;background:#0c0e17ed;z-index:2}button{cursor:pointer;background:#292e42;color:white;border:1px solid #51556d;border-radius:11px;padding:10px 13px;font-weight:700}button:hover,button.active{border-color:var(--pink);color:#fff;background:#5d1b48}.primary{background:var(--pink);color:#110613;border:0}.section{display:none}.section.active{display:block}.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border-bottom:1px solid #363a4a;flex-wrap:wrap}.item:last-child{border:0}.tag{color:var(--gold);font-size:12px}.bar{background:#363a4b;height:11px;border-radius:20px;overflow:hidden}.bar i{display:block;background:var(--pink);height:100%;max-width:100%}input,select{width:100%;background:#0e1220;color:white;border:1px solid #555b70;border-radius:9px;padding:11px;font:inherit}label{display:block;font-size:13px;color:var(--muted);margin:9px 0 4px}.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}.city{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}.place{min-height:115px;text-align:left;background:linear-gradient(135deg,#332037,#151b2b)}.place strong{display:block;font-size:21px;margin:7px 0}table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:9px 5px;border-bottom:1px solid #373c4e;text-align:left} .scroll{overflow-x:auto} .toast{position:fixed;bottom:15px;left:15px;right:15px;background:#2d253d;border:1px solid var(--pink);border-radius:12px;padding:14px;display:none;z-index:10} @media(max-width:540px){.hero{grid-template-columns:105px 1fr}.panel{padding:12px}h1{font-size:30px}}
 
@@ -201,6 +201,7 @@ body.pz-locked>main,body.pz-locked>#cloud31,body.pz-locked>#cloud31modal,body.pz
 .pz-alt{display:block;width:100%;background:#30374d!important;border:1px solid #65738e!important;margin:9px 0}
 #pz-recover-more[hidden]{display:none!important}#pz-recover-more{border-top:1px solid #5f4661;margin-top:15px;padding-top:14px}#pz-recover-switch{font-weight:800;font-size:17px}#pz-recover-expand{font-size:14px}#pz-recover-email,#pz-create-email,#pz-import-email{font-weight:600;color:#f1cde1}
 .pz-recover-caution{color:#f5bcba!important;font-size:12px!important}.pz-auth-email{padding:10px 12px;background:#27273d;border:1px solid #63516a;border-radius:12px;overflow-wrap:anywhere}.pz-recover-new{opacity:.72}#pz-recover-file[hidden]{display:none!important}
+.pz-checking #pz-authbox>p,#pz-loading{display:none}body.pz-checking #pz-loading{display:block;text-align:center;margin:16px auto;padding:15px 10px;font-weight:700;color:#f1c8e2}body.pz-checking #pz-authbox h1{font-size:25px}#pz-recover-back[hidden]{display:none!important}
 #pz-google{display:flex;align-items:center;justify-content:center;gap:12px;}#pz-google:disabled{opacity:.72;cursor:not-allowed;border-color:#444c64!important;background:#24283a!important;color:#aeb4c5!important}#pz-google .pz-google-mark{flex:0 0 24px;}#pz-google-note{font-size:12px!important;color:#a5abc1!important;margin:2px 2px 14px!important;line-height:1.4;}\n#pz-auth-status{min-height:20px;color:#f1b6d2!important;font-size:12px!important;overflow-wrap:anywhere}
 #pz-topbar{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin:8px 0 0;position:relative;z-index:12}
 #pz-settings{border:1px solid #715278;border-radius:50px;background:#25213a;color:white;padding:10px 14px;font-size:14px}
@@ -248,7 +249,7 @@ body.pz-three-ready #v17Avatar{display:none!important}
 <section id="pz-entry" aria-label="Вход и создание героя">
 <div id="pz-authbox">
 <h1>🐸 <span>ПУЗОПАД</span></h1><p>Твоя історія, твій герой. Увійди у свій акаунт — і продовжуй гру зі своїм персонажем.</p>
-<div id="pz-login">
+<div id="pz-loading">Відкриваємо твій Штаб…</div><div id="pz-login">
 <label for="pz-email">Email</label><input id="pz-email" type="email" autocomplete="email" placeholder="you@gmail.com">
 <label for="pz-pass">Пароль</label><input id="pz-pass" type="password" autocomplete="current-password" placeholder="Мінімум 6 символів">
 <button class="pz-primary" id="pz-email-signin" type="button">Увійти</button>
@@ -264,7 +265,7 @@ body.pz-three-ready #v17Avatar{display:none!important}
 <h2>Вітаємо знову!</h2>
 <p class="pz-auth-email" id="pz-recover-email">Поточний акаунт</p>
 <p>Ти вже увійшов, але герой цього акаунта зараз не завантажений. <strong>Твій основний БАНГЕР і тестова Букля — різні акаунти.</strong></p>
-<button type="button" class="pz-primary" id="pz-recover-switch">↔ Увійти з іншою поштою</button>
+<button type="button" class="pz-alt" id="pz-recover-back" hidden>← Повернутися до Штабу</button><button type="button" class="pz-primary" id="pz-recover-switch">↔ Увійти з іншою поштою</button>
 <button type="button" class="pz-alt" id="pz-recover-expand" aria-expanded="false">🗂 Знайти мого героя</button>
 <div id="pz-recover-more" hidden>
 <p>Тут тільки відновлення. Не створюй іншого героя, якщо шукаєш БАНГЕРА або Буклю.</p>
@@ -295,7 +296,7 @@ body.pz-three-ready #v17Avatar{display:none!important}
 <button id="pz-archive" type="button">⬇ Скачать резервную копию</button>
 <button class="pz-primary" id="pz-switch-account" type="button">↔ Вийти / змінити акаунт</button>
 </div></div>
-<style>.b29{padding:19px;margin:10px 0 16px;border-radius:22px;border:1px solid #85516c;background:radial-gradient(ellipse at 90% 0,#86346977,transparent 55%),linear-gradient(125deg,#10182a,#28192f);box-shadow:0 10px 30px #0006}.b29top{font-size:10px;color:#f4b9dc;letter-spacing:1.4px;font-weight:800;display:flex;justify-content:space-between}.b29top b{border:1px solid #a56b92;border-radius:7px;padding:3px 7px}.b29name{font-size:clamp(30px,8vw,52px);font-weight:1000;letter-spacing:-2px;margin:12px 0}.b29name span{color:#ff68b7}.b29foot{border-top:1px solid #ffffff30;padding-top:10px;font-size:10px;display:flex;justify-content:space-between;color:#d3b6d0}</style><header class="b29"><div class="b29top">✦ ПУЗОПАД / PERSONAL RPG <b>V67 · ПУЗОПАД</b></div><div class="b29name">BANGER<span>VERSE</span><i style="color:#f6d78c">.</i></div><div class="b29foot"><span>NEONHAVEN ✧ ТВОЯ ИГРА</span><span style="color:#a1e9bf">● WEB</span></div></header>
+<style>.b29{padding:19px;margin:10px 0 16px;border-radius:22px;border:1px solid #85516c;background:radial-gradient(ellipse at 90% 0,#86346977,transparent 55%),linear-gradient(125deg,#10182a,#28192f);box-shadow:0 10px 30px #0006}.b29top{font-size:10px;color:#f4b9dc;letter-spacing:1.4px;font-weight:800;display:flex;justify-content:space-between}.b29top b{border:1px solid #a56b92;border-radius:7px;padding:3px 7px}.b29name{font-size:clamp(30px,8vw,52px);font-weight:1000;letter-spacing:-2px;margin:12px 0}.b29name span{color:#ff68b7}.b29foot{border-top:1px solid #ffffff30;padding-top:10px;font-size:10px;display:flex;justify-content:space-between;color:#d3b6d0}</style><header class="b29"><div class="b29top">✦ ПУЗОПАД / PERSONAL RPG <b>V69 · ПУЗОПАД</b></div><div class="b29name">BANGER<span>VERSE</span><i style="color:#f6d78c">.</i></div><div class="b29foot"><span>NEONHAVEN ✧ ТВОЯ ИГРА</span><span style="color:#a1e9bf">● WEB</span></div></header>
 <nav id="nav"><button data-tab="home">🏠 Штаб</button><button data-tab="city">🗺️ Город</button><button data-tab="diary">🍽️ Еда</button><button data-tab="fridge">🧊 Холодильник</button><button data-tab="store">🛒 Магазин</button><button data-tab="sleep">😴 Сон</button><button data-tab="loot">🎒 Лут</button><button data-tab="drinks">🥤 Напитки</button><button data-tab="quests">⚔️ Квесты</button><button data-tab="gym">🏋️ Зал</button><button data-tab="weight">⚖️ Вес</button><button data-tab="charts">📈 Графики</button><button data-tab="save">💾 Сейв</button><button data-tab="fuel">🚗 Гараж</button><button data-tab="wardrobe">🧥 Гардероб</button><button data-tab="companion">🐾 Компаньон</button><button data-tab="arcade">🕹️ Аркада</button></nav>
 <section id="home" class="section active"><div class="v16-dashboard"><div class="v16-eyebrow">BANGER / ЛИЧНЫЙ ШТАБ</div><div class="v16-headline">ТВОЯ ЖИЗНЬ.<br><em>ТВОЙ ПЕРСОНАЖ.</em></div><p class="v16-intro">Один день — одно приключение. Данные настоящие, награды игровые.</p><div id="pz-game-explainer" class="pz-game-explainer"></div><div class="v16-resource-grid"><div class="v16-resource"><span>✦ УРОВЕНЬ</span><strong id="v16Level">1</strong><small id="v16Next">0 / 100 XP</small></div><div class="v16-resource"><span>🪙 МОНЕТЫ</span><strong id="v16Coins">0</strong><small>На экипировку</small></div><div class="v16-resource"><span>💧 МАНА</span><strong id="v16Mana">0</strong><small>Игровой ресурс</small></div></div><div class="v17-hp"><div class="v17-hp-top"><b>❤️ HP · восстановление героя</b><strong id="v17Hp">—</strong></div><div class="bar"><i id="v17HpBar" style="width:0%;background:linear-gradient(90deg,#e05a74,#ff9a76)"></i></div><p id="v17HpExplain" class="small">Сон и алкоголь меняют игровой HP. Это не медицинский показатель.</p></div><button id="pz3d-home" type="button" class="pz3d-home" hidden>🎮 3D Мастерская героя</button><p id="pz-hero-greeting" class="pz-hero-greeting"></p><div class="v20-world" id="v20World">
 <div class="v20-world-top"><span id="v20Where">🏠 ДОМА</span><span id="v20Time">Смена 18:00–06:00</span></div>
@@ -839,7 +840,7 @@ el('cloud33verify').onclick=()=>act(async()=>{
 el('cloud32disable').onclick=()=>{if(user)localStorage.removeItem(autoKey());clearTimeout(timer32);cloud32Ui();status('Автосохранение отключено. Локальный прогресс сохранён.')};
 window.addEventListener('pagehide',()=>{clearTimeout(timer32)});
 function init(){if(!window.supabase?.createClient){status('Библиотека Supabase не загрузилась. Попробуй обновить страницу.');return}
-client=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+client=(window.pzSupabaseShared||(window.pzSupabaseShared=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})));
 client.auth.onAuthStateChange((_event,session)=>{user=session?.user||null;ui();cloud32Ui();if(user)status('☁️ Аккаунт подключён. Облачный прогресс можно сохранить или восстановить.');else status('Войди или создай аккаунт, чтобы включить облачные сохранения.')});
 client.auth.getSession().then(({data,error})=>{if(error)status('Ошибка авторизации: '+error.message);user=data?.session?.user||null;ui();cloud32Ui()}).catch(e=>status(e.message));
 }init();
@@ -972,7 +973,7 @@ const setStatus=t=>status.textContent=t;
 const nickKey=()=>me?'banger_chat_nick_'+me.id:'banger_chat_nick_guest';
 function draw(rows){const bottom=list.scrollHeight-list.scrollTop-list.clientHeight<90;list.innerHTML=rows.map(x=>'<div class="b46msg '+(x.user_id===me?.id?'mine':'')+'"><div class="b46meta">'+safe(x.nickname||'Игрок')+' · '+safe(new Date(x.created_at).toLocaleString('ru-RU'))+'</div>'+safe(x.body).replace(/\n/g,'<br>')+'</div>').join('')||'<div style="color:#b7bdd0">Пока нет сообщений. Начни разговор!</div>';if(bottom)list.scrollTop=list.scrollHeight}
 async function connect(){if(!window.supabase?.createClient){setStatus('Нет подключения к библиотеке Supabase. Обнови страницу.');return false}
-if(!client)client=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+if(!client)client=(window.pzSupabaseShared||(window.pzSupabaseShared=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})));
 const {data,error}=await client.auth.getSession();if(error)throw error;me=data.session?.user||null;
 $('b46nickname').value=localStorage.getItem(nickKey())||'BANGER';
 if(!me){setStatus('Войди через кнопку ☁️ Аккаунт, чтобы писать и читать чат.');list.innerHTML='<p>Чат доступен зарегистрированным игрокам.</p>';return false}return true}
@@ -1046,7 +1047,7 @@ function stockButton(proposal){
  $('bai-log').append(button);$('bai-log').scrollTop=$('bai-log').scrollHeight;
 }
 
-async function session(){if(!window.supabase?.createClient)throw Error('Библиотека Supabase не загрузилась');if(!sb)sb=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});let {data:{session},error}=await sb.auth.getSession();if(error)throw error;if(!session)throw Error('Сначала войди через ☁️ Аккаунт');return session}
+async function session(){if(!window.supabase?.createClient)throw Error('Библиотека Supabase не загрузилась');if(!sb)sb=(window.pzSupabaseShared||(window.pzSupabaseShared=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})));let {data:{session},error}=await sb.auth.getSession();if(error)throw error;if(!session)throw Error('Сначала войди через ☁️ Аккаунт');return session}
 const micIcon=()=>'<svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg>';let voiceRecorder=null,voiceStream=null,voiceChunks=[],voiceBusy=false;
 async function stopVoice(){if(voiceRecorder&&voiceRecorder.state!=='inactive'){voiceRecorder.stop();status('⏳ Распознаю запись…');$('bai-mic').textContent='…';$('bai-mic').disabled=true}}
 $('bai-mic').onclick=async()=>{
@@ -1229,7 +1230,7 @@ if((t.startsWith('✅ Ответ')||t.startsWith('Ответ получен')) &
 <script src="./benny-food-v57.js?v=57" id="banger-meal-addon-v57"></script>
 <script id="banger-pwa-updates">
 (function(){
- const VERSION="58",KEY="bangerverse_installed_build";
+ const VERSION="69",KEY="bangerverse_installed_build";
  async function check(){
   try{
     const r=await fetch("./version.json?ts="+Date.now(),{cache:"no-store"});
@@ -1249,7 +1250,7 @@ if((t.startsWith('✅ Ответ')||t.startsWith('Ответ получен')) &
 })();
 </script>
 <script src="./storage-v64.js?v=64.0"></script>
-<script src="./onboarding-v65.js?v=65.0" id="pz-v64-gate"></script>
+<script src="./onboarding-v69.js?v=69.0" id="pz-v64-gate"></script>
 <script src="./interface-v61.js?v=63.0"></script>
 <script src="./arcade-v61.js?v=67.0"></script>
 <script src="./usability-v67.js?v=67.0"></script>
