@@ -9,7 +9,7 @@ const EMPTY=()=>({weights:[],foods:[],loot:[],quests:{},xp:0,pets:0,location:"ho
 const state={client:null,user:null,ready:false,hydrated:null,busy:false,syncing:false,syncTimer:0,knownRemote:null,recoveryInfo:"",authTransition:0,loadingUid:null,loadingPromise:null,switching:false};
 const say=t=>{const el=$("pz-auth-status");if(el)el.textContent=t};
 function show(stage){
- document.body.classList.remove("pz-unlocked");document.body.classList.add("pz-locked");
+ document.body.classList.remove("pz-unlocked");document.body.classList.add("pz-locked");document.body.classList.toggle("pz-checking",stage==="loading");
  $("pz-entry").hidden=false;
  ["pz-login","pz-import","pz-create","pz-recover"].forEach(id=>{const node=$(id);if(node)node.hidden=id!=="pz-"+stage});
  if(stage==="create")say("Створення нового героя. Існуючий профіль не буде видалено.");
@@ -53,7 +53,7 @@ function applyGameUi(){
  }
 }
 function unlock(){
- state.ready=true;document.body.classList.remove("pz-locked");document.body.classList.add("pz-unlocked");
+ state.ready=true;document.body.classList.remove("pz-locked","pz-checking");document.body.classList.add("pz-unlocked");
  $("pz-entry").hidden=true;
  const who=$("pz-account-email");if(who)who.textContent=state.user?.email||"Аккаунт";
  const profile=typeof db!=="undefined"?db.profile:null;
