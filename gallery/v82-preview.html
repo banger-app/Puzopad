@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>BANGERVERSE · ART REBORN v82</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#2a2048,#0b1021 75%);color:#f7eafb;font-family:-apple-system,BlinkMacSystemFont,Inter,Arial,sans-serif;padding-bottom:40px}
+header{padding:22px 16px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+header strong{letter-spacing:.02em;font-size:21px}header strong em{font-style:normal;color:#fa54b2}
+header span{font-size:11px;white-space:nowrap;border:1px solid #866687;border-radius:20px;padding:8px 11px;color:#e6bdde}
+main{width:min(980px,100%);margin:auto;padding:0 12px}
+p{font-size:13px;line-height:1.5;color:#bbc7e4}
+#pz3d-home-stage{height:clamp(290px,60vw,595px);border-radius:22px;overflow:hidden;background:#15152a;border:1px solid #f452b9;box-shadow:0 5px 28px #ef58b132}
+#pz3d-home-stage svg{width:100%;height:100%;display:block}
+.section{margin:12px 0;border:1px solid #4c5473;border-radius:18px;padding:11px;background:#171f33}
+.section h2{font-size:15px;margin:4px 0 11px;color:#fff}
+.choices{display:flex;flex-wrap:wrap;gap:7px}
+button{cursor:pointer;min-height:41px;border:1px solid #68739c;color:#ecf3ff;background:#29314c;padding:9px 12px;border-radius:12px;font-size:12px;font-weight:750}
+button.selected{background:#79325e;border-color:#ff6abb;box-shadow:0 0 15px #f43a9433}
+#chooseHero,#choosePet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+#chooseHero button,#choosePet button{white-space:normal}
+#selection{font-size:14px;font-weight:750;color:#f3bbd9;text-align:center;margin:7px 0}
+footer{text-align:center;padding:12px}
+footer a{color:#ffa7d6}small{color:#a2acc8}
+@media(min-width:700px){#chooseHero,#choosePet{grid-template-columns:repeat(5,minmax(0,1fr))}}
+</style>
+</head><body>
+<header><strong>BANGER<em>VERSE.</em></strong><span>ART REBORN · v82</span></header>
+<main>
+<p>Интерактивная демонстрация 2D-движка: любой герой + любой питомец + любая сцена. Здесь используются тестовые данные, твой аккаунт и монеты не затрагиваются.</p>
+<div id="pz3d-home-stage" role="img" aria-label="Интерактивная 2D-сцена"></div>
+<p id="selection">БАНГЕР + Суречка</p>
+<section class="section"><h2>🌃 Смена сцены</h2><div class="choices" id="chooseScene"></div></section>
+<section class="section"><h2>🎮 Герои</h2><div class="choices" id="chooseHero"></div></section>
+<section class="section"><h2>🐾 Питомцы</h2><div class="choices" id="choosePet"></div></section>
+<section class="section"><h2>👟 Комплекты одежды</h2><div class="choices" id="chooseSet"></div></section>
+<footer><a href="../?build=82">Открыть моё приложение BANGERVERSE</a><p><small>Витрина не сохраняет покупки, веса или питание. Для настоящих покупок открой Гардероб в приложении.</small></p></footer>
+</main>
+<script>
+window.pzActiveUserId="preview-v82";
+const db={profile:{created:true,name:"BANGER",species:"frog",pet:"dog",petName:"Суречка"},artV82:{scene:"city"},coins:30,wardrobeV73:{wear:{torso:"starter"},petWear:{},petItems:[],petNames:{}}};
+</script><script src="../art-engine-v82.js?v=82.0"></script>
+<script>
+const sets=[["street","🏙 Уличный",{torso:"starter",face:"glasses",feet:"sneakers"}],["cyber","⚡ Кибер",{torso:"void",face:"visor",back:"wings"}],["halloween","🎃 Хэллоуин",{torso:"pumpkincoat",head:"witchhat",back:"batcape"}],["winter","❄️ Зима",{torso:"wintercoat",head:"santahat",feet:"snowboots"}]];
+const root=id=>document.getElementById(id);
+function draw(){
+ const art=window.pzArtV82;if(!art)return;
+ for(const [name,items,key,label] of [["chooseHero",art.HEROES,"species",v=>v.ru],["choosePet",Object.entries(art.PET_INFO).map(([id,values])=>({id,name:values[0],symbol:values[1]})),"pet",v=>v.symbol+" "+v.name],["chooseScene",art.SCENES,"scene",v=>v.symbol+" "+v.ru]]){
+ const holder=root(name);holder.replaceChildren();
+ for(const item of items){const btn=document.createElement("button");btn.textContent=label(item);const chosen=key==="scene"?db.artV82.scene:db.profile[key];btn.className=chosen===item.id?"selected":"";
+ btn.onclick=()=>{if(key==="scene")db.artV82.scene=item.id;else if(key==="pet"){db.profile.pet=item.id;db.profile.petName=art.PET_INFO[item.id][0]}else db.profile.species=item.id;update();draw()};
+ holder.append(btn)}
+ }
+ const setBox=root("chooseSet");setBox.replaceChildren();
+ for(const [id,label,wear] of sets){const b=document.createElement("button");b.textContent=label;b.onclick=()=>{db.wardrobeV73.wear={...wear};db.artV82.scene=id==="halloween"?"halloween":id==="winter"?"winter":"city";update();draw()};setBox.append(b)}
+}
+function update(){window.pzArtV82?.sync();const h=window.pzArtV82?.HEROES?.find(x=>x.id===db.profile.species)?.ru||"БАНГЕР";root("selection").textContent=h+" + "+db.profile.petName}
+window.addEventListener("load",()=>{draw();update()});
+</script>
+</body></html>
