@@ -1,0 +1,31 @@
+/* PUZOPAD CHARACTER MARKET v72 */
+#rbBangerStyle,#rbPetStyle{display:none!important}
+#wardrobe #v23WardrobeGuide,#wardrobe #wardrobeWallet,#wardrobe #wardrobeItems,#wardrobe #rewardHistory,#companion #v23PetLook{display:none!important}
+#pz-pets-v61>h3,#pz-pets-v61>.pz-pet-select:nth-of-type(n+17){display:none!important}
+#pz-shop-root,#pz-pet-shop-root{background:linear-gradient(160deg,#1e2640,#161a2e);border:1px solid #6d4c72;border-radius:20px;padding:15px;margin:14px 0}
+#pz-shop-root h3,#pz-pet-shop-root h3{font-size:17px;color:#f8d5f0;margin:18px 0 10px}
+#pz-shop-root h3:first-child{margin-top:0}
+#pz-shop-root>strong,#pz-pet-shop-root>strong{font-size:17px;color:#ffe7bd;display:block;margin:5px 0}
+.pz-shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
+.pz-shop-item{display:flex!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;gap:7px!important;min-height:108px!important;border:1px solid #5f607b!important;border-radius:16px!important;background:#2b304a!important;padding:11px!important;text-align:center!important;white-space:normal!important}
+.pz-shop-item.active{border-color:#ff4fb0!important;background:#563455!important}
+.pz-shop-swatch{font-size:32px;width:52px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:11px}
+.pz-shop-item-name{font-size:14px;line-height:1.25;color:#f3e8fa}
+.pz-shop-item small{font-size:12px;line-height:1.25;color:#f4d39d}
+#pz-shop-message{color:#9fe9bc;font-size:13px;min-height:18px}
+#pz-pet3d-stage{position:relative;height:310px;width:100%;max-width:520px;margin:12px auto;overflow:hidden;border:1px solid #765b8b;border-radius:17px;background:radial-gradient(circle at 50% 65%,#3c2b59,#17192e 75%);touch-action:pan-y}
+#pz-pet3d-stage canvas{width:100%;height:100%;display:block}
+#pz3d-stage,#pz3d-home-stage{isolation:isolate;touch-action:pan-y}
+#pz3d-stage .pz3d-load-status,#pz-pet3d-stage .pz3d-load-status,#pz3d-home-stage .pz3d-load-status{position:absolute;left:8px;right:8px;bottom:8px;margin:0;padding:8px;font-size:12px;color:#dceafa;background:#1d2445d9;border-radius:9px;text-align:center;pointer-events:none;z-index:1}
+#pz3d-home-stage{z-index:4}
+body.pz-three-ready #v20AvatarSlot,body.pz-three-ready #v20World .v20-pet{visibility:hidden!important}
+#pz-topbar{margin-left:auto;position:relative!important;top:auto!important;right:auto!important}
+.b29 .b29top{align-items:center;flex-wrap:wrap;gap:5px}
+.b29 .b29top>b{margin-left:auto}
+.b29 .b29name{font-size:clamp(29px,8vw,52px);overflow-wrap:anywhere}
+#pz-settings{width:43px;min-width:43px!important;height:43px!important;box-shadow:none!important}
+#pz-menu{right:0!important;top:46px!important;max-height:75dvh;overflow:auto;border-radius:16px}
+#pz-repair-meal[hidden]{display:none!important}
+#pz-repair-meal{border:1px solid #735576;border-radius:15px;padding:12px;background:#24253d}
+#pz-repair-meal p{font-size:13px;color:#d6d6e9}
+#pz-repair-meal button{font-size:13px}
