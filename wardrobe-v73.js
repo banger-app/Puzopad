@@ -62,15 +62,16 @@ const T=i=>TEXT[lang()][i];
 const itemName=x=>x[lang()==="uk"?4:lang()==="ru"?5:6];
 const petName=x=>x[lang()==="uk"?3:lang()==="ru"?4:5];
 const d=()=>typeof db==="undefined"?null:db;
-const can=()=>!!(window.pzActiveUserId&&d()?.profile?.created&&!window.testMode);
+const can=()=>!!(window.pzActiveUserId&&d()?.profile?.created&&!(typeof testMode!=="undefined"&&testMode));
 const $node=(tag,cls,text)=>{const n=document.createElement(tag);n.className=cls||"";if(text!=null)n.textContent=text;return n};
 const $btn=(txt,fn,cls)=>{const n=$node("button",cls,txt);n.type="button";n.onclick=fn;return n};
 function setup(){
  if(!can())return null;
  const data=d();
- if(!data.wardrobeV73)data.wardrobeV73={owned:["starter"],wear:{torso:"starter"},petItems:[],petWear:{},pets:["none","dog","cat","hamster"]};
- const w=data.wardrobeV73;w.owned ||= ["starter"];w.wear ||= {torso:"starter"};w.petItems ||= [];w.petWear ||= {};w.pets ||= ["none","dog","cat","hamster"];
+ if(!data.wardrobeV73)data.wardrobeV73={owned:["starter"],wear:{torso:"starter"},petItems:[],petWear:{},pets:["none","dog","cat","hamster"],petNames:{}};
+ const w=data.wardrobeV73;w.owned ||= ["starter"];w.wear ||= {torso:"starter"};w.petItems ||= [];w.petWear ||= {};w.pets ||= ["none","dog","cat","hamster"];w.petNames ||= {};
  if(!w.owned.includes("starter"))w.owned.push("starter");
+ if(data.profile.pet&&data.profile.petName&&!w.petNames[data.profile.pet])w.petNames[data.profile.pet]=data.profile.petName;
  for(const p of ["none","dog","cat","hamster",data.profile.pet||"none"])if(!w.pets.includes(p))w.pets.push(p);
  const legacy=data.heroStyle||{};
  for(const [old,converted] of [["casual","starter"],["work","work"],["gym","gym"],["hero","knight"]])if(legacy.owned?.includes(old)&&!w.owned.includes(converted))w.owned.push(converted);
@@ -108,7 +109,7 @@ function chooseItem(x,kind){
 function choosePet(x){
  const w=setup();if(!w)return;
  if(!w.pets.includes(x[0])){if(!spend(x[2])){message=T(17);render();return}w.pets.push(x[0])}
- d().profile.pet=x[0];d().profile.petName=x[0]==="none"?"":d().profile.petName||petName(x);message=T(26);save();
+ d().profile.pet=x[0];d().profile.petName=x[0]==="none"?"":(w.petNames[x[0]]||petName(x));message=T(26);save();
 }
 function root(){
  const host=el("wardrobe")?.querySelector(".panel");if(!host)return null;
@@ -175,7 +176,7 @@ function render(){
  const grid=$node("div","pz73-grid");for(const x of filtered)grid.append(card(x,tab,w));if(!filtered.length)grid.append($node("p","",T(25)));content.append(grid);
  if(preview?.uid===window.pzActiveUserId)content.prepend($btn("✕ "+T(23),()=>{preview=null;window.pzWardrobePreviewV73=null;window.dispatchEvent(new Event("pz:style-change"));render()},"pz73-secondary"));
  const label=$node("label","pz73-name",T(21)),input=$node("input","pz73-input");input.maxLength=40;input.value=tab==="hero"?d().profile.name||"":d().profile.petName||"";
- content.append(label,input,$btn(T(22),()=>{const name=input.value.trim().slice(0,40);if(!name)return;if(tab==="hero"){d().profile.name=name;d().characterName=name;d().profile.provisional=false}else d().profile.petName=name;message=T(27);save()},"pz73-primary"));
+ content.append(label,input,$btn(T(22),()=>{const name=input.value.trim().slice(0,40);if(!name)return;if(tab==="hero"){d().profile.name=name;d().characterName=name;d().profile.provisional=false}else {d().profile.petName=name;w.petNames[d().profile.pet]=name}message=T(27);save()},"pz73-primary"));
  content.append($node("p","pz73-tip",T(24)));el("pz73-notice").textContent=message;
 }
 function poop(){
