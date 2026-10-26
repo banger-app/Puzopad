@@ -8,19 +8,19 @@ const read=file=>fs.readFileSync(file,"utf8");
 const html=read("index.html");
 const version=JSON.parse(read("version.json"));
 test("all v80 production scripts & styles exist and build matches",()=>{
- assert.equal(version.build,"82.1");
- for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-v81.css","art-engine-v82.js","art-v82.css"]){
+ assert.equal(version.build,"83");
+ for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-v81.css","art-engine-v82.js","art-v82.css","art-raster-v83.js","art-v83.css","benny-voice-v83.js","benny-v83.css"]){
   assert.ok(fs.existsSync(path),"missing "+path);
  }
- for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=82.1","./art-engine-v82.js?v=82.1","./art-v82.css?v=82.1","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
+ for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=82.1","./art-engine-v82.js?v=82.1","./art-v82.css?v=82.1","./art-raster-v83.js?v=83.0","./art-v83.css?v=83.0","./benny-voice-v83.js?v=83.0","./benny-v83.css?v=83.0","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
  assert.ok(read("onboarding-v69.js").includes("./gym-reborn-v80.js?v=80.3"));
- assert.ok(read("interface-v61.js").includes('V82.1 · '));
- assert.ok(html.includes('V82.1 · ПУЗОПАД'));
- assert.ok(read("sw.js").includes("puzopad-v821-20261026"));
+ assert.ok(read("interface-v61.js").includes('V83 · '));
+ assert.ok(html.includes('V83 · ПУЗОПАД'));
+ assert.ok(read("sw.js").includes("puzopad-v83-20261027"));
  assert.ok(html.includes('window.pzBennyContextV80?.()'));
 });
 test("classic JavaScript modules parse",()=>{
- for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-food-v57.js","art-engine-v82.js"]){
+ for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-food-v57.js","art-engine-v82.js","art-raster-v83.js","benny-voice-v83.js"]){
   assert.doesNotThrow(()=>new vm.Script(read(f),{filename:f}));
  }
 });
@@ -282,4 +282,22 @@ test("v82 preview pet shows selected species name and its own gear without chang
  assert.equal(state.heroWear.torso,"royal");
  assert.equal(saved.profile.species,"robot");
  assert.equal(saved.coins,50);
+});
+
+test("v83: original raster image assets are checked into the app and used as independently selectable sprites",()=>{
+ for(const id of ["pepe","surechka","kisyusha","masya","bender","robodog"]){
+  const p="assets/art-v83/"+id+".webp";
+  assert.ok(fs.existsSync(p),p+" missing");
+  assert.ok(fs.statSync(p).size>8000,p+" empty");
+ }
+ const source=read("art-raster-v83.js"),voice=read("benny-voice-v83.js");
+ for(const s of ["frog:","robot:","dog:","cat:","robodog:","original.current()","images(\"hero\"","images(\"pet\""]){
+  assert.ok(source.includes(s),s+" is not combined independently");
+ }
+ for(const s of ["MediaRecorder","r.pause()","r.resume()","banger-transcribe","sendText(words)","synth.speak(speech)","stopCall","speech.onend"]){
+  assert.ok(voice.includes(s),s+" missing in voice module");
+ }
+ assert.ok(html.includes('./art-raster-v83.js?v=83.0'));
+ assert.ok(html.includes('./benny-voice-v83.js?v=83.0'));
+ assert.ok(read("sw.js").includes('art-v83'));
 });
