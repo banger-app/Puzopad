@@ -8,19 +8,19 @@ const read=file=>fs.readFileSync(file,"utf8");
 const html=read("index.html");
 const version=JSON.parse(read("version.json"));
 test("all v80 production scripts & styles exist and build matches",()=>{
- assert.equal(version.build,"84");
- for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-v81.css","art-engine-v82.js","art-v82.css","art-raster-v83.js","art-v83.css","benny-voice-v83.js","benny-v83.css","art-cinema-v84.js","reborn-v84.css","nav-icons-v84.js"]){
+ assert.equal(version.build,"85");
+ for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-v81.css","art-engine-v82.js","art-v82.css","art-raster-v83.js","art-v83.css","benny-voice-v83.js","benny-v83.css","art-cinema-v84.js","reborn-v84.css","nav-icons-v84.js","reborn-v85.js","reborn-v85.css"]){
   assert.ok(fs.existsSync(path),"missing "+path);
  }
- for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=82.1","./art-engine-v82.js?v=82.1","./art-v82.css?v=82.1","./art-raster-v83.js?v=84.0","./art-v83.css?v=83.0","./benny-voice-v83.js?v=84.0","./benny-v83.css?v=83.0","./art-cinema-v84.js?v=84.0","./reborn-v84.css?v=84.0","./nav-icons-v84.js?v=84.0","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
+ for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=82.1","./art-engine-v82.js?v=82.1","./art-v82.css?v=82.1","./art-raster-v83.js?v=84.0","./art-v83.css?v=83.0","./benny-voice-v83.js?v=84.0","./benny-v83.css?v=83.0","./art-cinema-v84.js?v=84.0","./reborn-v84.css?v=84.0","./nav-icons-v84.js?v=84.0","./reborn-v85.js?v=85.0","./reborn-v85.css?v=85.0","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
  assert.ok(read("onboarding-v69.js").includes("./gym-reborn-v80.js?v=80.3"));
- assert.ok(read("interface-v61.js").includes('V84 · '));
- assert.ok(html.includes('V84 · ПУЗОПАД'));
- assert.ok(read("sw.js").includes("puzopad-v84-20261027"));
+ assert.ok(read("interface-v61.js").includes('V85 · '));
+ assert.ok(html.includes('V85 · ПУЗОПАД'));
+ assert.ok(read("sw.js").includes("puzopad-v85-20261027"));
  assert.ok(html.includes('window.pzBennyContextV80?.()'));
 });
 test("classic JavaScript modules parse",()=>{
- for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-food-v57.js","art-engine-v82.js","art-raster-v83.js","benny-voice-v83.js","art-cinema-v84.js","nav-icons-v84.js"]){
+ for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-food-v57.js","art-engine-v82.js","art-raster-v83.js","benny-voice-v83.js","art-cinema-v84.js","nav-icons-v84.js","reborn-v85.js"]){
   assert.doesNotThrow(()=>new vm.Script(read(f),{filename:f}));
  }
 });
@@ -319,4 +319,19 @@ test("v84 premium scenes are limited to exact paired looks and artwork is checke
  assert.ok(read("nav-icons-v84.js").includes("data-tab"),"unified UI icon source");
  assert.ok(read("benny-voice-v83.js").includes('mic.onclick=()=>{if(rec||blob){sendRecording();return}begin(false)}'),"one tap starts, second sends");
  assert.ok(read("benny-voice-v83.js").includes("begin(true);"),"call opens microphone without second tap");
+});
+
+test("v85: auth startup, iPhone width safety and playable illustrated city",()=>{
+ const index=read("index.html"),css=read("reborn-v85.css"),js=read("reborn-v85.js");
+ assert.ok(index.includes('class="pz-locked pz-checking"'),"initial app must not flash login");
+ assert.ok(index.includes('id="pz-login" hidden'),"login hidden until auth check");
+ assert.ok(index.includes('viewport-fit=cover')&&!index.includes("user-scalable=no"),"safe area without disabling pinch accessibility");
+ assert.ok(css.includes("#home .v16-resource:has(#v16Mana)"));
+ assert.ok(css.includes("#home .v17-hp"));
+ assert.ok(css.includes("input,select,textarea{font-size:16px"),"avoid iOS input zoom");
+ assert.ok(css.includes("#city .bang-map .bang-pin"),"map pins stay actionable");
+ for(const loc of ["home","work","shop","gym","fuel"])assert.ok(index.includes('data-destination="'+loc+'"'));
+ assert.ok(js.includes('goTo("arcade")'),"coins link to arcades");
+ assert.ok(js.includes('goTo("wardrobe")'),"shop promotional button enters wardrobe");
+ assert.ok(css.includes("banger_surechka_city.webp"),"existing curated cinematic artwork");
 });
