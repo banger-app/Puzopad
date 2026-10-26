@@ -46,7 +46,9 @@ const callPause=button("Ⅱ","pz83-call-pause",pauseToggle);
 const callSend=button("↑","pz83-call-send",()=>sendRecording());
 const callCancel=button("✕","pz83-call-cancel",cancel);
 callControls.append(callCancel,callPause,callSend);
-overlay.append(callTop,ring,callMessage,callControls);
+const callWave=make("div","pz85-call-wave");
+for(let i=0;i<29;i++)callWave.append(make("i","pz85-call-wavebar"));
+overlay.append(callTop,ring,callMessage,callWave,callControls);
 panel.append(overlay);
 const oldActions=$("pz803-voice-actions");if(oldActions)oldActions.remove();
 const oldVoiceToggle=document.querySelector("#bai-top .pz81-voice-toggle");
@@ -60,6 +62,42 @@ function elapsed(){
  time.textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
 }
 let tick=null;
+let soundCtx=null,soundAnalyser=null,soundSource=null,soundValues=null,soundFrame=0;
+const waveBars=Array.from(callWave.children);
+const smallBars=Array.from(waveform.children);
+function stopSoundMeter(){
+ if(soundFrame){cancelAnimationFrame(soundFrame);soundFrame=0}
+ try{soundSource?.disconnect()}catch(_){}
+ try{soundCtx?.close()}catch(_){}
+ soundSource=null;soundAnalyser=null;soundCtx=null;soundValues=null;
+ for(const bar of [...waveBars,...smallBars])bar.style.height="";
+}
+function startSoundMeter(media){
+ stopSoundMeter();
+ const Audio=window.AudioContext||window.webkitAudioContext;
+ if(!Audio||!window.requestAnimationFrame)return;
+ try{
+  soundCtx=new Audio();soundSource=soundCtx.createMediaStreamSource(media);
+  soundAnalyser=soundCtx.createAnalyser();soundAnalyser.fftSize=256;
+  soundAnalyser.smoothingTimeConstant=.72;soundSource.connect(soundAnalyser);
+  soundValues=new Uint8Array(soundAnalyser.frequencyBinCount);
+  const draw=()=>{
+   if(!soundAnalyser)return;
+   soundAnalyser.getByteFrequencyData(soundValues);
+   const paused=rec?.state==="paused";
+   const levels=[...waveBars,...smallBars];
+   for(let j=0;j<levels.length;j++){
+    const k=Math.round(j*soundValues.length/levels.length);
+    const value=paused?0:(soundValues[Math.min(k,soundValues.length-1)]||0);
+    const strength=Math.min(1,value/140),height=3+Math.round(25*Math.pow(strength,.62));
+    levels[j].style.height=height+"px";
+    levels[j].style.opacity=(.38+strength*.62).toFixed(2);
+   }
+   soundFrame=requestAnimationFrame(draw);
+  };
+  soundFrame=requestAnimationFrame(draw);
+ }catch(_){stopSoundMeter()}
+}
 function refresh(){
  const state=rec?.state||"idle";const recording=state==="recording",paused=state==="paused",ready=!!blob&&!rec;
  const expanded=!!rec||ready||busy;
@@ -81,6 +119,7 @@ function refresh(){
  if(!rec&&tick!==null){clearInterval(tick);tick=null}
 }
 function release(){
+ stopSoundMeter();
  try{stream?.getTracks?.().forEach(x=>x.stop())}catch(_){}
  stream=null;rec=null;chunks=[];pausedAt=0;
 }
@@ -98,7 +137,7 @@ async function begin(call=false){
   r.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
   r.onerror=e=>{message(e.error?.message||T("denied"))};
   r.onstop=()=>{const bytes=new Blob(chunks,{type:r.mimeType||mime||"audio/mp4"});release();if(!cancelled&&bytes.size>=900)blob=bytes;else if(!cancelled)message(T("tooShort"));refresh()};
-  createdAt=Date.now();pausedAt=0;pausedTotal=0;r.start(250);message(T("record"));refresh();
+  createdAt=Date.now();pausedAt=0;pausedTotal=0;r.start(250);startSoundMeter(stream);message(T("record"));refresh();
  }catch(e){release();message(e?.message||T("denied"));refresh()}
 }
 function pauseToggle(){
