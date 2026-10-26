@@ -149,13 +149,39 @@ async function signIn(email,password,signup){
  if(data.session?.user)await signedIn(data.session.user);
  }catch(e){say("Ошибка входа: "+e.message)}finally{state.busy=false}
 }
+let googleEnabled=false;
+async function checkGoogleProvider(){
+ const btn=$("pz-google"),note=$("pz-google-note"),label=$("pz-google-label");
+ if(!btn)return;
+ googleEnabled=false;
+ btn.disabled=true;btn.setAttribute("aria-disabled","true");
+ if(label)label.textContent="Проверяю вход Google...";
+ if(note)note.textContent="Проверяю настройку Google-входа.";
+ try{
+  const response=await fetch(URL+"/auth/v1/settings",{headers:{"apikey":KEY},cache:"no-store"});
+  if(!response.ok)throw Error("Настройки входа недоступны");
+  const data=await response.json();
+  googleEnabled=data?.external?.google===true;
+  btn.disabled=!googleEnabled;
+  btn.setAttribute("aria-disabled",String(!googleEnabled));
+  if(label)label.textContent=googleEnabled?"Продолжить с Google":"Google — пока недоступен";
+  if(note)note.textContent=googleEnabled?"Войди одним нажатием с Google-аккаунтом.":"Вход Google пока не подключён. Используй регистрацию по email и отдельному паролю ПУЗОПАДА.";
+ }catch(_err){
+  if(label)label.textContent="Google — пока недоступен";
+  if(note)note.textContent="Не удалось проверить Google-вход. Вход по email остаётся доступен.";
+ }
+}
 async function signInGoogle(){
+ if(!googleEnabled){say("Google-вход пока не подключён в Supabase. Используй email и отдельный пароль ПУЗОПАДА.");return}
  try{
   if(!state.client)throw Error("Авторизация не загрузилась");
+  const response=await fetch(URL+"/auth/v1/settings",{headers:{"apikey":KEY},cache:"no-store"});
+  const providers=response.ok?await response.json():null;
+  if(!providers?.external?.google){googleEnabled=false;await checkGoogleProvider();say("Google-вход ещё не подключён. Используй email и пароль.");return}
   say("Открываю Google...");
   const {error}=await state.client.auth.signInWithOAuth({provider:"google",options:{redirectTo:"https://banger-app.github.io/Puzopad/"}});
   if(error)throw error;
- }catch(e){say("Google-вход пока недоступен: "+e.message+". Используй вход по почте.")}
+ }catch(e){say("Не удалось начать вход через Google: "+e.message)}
 }
 function menu(open){$("pz-menu").hidden=!open}
 function setLangNav(){
@@ -201,6 +227,7 @@ function setup(){
 }
 async function boot(){
  show("login");setup();
+ checkGoogleProvider();
  if(!window.supabase?.createClient){say("Не удалось загрузить систему входа. Проверь интернет и открой сайт ещё раз.");return}
  try{
  state.client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
