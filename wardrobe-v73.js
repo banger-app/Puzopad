@@ -66,7 +66,7 @@ const PETS=[
 ["otter","epic",225,"Видра","Выдра","Otter","🦦",0],
 ["dragon","legend",500,"Дракон","Дракон","Dragon","🐉",0],
 ["lion","legend",450,"Лев","Лев","Lion","🦁",0],
-["tiger","legend",450,"Тигр","Тигр","Tiger","🐅",0]
+["tiger","legend",450,"Тигр","Тигр","Tiger","🐅",1]
 ];
 let tab="hero",mode="shop",filter="all",preview=null,message="",uid=null;
 const lang=()=>{const x=el("banger-language-select")?.value||el("pz-language")?.value||localStorage.getItem("banger_language")||"uk";return TEXT[x]?x:"uk"};
