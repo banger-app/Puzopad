@@ -134,7 +134,7 @@ function setLangNav(){
  const lang=localStorage.getItem("banger_language")||"uk";
  const byid={home:["Штаб","Штаб","Home"],city:["Місто","Город","City"],diary:["Їжа","Еда","Food"],fridge:["Холодильник","Холодильник","Fridge"],drinks:["Напої","Напитки","Drinks"],sleep:["Сон","Сон","Sleep"],weight:["Вага","Вес","Weight"],charts:["Графіки","Графики","Charts"],fuel:["Гараж","Гараж","Garage"],gym:["Зал","Зал","Gym"],companion:["Компаньйон","Компаньон","Companion"],quests:["Завдання","Задания","Quests"],wardrobe:["Гардероб","Гардероб","Wardrobe"]};
  const index=lang==="uk"?0:lang==="ru"?1:2;
- document.querySelectorAll("nav#nav button").forEach(el=>{const tab=el.dataset.tab;if(byid[tab]&&!el.dataset.pzEmoji)el.dataset.pzEmoji=(el.textContent.match(/^\s*\S+/)||[""])[0];if(byid[tab])el.textContent=(el.dataset.pzEmoji||"")+" "+byid[tab][index]});
+ document.querySelectorAll("nav#nav button").forEach(el=>{const tab=el.dataset.tab;if(byid[tab]&&!el.dataset.pzEmoji)el.dataset.pzEmoji=(el.textContent.match(/^\s*\S+/)||[""])[0];if(byid[tab]){const next=(el.dataset.pzEmoji||"")+" "+byid[tab][index];if(el.textContent!==next)el.textContent=next}});
  const headline=document.querySelector(".v16-eyebrow");if(headline)headline.textContent=lang==="uk"?"ШТАБ ПЕРСОНАЖА":lang==="en"?"CHARACTER HQ":"ШТАБ ПЕРСОНАЖА";
  const slogan=document.querySelector(".v16-headline");if(slogan)slogan.innerHTML=lang==="uk"?"ТВОЯ ІСТОРІЯ.<br><em>ТВІЙ ГЕРОЙ.</em>":lang==="en"?"YOUR STORY.<br><em>YOUR HERO.</em>":"ТВОЯ ИСТОРИЯ.<br><em>ТВОЙ ГЕРОЙ.</em>";
  const intro=document.querySelector(".v16-intro");if(intro)intro.textContent=lang==="uk"?"Тут живе твій герой. Їжа, сон, тренування та прогрес — реальні. Пригоди та нагороди — ігрові.":lang==="en"?"Your hero lives here. Meals, sleep and training are real; quests and rewards are a game.":"Здесь живёт твой герой. Питание, сон и тренировки — настоящие; задания и награды — игровые.";
@@ -176,7 +176,7 @@ async function boot(){
  try{
  state.client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  state.client.auth.onAuthStateChange((event,session)=>{
-  if(event==="SIGNED_OUT"){state.ready=false;state.user=null;state.hydrated=null;window.pzActiveUserId=null;show("login");}
+  if(event==="SIGNED_OUT"){if(state.user?.id&&typeof db!=="undefined"){try{localStorage.setItem(PREFIX+state.user.id,JSON.stringify(db))}catch(_){}}state.ready=false;state.user=null;state.hydrated=null;window.pzActiveUserId=null;show("login");}
   else if(event==="SIGNED_IN"||event==="INITIAL_SESSION"){Promise.resolve().then(()=>signedIn(session?.user||null));}
  });
  const {data,error}=await state.client.auth.getSession();if(error)throw error;
