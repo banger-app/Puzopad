@@ -53,7 +53,7 @@ test("gym draft is not a logged workout and only completed exercises persist",()
  const tap=phrase=>{const b=flatten(zone).find(n=>n.tag==="button"&&String(n.textContent).includes(phrase));assert.ok(b,"button "+phrase);b.onclick()};
  tap("Начать тренировку");
  assert.equal(data.workouts.length,0,"starting a workout must not fake exercise results");
- const actualMinutes=flatten(zone).find(n=>n.tag==="input"&&n.type==="number"&&n.value==="0");assert.ok(actualMinutes);
+ const actualMinutes=flatten(zone).find(n=>n.tag==="input"&&n.type==="number"&&n.value==="6");assert.ok(actualMinutes);
  actualMinutes.value="6";tap("Выполнено");
  assert.equal(data.workouts.length,0);
  assert.equal(data.gymV80.session.done.length,1);
