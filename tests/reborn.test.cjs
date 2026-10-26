@@ -135,7 +135,7 @@ test("Benny string ID: delete works; calorie clarification updates only one exis
 test("Benny v81 accepts up to five photos and keeps user's multimodal draft",()=>{
  const src=read("benny-chat-v81.js"),index=read("index.html");
  assert.ok(index.includes('id="bai-file" type="file" accept="image/*" multiple'));
- assert.ok(index.includes('./benny-chat-v81.js?v=81.0'));
+ assert.ok(index.includes('./benny-chat-v81.js?v=83.0'));
  assert.ok(index.includes('./exercise-gallery-v81.js?v=81.0'));
  assert.ok(index.includes('./benny-v81.css?v=81.0'));
  assert.ok(!index.includes('<script id="benny-photo-preview-v55">'),"old single-photo widget must be disabled");
@@ -294,7 +294,7 @@ test("v83: original raster image assets are checked into the app and used as ind
  for(const s of ["frog:","robot:","dog:","cat:","robodog:","original.current()","images(\"hero\"","images(\"pet\""]){
   assert.ok(source.includes(s),s+" is not combined independently");
  }
- for(const s of ["MediaRecorder","r.pause()","r.resume()","banger-transcribe","sendText(words)","synth.speak(speech)","stopCall","speech.onend"]){
+ for(const s of ["MediaRecorder","rec.pause()","rec.resume()","banger-transcribe","sendText(words)","synth.speak(speech)","stopCall","speech.onend"]){
   assert.ok(voice.includes(s),s+" missing in voice module");
  }
  assert.ok(html.includes('./art-raster-v83.js?v=83.0'));
