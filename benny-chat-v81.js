@@ -25,9 +25,12 @@ if(title){title.replaceChildren();const identity=node("div","pz81-brand");const 
 const top=$("bai-top");
 const voiceSwitch=button("🔈",()=>{replyVoice=!replyVoice;voiceSwitch.textContent=replyVoice?"🔊":"🔈";voiceSwitch.setAttribute("aria-label",T(replyVoice?"stop":"listen"));voiceSwitch.setAttribute("aria-pressed",String(replyVoice));if(!replyVoice&&"speechSynthesis" in window)window.speechSynthesis.cancel()},"pz81-voice-toggle");
 voiceSwitch.setAttribute("aria-label",T("listen"));voiceSwitch.setAttribute("aria-pressed","false");
+if(!("speechSynthesis" in window)){voiceSwitch.disabled=true;voiceSwitch.title=T("noSpeech")}
 top?.insertBefore(voiceSwitch,$("bai-close"));
 fileInput.multiple=true;fileInput.accept="image/*";fileInput.value="";
 input.placeholder=T("input");input.rows=1;input.autocomplete="off";
+function sizeComposer(){input.style.height="auto";input.style.height=Math.min(input.scrollHeight||42,120)+"px"}
+input.addEventListener("input",sizeComposer);
 const camera=node("input");camera.type="file";camera.accept="image/*";camera.setAttribute("capture","environment");camera.className="pz81-camera-input";camera.setAttribute("aria-label",T("camera"));
 const cameraButton=button("📷",()=>camera.click(),"pz81-camera-btn");cameraButton.setAttribute("aria-label",T("camera"));
 $("bai-composer")?.insertBefore(cameraButton,input);$("bai-composer")?.append(camera);
@@ -138,7 +141,7 @@ async function deliver(){
   addMessage("user",text,urls);
   addMessage("assistant",result.answer||"Не удалось прочитать ответ",[]);
   voiceSpeak(result.answer);
-  input.value="";for(const item of selection)URL.revokeObjectURL(item.url);
+  input.value="";sizeComposer();for(const item of selection)URL.revokeObjectURL(item.url);
   draft=draft.filter(x=>!selection.some(y=>y.id===x.id));updatePreview();
   statusBox.textContent="";
  }catch(e){

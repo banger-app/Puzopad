@@ -70,3 +70,8 @@ body.pz81-benny-open{overflow:hidden!important}
  #pz-gym-zone .pz803-workout-art{min-height:170px!important;max-height:285px!important}
 }
 @media(prefers-reduced-motion:reduce){#bai-log .pz81-typing span{animation:none;opacity:1}}
+
+/* v81 final visual polish: keep old experimental prompts out of the conversation area. */
+#bai-log .pz80-benny-chips{display:none!important}
+#bai-top #bai-close{border-radius:50%!important;min-height:42px!important;width:42px!important;background:#272f48!important;padding:4px!important}
+#bai-top .pz81-voice-toggle:disabled{opacity:.4}

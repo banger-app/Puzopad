@@ -157,3 +157,14 @@ test("gym v81 uses verified photograph mappings and fallbacks are not required o
  const gym=read("gym-reborn-v80.js");
  assert.ok(gym.includes("window.pzExerciseVisuals.thumb"),"compact timeline uses thumbnails");
 });
+
+test("v81 local photographic bundle has all 30 licensed assets",()=>{
+ const gallery=read("exercise-gallery-v81.js");
+ const labels=[...gallery.matchAll(/\w+:"([A-Za-z_]+)"/g)].map(m=>m[1]);
+ const unique=[...new Set(labels)];
+ for(const slug of unique){
+  for(const frame of ["0","1"])assert.ok(fs.existsSync("assets/exercises-v81/"+slug+"/"+frame+".jpg"),slug+" missing "+frame);
+ }
+ assert.ok(gallery.includes("./assets/exercises-v81/"));
+ assert.ok(read("sw.js").includes('caches.open(REV+"-gym")'));
+});
