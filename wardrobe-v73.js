@@ -235,7 +235,7 @@ function poop(){
  document.body.append(layer);setTimeout(()=>layer.remove(),1500);
 }
 document.addEventListener("change",e=>{if(e.target?.id!=="pz-language"&&e.target?.id!=="banger-language-select")return;if(e.target.value==="ru")poop();setTimeout(render,80)},true);
-document.addEventListener("click",e=>{if(e.target?.closest?.('nav button[data-tab="wardrobe"],nav button[data-tab="companion"]'))setTimeout(render,30)});
+document.addEventListener("click",e=>{const companion=e.target?.closest?.('nav button[data-tab="companion"]');if(companion){setTimeout(()=>{if(typeof go==="function")go("wardrobe");tab="pet";render()},40);return}if(e.target?.closest?.('nav button[data-tab="wardrobe"]'))setTimeout(()=>{tab="hero";render()},30)});
 function watchSections(){
  for(const [id,value] of [["wardrobe","hero"],["companion","pet"]]){
   const section=el(id);if(!section)return;
