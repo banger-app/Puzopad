@@ -265,3 +265,21 @@ test("v82 interactive art gallery is safe and includes all combinable heroes and
  assert.ok(art.includes("function heroArt(")&&art.includes("function petArt(")&&art.includes("function sceneArt("));
  assert.ok(!read("index.html").includes('type="module" src="./three-studio-v72.js'));
 });
+
+test("v82 preview pet shows selected species name and its own gear without changing active pet",()=>{
+ const saved={coins:50,profile:{created:true,species:"robot",pet:"dog",petName:"Суречка"},artV82:{scene:"city"},wardrobeV73:{wear:{torso:"starter"},heroWardrobes:{robot:{torso:"starter"},frog:{torso:"royal"}},petWear:{head:"bow"},petWardrobes:{dog:{head:"bow"},cat:{neck:"scarf"}},petNames:{cat:"Мася"}}};
+ const window={pzActiveUserId:"acct",pzWardrobePreviewV73:{uid:"acct",which:"pettype",id:"cat"},addEventListener(){}};
+ vm.runInNewContext(read("art-engine-v82.js"),{window,db:saved,document:{readyState:"loading",addEventListener(){},getElementById:()=>null},localStorage:{getItem:()=>"ru"},setTimeout:()=>{}});
+ let state=window.pzArtV82.current();
+ assert.equal(state.hero,"robot");
+ assert.equal(state.pet,"cat");
+ assert.equal(state.pname,"Мася");
+ assert.equal(state.petWear.neck,"scarf");
+ assert.equal(saved.profile.pet,"dog");
+ assert.equal(saved.profile.petName,"Суречка");
+ window.pzWardrobePreviewV73={uid:"acct",which:"species",id:"frog"};
+ state=window.pzArtV82.current();
+ assert.equal(state.heroWear.torso,"royal");
+ assert.equal(saved.profile.species,"robot");
+ assert.equal(saved.coins,50);
+});
