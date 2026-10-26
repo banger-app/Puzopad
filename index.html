@@ -1082,33 +1082,71 @@ function stockButton(proposal){
 }
 
 async function session(){if(!window.supabase?.createClient)throw Error('Библиотека Supabase не загрузилась');if(!sb)sb=(window.pzSupabaseShared||(window.pzSupabaseShared=window.supabase.createClient(URL,PUB,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})));let {data:{session},error}=await sb.auth.getSession();if(error)throw error;if(!session)throw Error('Сначала войди через ☁️ Аккаунт');return session}
-const micIcon=()=>'<svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg>';let voiceRecorder=null,voiceStream=null,voiceChunks=[],voiceBusy=false;
-async function stopVoice(){if(voiceRecorder&&voiceRecorder.state!=='inactive'){voiceRecorder.stop();status('⏳ Распознаю запись…');$('bai-mic').textContent='…';$('bai-mic').disabled=true}}
+const micIcon=()=>'<svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg>';
+let voiceRecorder=null,voiceStream=null,voiceChunks=[],voiceBusy=false,lastVoiceBlob=null,lastVoiceType="audio/mp4";
+const voiceActions=document.createElement("div");voiceActions.id="pz803-voice-actions";
+voiceActions.style.cssText="display:flex;flex-wrap:wrap;gap:7px;margin-top:4px";
+const retryVoice=document.createElement("button");retryVoice.type="button";retryVoice.textContent="↻ Повторить запись";
+retryVoice.style.cssText="padding:7px 10px;border:1px solid #e28aba;border-radius:11px;font-size:12px;display:none";
+voiceActions.append(retryVoice);
+const VoiceAPI=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(VoiceAPI){
+ const native=document.createElement("button");native.type="button";native.textContent="🎙 Диктовка на телефоне";
+ native.style.cssText="padding:7px 10px;border:1px solid #6b7f9d;border-radius:11px;font-size:12px";
+ native.onclick=()=>{
+  try{
+   const r=new VoiceAPI();r.lang=(localStorage.getItem("banger_language")==="uk"?"uk-UA":localStorage.getItem("banger_language")==="en"?"en-US":"ru-RU");
+   r.interimResults=false;r.maxAlternatives=1;
+   r.onresult=e=>{const t=e.results?.[0]?.[0]?.transcript||"";if(t){$('bai-input').value=[$('bai-input').value,t].filter(Boolean).join(" ").trim();status("✅ Диктовка готова, проверь перед отправкой.")}};
+   r.onerror=e=>status("⚠️ Диктовка на устройстве недоступна: "+String(e.error||"ошибка"));
+   r.start();status("🎙 Слушаю через диктовку браузера…");
+  }catch(e){status("⚠️ Диктовка недоступна на этом устройстве.")}
+ };
+ voiceActions.append(native);
+}
+$('bai-status').insertAdjacentElement("afterend",voiceActions);
+async function transcribeBlob(blob,type){
+ if(voiceBusy||!blob)return;
+ voiceBusy=true;$('bai-mic').disabled=true;retryVoice.disabled=true;status("⏳ Распознаю голос…");
+ try{
+  const auth=await session();const fd=new FormData();const ext=type.includes("mp4")?"m4a":type.includes("webm")?"webm":"wav";fd.append("audio",blob,"voice."+ext);
+  const response=await fetch(URL+"/functions/v1/banger-transcribe",{method:"POST",headers:{"Authorization":"Bearer "+auth.access_token,"apikey":PUB},body:fd});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok||!data.text?.trim())throw Error(data.error||"Сервис распознавания не смог определить слова");
+  $('bai-input').value=[$('bai-input').value,data.text.trim()].filter(Boolean).join(" ").trim();
+  // Clear the sensitive audio buffer on successful transcription.
+  lastVoiceBlob=null;retryVoice.style.display="none";
+  status("✅ Распознано. Проверь текст и нажми отправить.");
+ }catch(e){
+  retryVoice.style.display=lastVoiceBlob?"inline-flex":"none";
+  status("⚠️ "+String(e.message||e)+" · текст можно ввести вручную, запись не потеряна.");
+ }finally{voiceBusy=false;$('bai-mic').disabled=false;retryVoice.disabled=false;$('bai-mic').innerHTML=micIcon();$('bai-mic').setAttribute("aria-label","Записать голос")}
+}
+retryVoice.onclick=()=>{if(lastVoiceBlob)transcribeBlob(lastVoiceBlob,lastVoiceType)};
+function stopVoice(){
+ if(voiceRecorder?.state==="recording"){voiceRecorder.stop();$('bai-mic').textContent="…";$('bai-mic').disabled=true;status("⏳ Завершаю запись…")}
+}
 $('bai-mic').onclick=async()=>{
-if(voiceBusy)return;
-if(voiceRecorder&&voiceRecorder.state==='recording'){stopVoice();return}
-try{
-if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder)throw Error('Запись недоступна в этом браузере. Открой сайт в Safari.');
-voiceStream=await navigator.mediaDevices.getUserMedia({audio:true});
-const formats=['audio/mp4','audio/webm;codecs=opus','audio/webm'];const mime=formats.find(x=>MediaRecorder.isTypeSupported(x))||'';
-voiceRecorder=new MediaRecorder(voiceStream,mime?{mimeType:mime}:undefined);voiceChunks=[];
-voiceRecorder.ondataavailable=e=>{if(e.data?.size)voiceChunks.push(e.data)};
-voiceRecorder.onerror=e=>status('Ошибка записи: '+(e.error?.message||'неизвестная'));
-voiceRecorder.onstop=async()=>{
-voiceBusy=true;$('bai-mic').disabled=true;
-try{
-voiceStream?.getTracks().forEach(t=>t.stop());voiceStream=null;
-const type=voiceRecorder.mimeType||mime||'audio/mp4',ext=type.includes('mp4')?'m4a':'webm';
-const blob=new Blob(voiceChunks,{type});if(blob.size<1000)throw Error('Запись слишком короткая');
-const auth=await session();const fd=new FormData();fd.append('audio',blob,'voice.'+ext);
-const response=await fetch(URL+'/functions/v1/banger-transcribe',{method:'POST',headers:{'Authorization':'Bearer '+auth.access_token,'apikey':PUB},body:fd});
-const data=await response.json();if(!response.ok)throw Error(data.error||'Не удалось распознать');
-$('bai-input').value=[$('bai-input').value,data.text||''].filter(Boolean).join(' ').trim();
-status('✅ Голос распознан. Проверь текст и нажми «Отправить».');
-}catch(e){status('⚠️ '+e.message)}finally{voiceBusy=false;voiceRecorder=null;$('bai-mic').disabled=false;$('bai-mic').innerHTML=micIcon();$('bai-mic').setAttribute('aria-label','Записать голос')}
-};
-voiceRecorder.start();$('bai-mic').textContent='■';$('bai-mic').setAttribute('aria-label','Остановить запись');status('🔴 Идёт запись. Говори, затем нажми «Остановить».');
-}catch(e){voiceStream?.getTracks().forEach(t=>t.stop());voiceStream=null;status('⚠️ '+e.message)}
+ if(voiceBusy)return;
+ if(voiceRecorder?.state==="recording"){stopVoice();return}
+ try{
+  if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder)throw Error("Запись недоступна, попробуй диктовку или текст");
+  voiceStream=await navigator.mediaDevices.getUserMedia({audio:true});
+  const supported=["audio/mp4","audio/webm;codecs=opus","audio/webm"].find(x=>MediaRecorder.isTypeSupported(x))||"";
+  voiceRecorder=new MediaRecorder(voiceStream,supported?{mimeType:supported}:undefined);voiceChunks=[];
+  voiceRecorder.ondataavailable=e=>{if(e.data?.size)voiceChunks.push(e.data)};
+  voiceRecorder.onerror=e=>status("⚠️ Ошибка микрофона: "+String(e.error?.message||"неизвестная"));
+  voiceRecorder.onstop=()=>{
+   voiceStream?.getTracks().forEach(t=>t.stop());voiceStream=null;
+   const type=voiceRecorder?.mimeType||supported||"audio/mp4",blob=new Blob(voiceChunks,{type});
+   voiceRecorder=null;voiceChunks=[];
+   if(blob.size<1000){status("⚠️ Очень короткая запись, попробуй ещё раз.");$('bai-mic').disabled=false;$('bai-mic').innerHTML=micIcon();return}
+   lastVoiceBlob=blob;lastVoiceType=type;retryVoice.style.display="inline-flex";
+   transcribeBlob(blob,type);
+  };
+  voiceRecorder.start();$('bai-mic').textContent="■";$('bai-mic').setAttribute("aria-label","Остановить запись");
+  status("🔴 Идёт запись. Нажми квадрат, когда закончишь.");
+ }catch(e){voiceStream?.getTracks().forEach(t=>t.stop());voiceStream=null;status("⚠️ "+String(e.message||e));$('bai-mic').disabled=false;$('bai-mic').innerHTML=micIcon()}
 };
 $('bai-open').onclick=()=>{$('bai-modal').classList.add('open');status('⏳ Проверяю подключение Gemini…');session().then(()=>status('🟢 Gemini подключён. Отправь сообщение для проверки.')).catch(e=>status('⚠️ '+e.message))};
 $('bai-close').onclick=()=>$('bai-modal').classList.remove('open');
