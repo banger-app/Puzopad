@@ -15,7 +15,8 @@ const PHOTO=Object.freeze({
  squat:"Leg_Press",legpress:"Leg_Press",hinge:"Romanian_Deadlift",
  calves:"Standing_Calf_Raises",plank:"Plank"
 });
-const source=(id,n)=>root+(PHOTO[id]||PHOTO.warm)+"/"+(n===1?"1":"0")+".jpg";
+const source=(id,n)=>"./assets/exercises-v81/"+(PHOTO[id]||PHOTO.warm)+"/"+(n===1?"1":"0")+".jpg";
+const remote=(id,n)=>root+(PHOTO[id]||PHOTO.warm)+"/"+(n===1?"1":"0")+".jpg";
 const previous=window.pzExerciseVisuals;
 if(!previous)return;
 function render(id){
@@ -30,5 +31,14 @@ function thumb(id){
  return '<img src="'+source(id,0)+'" loading="lazy" decoding="async" alt="'+(previous.meta[id]?.[0]||"Упражнение")+'">';
 }
 previous.render=render;previous.thumb=thumb;
-window.pzExerciseGalleryV81={source,photoIds:PHOTO,thumb};
+// If the local asset download hasn't deployed yet, use the pinned upstream image.
+ document.addEventListener("error",event=>{
+   const im=event.target;
+   if(!(im instanceof HTMLImageElement)||im.dataset.pzRemoteTried)return;
+   const name=im.getAttribute("src")||"";
+   if(!name.startsWith("./assets/exercises-v81/"))return;
+   im.dataset.pzRemoteTried="1";
+   im.src=root+name.slice("./assets/exercises-v81/".length);
+ },true);
+ window.pzExerciseGalleryV81={source,remote,photoIds:PHOTO,thumb};
 })();
