@@ -155,3 +155,26 @@ body.pz-locked.pz-checking #pz-login,body.pz-locked.pz-checking #pz-import,body.
   #pz73 .pz80-studio-shell{max-width:100%}
 }
 @media(prefers-reduced-motion:reduce){#nav button,.bang-pin{transition:none!important}}
+
+/* Interactive neon location labels, cosmetic inventory and safe area footer. */
+#city .pz85-map-heading{position:absolute;z-index:4;bottom:43px;left:14px;display:grid;gap:3px;
+ padding:8px 12px;color:white;border-radius:12px;border:1px solid #f47ac57a;background:#141629d9;
+ backdrop-filter:blur(14px);pointer-events:none;max-width:60%}
+#city .pz85-map-heading strong{font-size:17px;letter-spacing:.1em;text-shadow:0 0 10px #f758a6}
+#city .pz85-map-heading small{font-size:9px;letter-spacing:.11em;color:#bdc5e4}
+#home .pz85-coin-button{cursor:pointer;transition:filter .15s}
+#home .pz85-coin-button:active{filter:brightness(1.2)}
+#home .pz85-coin-button:focus-visible{outline:3px solid #88ffdd;outline-offset:3px}
+#store .pz85-season-card{position:relative;isolation:isolate;min-height:185px;border-radius:21px;
+ background:linear-gradient(90deg,#0d1033eb 0%,#180e39af 51%,#14092624 95%),url("./assets/scenes-v84/banger_surechka_city.webp") center 46%/cover no-repeat;
+ margin:0 0 17px;padding:16px;overflow:hidden;border:1px solid #f478c9;
+ box-shadow:0 10px 30px #06091d,0 0 28px #f4539c35}
+#store .pz85-season-copy{display:flex;flex-direction:column;gap:7px;max-width:75%;position:relative;z-index:2}
+#store .pz85-season-copy small{font-size:10px;letter-spacing:.12em;color:#ffc5e8;font-weight:900}
+#store .pz85-season-copy strong{font-size:clamp(20px,5vw,29px);line-height:1.13;color:white;text-shadow:0 3px 10px #070917}
+#store .pz85-season-copy span{font-size:12px;line-height:1.4;color:#ece7ff}
+#store .pz85-season-copy button{align-self:start;padding:9px 16px!important;min-height:39px;
+ background:linear-gradient(120deg,#fa48ae,#af379d)!important;border-color:#ffc1e7!important;color:white!important}
+.v17-bottomnav{background:rgba(18,16,41,.91)!important;backdrop-filter:blur(17px);
+ -webkit-backdrop-filter:blur(17px);border-top:1px solid #e96dbc9e!important;box-shadow:0 -5px 30px #170a3bb3!important}
+.v17-bottomnav button.active{background:linear-gradient(135deg,#74256d,#31204d)!important}
