@@ -91,3 +91,8 @@
 #pz73 .pz77-hero-choice{display:flex;gap:5px;align-items:stretch;min-width:0}
 #pz73 .pz77-hero-choice>.pz73-chip{min-width:0;flex:1;white-space:normal;font-size:11px!important;border-radius:12px!important}
 #pz73 .pz77-hero-choice>.pz73-secondary{flex:0 0 38px;min-width:38px;padding:8px!important}
+
+/* v78 mobile showroom controls */
+#pz73 .pz78-view-controls{display:flex;justify-content:center;gap:9px;margin:-4px 0 15px;padding:0}
+#pz73 .pz78-view-controls button{min-width:62px;min-height:40px!important;padding:6px 14px!important;font-size:20px!important;border-radius:11px}
+#pz73 .pz73-frame canvas{display:block;width:100%;height:100%;object-fit:contain}

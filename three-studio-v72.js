@@ -5,7 +5,7 @@ import {PREMIUM_HERO,PREMIUM_PET} from "./model-sources-v77.js";
 import {clone as cloneRig} from "three/addons/utils/SkeletonUtils.js";
 const $=id=>document.getElementById(id);
 const loader=new GLTFLoader();
-const PET_FILES={dog:"pet-corgi-gobkit.glb",duck:"pet-duck-gobkit.glb",hippo:"pet-hippo-gobkit.glb",rhino:"pet-rhino-gobkit.glb",platypus:"pet-platypus-gobkit.glb",shark:"pet-shark-gobkit.glb",bat:"pet-bat-gobkit.glb",cat:"pet-cat.glb",hamster:"pet-hamster.glb",rabbit:"pet-rabbit.glb",fox:"pet-fox.glb",panda:"pet-panda.glb",parrot:"pet-parrot.glb",penguin:"pet-penguin.glb",fish:"pet-fish.glb",lion:"pet-lion.glb",tiger:"pet-tiger.glb"};
+const PET_FILES={dog:"pet-dog.glb",duck:"pet-duck-gobkit.glb",hippo:"pet-hippo-gobkit.glb",rhino:"pet-rhino-gobkit.glb",platypus:"pet-platypus-gobkit.glb",shark:"pet-shark-gobkit.glb",bat:"pet-bat-gobkit.glb",cat:"pet-cat.glb",hamster:"pet-hamster.glb",rabbit:"pet-rabbit.glb",fox:"pet-fox.glb",panda:"pet-panda.glb",parrot:"pet-parrot.glb",penguin:"pet-penguin.glb",fish:"pet-fish.glb",lion:"pet-lion.glb",tiger:"pet-tiger.glb"};
 const COLORS=[0x56d97b,0xff349a,0x55c5f8,0xf7c45d];
 const CLOTH=[0x252b49,0x496970,0xe33a91,0x7c5ff2];
 const VIEWS=[
@@ -19,7 +19,7 @@ function preview(kind){
  const p=window.pzShopPreview;
  return p&&p.account===window.pzActiveUserId&&p.kind===kind?p.key:null;
 }
-function src(name){return /^https:\/\//.test(name)?name:"./assets/3d/"+name+"?v=77"}
+function src(name){return /^https:\/\//.test(name)?name:"./assets/3d/"+name+"?v=78"}
 function notice(view,msg){if(!view?.host)return;const x=view.host.querySelector(".pz3d-load-status")||document.createElement("p");x.className="pz3d-load-status";x.textContent=msg;view.host.append(x)}
 function clearNotice(view){view.host?.querySelector(".pz3d-load-status")?.remove()}
 function makeViewer(spec){
@@ -27,16 +27,17 @@ function makeViewer(spec){
  host.dataset.viewer="loading";
  try{
   host.textContent="";
-  const renderer=new THREE.WebGLRenderer({alpha:false,antialias:true,powerPreference:"low-power",preserveDrawingBuffer:false});
-  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0x101326,1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;
+  const isHome=spec.kind==="home";
+  const renderer=new THREE.WebGLRenderer({alpha:isHome,antialias:true,powerPreference:"low-power",preserveDrawingBuffer:false});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0x101326,isHome?0:1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=isHome?1.02:1.15;
   renderer.domElement.style.touchAction="pan-y";renderer.domElement.setAttribute("aria-label","Об'ємна 3D-модель. Проведи пальцем для обертання");
   host.append(renderer.domElement);
-  const scene=new THREE.Scene();scene.background=new THREE.Color(0x101326);
+  const scene=new THREE.Scene();scene.background=isHome?null:new THREE.Color(0x101326);
   scene.add(new THREE.HemisphereLight(0xe6f4ff,0x3a2146,2.2));
   const key=new THREE.DirectionalLight(0xffffff,3.0);key.position.set(-2,5,6);scene.add(key);
   const rim=new THREE.DirectionalLight(0xff67bf,1.4);rim.position.set(3,3,-3);scene.add(rim);
   const camera=new THREE.PerspectiveCamera(36,1,.06,100);
-  camera.position.set(0,1.48,spec.kind==="home"?6.6:spec.kind==="pet"?4.65:5.2);camera.lookAt(0,1.20,0);
+  camera.position.set(0,1.36,spec.kind==="home"?5.25:4.75);camera.lookAt(0,1.22,0);
   const floor=new THREE.Mesh(new THREE.CylinderGeometry(1.67,1.73,.23,64),new THREE.MeshStandardMaterial({color:0x292444,metalness:.45,roughness:.38}));
   floor.position.y=-.18;scene.add(floor);
   const edge=new THREE.Mesh(new THREE.TorusGeometry(1.67,.025,8,64),new THREE.MeshStandardMaterial({color:0xff8bc1,emissive:0x85265a,emissiveIntensity:.35}));
@@ -44,14 +45,14 @@ function makeViewer(spec){
   const fillPink=new THREE.PointLight(0xffa8db,13,6);fillPink.position.set(-1.2,2.4,2);scene.add(fillPink);
   const fillBlue=new THREE.PointLight(0x97cafa,9,6);fillBlue.position.set(1.5,2.3,-1.5);scene.add(fillBlue);
   const stage=new THREE.Group();scene.add(stage);
-  const view={...spec,host,renderer,scene,camera,stage,serial:0,key:"",drag:false,lastX:0};
+  const view={...spec,host,renderer,scene,camera,stage,serial:0,key:"",drag:false,lastX:0,lastFrame:0,mixers:[]};
   renderer.domElement.addEventListener("pointerdown",e=>{view.drag=true;view.lastX=e.clientX;try{renderer.domElement.setPointerCapture(e.pointerId)}catch(_){}});
   renderer.domElement.addEventListener("pointermove",e=>{if(!view.drag)return;stage.rotation.y+=(e.clientX-view.lastX)*.012;view.lastX=e.clientX});
   renderer.domElement.addEventListener("pointerup",()=>view.drag=false);
   renderer.domElement.addEventListener("pointercancel",()=>view.drag=false);
   const resize=()=>{
    const w=Math.max(200,host.clientWidth||300),h=Math.max(160,host.clientHeight||330);
-   renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+   renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(stage.children.length)fitCamera(view);
   };
   view.resize=resize;resize();
   if(typeof ResizeObserver!=="undefined")new ResizeObserver(resize).observe(host);
@@ -88,14 +89,51 @@ function getHero(){
  const palette=Math.max(0,Math.min(3,Number(preview("palette")??d?.heroStyle?.palette)||0));
  return sp==="human"?"hero-human.glb":sp==="robot"?"hero-robot.glb":"hero-frog-0-"+palette+".glb";
 }
-function normalize(modelNode,height){
- const bounds=new THREE.Box3().setFromObject(modelNode);
- const center=bounds.getCenter(new THREE.Vector3()),size=bounds.getSize(new THREE.Vector3());
- const maximum=Math.max(.001,size.y,size.x*1.3,size.z*1.3);
- const scale=height/maximum;
- modelNode.scale.multiplyScalar(scale);
- modelNode.position.set(-center.x*scale,-bounds.min.y*scale,-center.z*scale);
- return Math.max(.2,size.y*scale);
+// Fit geometry without changing animated glTF roots. The root may be animated by its clips.
+function normalize(modelNode,wantedHeight){
+ modelNode.updateMatrixWorld(true);
+ const bounds=new THREE.Box3();
+ modelNode.traverse(node=>{
+  if((node.isMesh||node.isSkinnedMesh)&&node.visible!==false){
+   const b=new THREE.Box3().setFromObject(node);
+   if(!b.isEmpty())bounds.union(b);
+  }
+ });
+ if(bounds.isEmpty())bounds.setFromObject(modelNode);
+ const size=bounds.getSize(new THREE.Vector3());
+ const center=bounds.getCenter(new THREE.Vector3());
+ const longSide=Math.max(.001,size.y,size.x*1.16,size.z*1.16);
+ const factor=wantedHeight/longSide;
+ const aligner=new THREE.Group();
+ aligner.add(modelNode);
+ // Translate a parent, not the animated model itself. This avoids overriding glTF bones/root tracks.
+ aligner.position.set(-center.x,-bounds.min.y,-center.z);
+ const normalizer=new THREE.Group();
+ normalizer.scale.setScalar(factor);
+ normalizer.add(aligner);
+ return {root:normalizer,actualHeight:Math.max(.2,size.y*factor)};
+}
+// Reframe camera from the combined *visible* hero/pet geometry so neither looks tiny or floats outside shot.
+function fitCamera(view){
+ if(!view?.stage?.children?.length)return;
+ view.stage.updateMatrixWorld(true);
+ const bounds=new THREE.Box3().setFromObject(view.stage);
+ if(bounds.isEmpty())return;
+ const size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());
+ if(!Number.isFinite(size.y)||!Number.isFinite(center.y))return;
+ const half=Math.tan(THREE.MathUtils.degToRad(view.camera.fov)/2);
+ const a=Math.max(.50,view.camera.aspect||1);
+ const fitV=Math.max(1.9,size.y)/(2*half);
+ const fitH=Math.max(1.25,size.x)/(2*half*a);
+ const distance=THREE.MathUtils.clamp(Math.max(fitV,fitH)*1.28,3.45,8.4);
+ view.camera.position.set(center.x,center.y+.17,center.z+distance);
+ view.camera.lookAt(center.x,center.y+.04,center.z);
+ view.camera.near=.05;view.camera.far=80;view.camera.updateProjectionMatrix();
+}
+function safeIdle(animations){
+ return animations.find(c=>/^(idle|stand|rest|breath|sit)(?:[\\s_.-]|$)/i.test(c.name))
+  ||animations.find(c=>/idle|standing|breathing/i.test(c.name)&&!/attack|die|death|jump|run|walk|hit|hurt/i.test(c.name))
+  ||null;
 }
 function addAccessories(root,style,height,type,shirt,skin){
  const pink=material(0xff65b5),gold=material(0xffd46b),white=material(0xcde8fa);
@@ -227,10 +265,10 @@ async function put(view,kind,x=0,z=0,scale=1){
   }else obj=placeholderPet(petKey);
  }
  const target=new THREE.Group();target.position.set(x,0,z);target.scale.setScalar(scale);
- const actual=normalize(obj,kind==="hero"?2.55:1.78);
- const rig=new THREE.Group();rig.add(obj);target.add(rig);
- if(anims.length){
-  const idle=anims.find(c=>/idle|stand|breath/i.test(c.name))||anims[0];
+ const fitted=normalize(obj,kind==="hero"?2.75:2.05);
+ const actual=fitted.actualHeight;target.add(fitted.root);
+ const idle=safeIdle(anims);
+ if(idle){
   const mixer=new THREE.AnimationMixer(obj);mixer.clipAction(idle).play();target.userData.mixer=mixer;
  }
  if(d?.wardrobeV73){
@@ -251,10 +289,11 @@ async function renderModels(view){
  if(identity===view.key)return;
  view.key=identity;const serial=++view.serial;notice(view,"Завантажуємо справжню 3D модель…");
  try{
-  const hero=view.kind!=="pet"?await put(view,"hero",view.kind==="home"?-.7:0,0,view.kind==="home"?.85:1):null;
-  const pet=view.kind!=="hero"?await put(view,"pet",view.kind==="home"?.85:0,0,view.kind==="home"?.68:1):null;
+  const hero=view.kind!=="pet"?await put(view,"hero",view.kind==="home"?-.72:0,0,view.kind==="home"?.95:1):null;
+  const pet=view.kind!=="hero"?await put(view,"pet",view.kind==="home"?.90:0,0,view.kind==="home"?.78:1):null;
   if(serial!==view.serial||window.pzActiveUserId!==identity.split("|")[0])return;
   view.stage.clear();view.mixers=[];if(hero){view.stage.add(hero);if(hero.userData.mixer)view.mixers.push(hero.userData.mixer)}if(pet){view.stage.add(pet);if(pet.userData.mixer)view.mixers.push(pet.userData.mixer)}
+  fitCamera(view);
   if(view.kind==="home"&&hero){document.body.classList.add("pz-three-ready");}
   clearNotice(view);view.host.dataset.viewer="loaded";
  }catch(e){view.key="";view.host.dataset.viewer="failed";notice(view,"3D поки не завантажилось: "+String(e.message||e)+". Перевір інтернет і перезавантаж сторінку.");}
@@ -280,6 +319,17 @@ function loop(t){
   v.renderer.render(v.scene,v.camera);
  }
 }
+window.pz3dZoom=(kind,direction)=>{
+ const id=kind==="pet"?"pz-pet3d-stage":"pz3d-stage";
+ const v=renderers.find(x=>x.id===id);if(!v)return;
+ v.camera.zoom=THREE.MathUtils.clamp(v.camera.zoom*(direction>0?1.2:1/1.2),.75,2.6);
+ v.camera.updateProjectionMatrix();
+};
+window.pz3dReset=(kind)=>{
+ const id=kind==="pet"?"pz-pet3d-stage":"pz3d-stage";
+ const v=renderers.find(x=>x.id===id);if(!v)return;
+ v.stage.rotation.set(0,0,0);v.camera.zoom=1;fitCamera(v);
+};
 window.pz3dRefresh=update;
 window.addEventListener("pz:unlocked",()=>setTimeout(update,150));
 window.addEventListener("pz:style-change",()=>setTimeout(update,30));

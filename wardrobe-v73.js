@@ -186,7 +186,15 @@ function root(){
  hero ||= $node("div","","");hero.id="pz3d-stage";
  pet ||= $node("div","","");pet.id="pz-pet3d-stage";
  const hidden=$node("div","");hidden.hidden=true;hidden.id="pz73-hidden";hidden.append(hero,pet);
- ui.append(frame,hidden);ui._hero=hero;ui._pet=pet;
+ ui.append(frame);
+ const controls=$node("div","pz78-view-controls");
+ controls.append(
+  $btn("−",()=>window.pz3dZoom?.(tab,-1),"pz73-secondary"),
+  $btn("＋",()=>window.pz3dZoom?.(tab,1),"pz73-secondary"),
+  $btn("⟲",()=>window.pz3dReset?.(tab),"pz73-secondary")
+ );
+ controls.setAttribute("aria-label","3D viewer controls");
+ ui.append(controls,hidden);ui._hero=hero;ui._pet=pet;
  const content=$node("div","pz73-content");content.id="pz73-content";ui.append(content);
  const note=$node("p","pz73-notice");note.id="pz73-notice";note.setAttribute("role","status");ui.append(note);host.append(ui);
  return ui;
