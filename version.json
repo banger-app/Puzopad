@@ -1,7 +1,7 @@
 {
-  "build": "64",
+  "build": "65",
   "date": "2026-10-26",
   "assets": "puzopad-standalone-icon-v1",
   "stable_url": "/Puzopad/",
-  "changes": "account-first-existing-character-recovery-legacy-json-import-automatic-cloud-profile-save-ukrainian-onboarding"
+  "changes": "safe-email-account-switching-two-independent-profiles-collapsed-recovery-legacy-save-restore"
 }
