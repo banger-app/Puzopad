@@ -1,7 +1,7 @@
 {
-  "build": "80.3",
+  "build": "81",
   "date": "2026-10-26",
   "assets": "puzopad-standalone-icon-v1",
   "stable_url": "/Puzopad/",
-  "changes": "single-hero-no-floating-armor-and-food-string-id-deletion-correction"
+  "changes": "benny-messenger-multi-image-voice-replies-photographic-workout-guides"
 }

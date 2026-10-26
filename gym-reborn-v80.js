@@ -110,7 +110,7 @@ function make(g){
     session.index=i;store();make(g);
    },i===stepIndex?"pz80-step-current":yes?"pz80-step-done":"pz80-step");
    if(window.pzExerciseVisuals?.meta?.[st[0]]){
-     const thumb=el("span","pz803-step-thumb");thumb.innerHTML=window.pzExerciseVisuals.render(st[0]);
+     const thumb=el("span","pz803-step-thumb");thumb.innerHTML=window.pzExerciseVisuals.thumb?window.pzExerciseVisuals.thumb(st[0]):window.pzExerciseVisuals.render(st[0]);
      stepButton.insertBefore(thumb,stepButton.firstChild);
    }
    done.append(stepButton);
@@ -129,6 +129,11 @@ function make(g){
  }
 }
 function status(s){let node=$("pz-gym-status");if(node)node.textContent=s}
+function photoCredit(){
+ const root=$("pz-gym-zone");if(!root||!window.pzExerciseGalleryV81||root.querySelector(".pz81-attribution"))return;
+ const credit=el("p","pz81-attribution");const link=el("a","", "Exercise photos · free-exercise-db (Unlicense)");
+ link.href="https://github.com/yuhonas/free-exercise-db";link.target="_blank";link.rel="noopener noreferrer";credit.append(link);root.append(credit);
+}
 function history(){
  const box=$("pz-gym-history"),d=data();if(!box)return;box.replaceChildren();
  box.append(el("h3","",T("log")));
@@ -144,7 +149,7 @@ function boot(){
  root.closest("#pz-gym-main")?.classList.add("pz80-gym-main");
  const g=state();
  if(g?.session&&Date.now()-Number(g.session.startedAt)>16*3600*1000){g.session=null;store()}
- make(g);history();status(T("recorded"));
+ make(g);photoCredit();history();status(T("recorded"));
 }
 window.addEventListener("pz:unlocked",boot);
 window.addEventListener("banger:local-save",()=>{if(data()&&window.pzActiveUserId!==lastUid)boot()});
