@@ -192,3 +192,8 @@ body.pz-locked.pz-checking #pz-login,body.pz-locked.pz-checking #pz-import,body.
 #bai-form .pz83-wave i{animation:none!important;transition:height 75ms linear}
 @media(max-width:390px){#bai-panel .pz83-call-overlay{height:232px!important;max-height:232px!important}}
 @media(prefers-reduced-motion:reduce){#bai-panel .pz85-call-wavebar,#bai-form .pz83-wave i{transition:none}}
+
+/* v85.2: compact iPhone-safe Benny composer */
+#bai-composer #bai-input{font-size:16px!important;line-height:22px!important;min-height:42px!important;min-width:0!important}
+#bai-composer{width:100%;max-width:100%;box-sizing:border-box}
+#bai-form{max-width:100%;box-sizing:border-box}
