@@ -1,6 +1,6 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js";
 const Q=id=>document.getElementById(id);
-let root,renderer,scene,camera,figure,last=0,drag=false,oldX=0,parts={};
+let root,renderer,homeRenderer,scene,camera,homeCamera,figure,last=0,drag=false,oldX=0,parts={};
 const PALETTES=[
  {name:"Лісовий / Лесной",color:0x56d97b,cost:0},
  {name:"Неоновий / Неоновый",color:0xff349a,cost:20},
@@ -77,6 +77,25 @@ function sceneStart(){
   build();
   function resize(){const w=container.clientWidth||320,h=container.clientHeight||380;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
   new ResizeObserver(resize).observe(container);resize();
+  const homeHost=Q("pz3d-home-stage");
+  if(homeHost){
+    try{
+      homeRenderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:"low-power"});
+      homeRenderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
+      homeRenderer.outputColorSpace=THREE.SRGBColorSpace;
+      homeHost.appendChild(homeRenderer.domElement);
+      homeCamera=camera.clone();
+      homeCamera.position.set(0,1.0,8.0);homeCamera.lookAt(0,.95,0);
+      const sizeHome=()=>{const w=homeHost.clientWidth||290,h=homeHost.clientHeight||260;homeRenderer.setSize(w,h,false);homeCamera.aspect=w/h;homeCamera.updateProjectionMatrix()};
+      new ResizeObserver(sizeHome).observe(homeHost);sizeHome();
+      homeRenderer.domElement.style.touchAction="pan-y";
+      homeRenderer.domElement.addEventListener("pointerdown",e=>{drag=true;oldX=e.clientX;homeRenderer.domElement.setPointerCapture(e.pointerId)});
+      homeRenderer.domElement.addEventListener("pointerup",()=>drag=false);
+      homeRenderer.domElement.addEventListener("pointercancel",()=>drag=false);
+      homeRenderer.domElement.addEventListener("pointermove",e=>{if(!drag)return;figure.rotation.y+=(e.clientX-oldX)*.012;oldX=e.clientX});
+      document.body.classList.add("pz-three-ready");
+    }catch(e){console.warn("Home 3D unavailable",e)}
+  }
   renderer.domElement.style.touchAction="pan-y";
   renderer.domElement.addEventListener("pointerdown",e=>{drag=true;oldX=e.clientX;renderer.domElement.setPointerCapture(e.pointerId)});
   renderer.domElement.addEventListener("pointerup",()=>drag=false);
@@ -84,7 +103,7 @@ function sceneStart(){
   renderer.domElement.addEventListener("pointermove",e=>{if(!drag)return;figure.rotation.y+=(e.clientX-oldX)*.012;oldX=e.clientX});
   const loop=t=>{requestAnimationFrame(loop);if(!document.body.classList.contains("pz-unlocked")||document.hidden)return;
    if(figure){figure.position.y=-.24+Math.sin(t/700)*.035;if(!drag)figure.rotation.y+=.0025;}
-   renderer.render(scene,camera);};requestAnimationFrame(loop);
+   renderer.render(scene,camera);if(homeRenderer&&homeCamera)homeRenderer.render(scene,homeCamera);};requestAnimationFrame(loop);
  }catch(err){container.dataset.ready="0";container.textContent="3D недоступно на этом устройстве: "+err.message}
 }
 function persistStyle(){const d=state();if(!d)return;if(typeof persist==="function")persist();renderOptions();build();}
@@ -115,7 +134,7 @@ function init(){
  if(!document.body.classList.contains("pz-unlocked"))return;
  const d=state();if(!d?.profile?.created)return;
  const area=Q("pz3d-area");if(!area)return;
- const old=Q("v20AvatarSlot");if(old){old.style.opacity="1";}
+ const old=Q("v20AvatarSlot");if(old&&document.body.classList.contains("pz-three-ready"))old.style.visibility="hidden";
  const hero=Q("pz3d-home");if(hero){hero.hidden=false;hero.textContent="🎮 "+(d.profile.name||"Герой")+" · 3D студія";hero.onclick=()=>{if(typeof go==="function")go("wardrobe");area.scrollIntoView({behavior:"smooth",block:"start"})};}
  sceneStart();renderOptions();build();
 }
