@@ -394,7 +394,7 @@ function setup(){
  $("pz-archive").onclick=()=>{if(typeof v20ExportAll==="function")v20ExportAll();else alert("Перейди в настройки резервных копий");};
  $("pz-settings-close").onclick=()=>menu(false);
  $("pz-open-account").onclick=()=>{menu(false);$("cloud31open")?.click()};
- $("pz-signout").onclick=switchAccount;
+ // One visible switch-account action; no duplicate sign-out buttons.
  $("pz-language").value=localStorage.getItem("banger_language")||"uk";
  $("pz-language").onchange=e=>{localStorage.setItem("banger_language",e.target.value);
   const orig=document.getElementById("banger-language-select");if(orig){orig.value=e.target.value;orig.dispatchEvent(new Event("change",{bubbles:true}))}
@@ -413,7 +413,7 @@ async function boot(){
  try{
  state.client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  state.client.auth.onAuthStateChange((event,session)=>{
-  if(event==="SIGNED_OUT"){if(state.user?.id&&typeof db!=="undefined"){try{localStorage.setItem(PREFIX+state.user.id,JSON.stringify(db))}catch(_){}}state.ready=false;state.user=null;state.hydrated=null;window.pzActiveUserId=null;show("login");}
+  if(event==="SIGNED_OUT"){if(state.user?.id&&window.pzActiveUserId===state.user.id&&typeof db!=="undefined"&&db?.profile?.created){try{localStorage.setItem(PREFIX+state.user.id,JSON.stringify(db))}catch(_){}}state.ready=false;state.user=null;state.hydrated=null;window.pzActiveUserId=null;show("login");}
   else if(event==="SIGNED_IN"||event==="INITIAL_SESSION"){Promise.resolve().then(()=>signedIn(session?.user||null));}
  });
  const {data,error}=await state.client.auth.getSession();if(error)throw error;
