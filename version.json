@@ -1,7 +1,7 @@
 {
-  "build": "83",
+  "build": "84",
   "date": "2026-10-27",
   "assets": "puzopad-standalone-icon-v1",
   "stable_url": "/Puzopad/",
-  "changes": "Benny voice recorder and spoken turn-based dialogue; raster illustrated Pepe and toy-poodle Surachka in independent RPG scenes"
+  "changes": "3 curated cinematic hero+pet scene presets, reusable neon navigation icons, compact one-tap Benny voice UI"
 }

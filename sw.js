@@ -1,11 +1,11 @@
-const REV="puzopad-v83-20261027";
+const REV="puzopad-v84-20261027";
 self.addEventListener("install",()=>self.skipWaiting());
 self.addEventListener("activate",event=>event.waitUntil(self.clients.claim()));
 self.addEventListener("fetch",event=>{
  const request=event.request;
  if(request.method!=="GET"||new URL(request.url).origin!==self.location.origin)return;
  const pathname=new URL(request.url).pathname;
- if(/\/assets\/(?:exercises-v81\/.+\.jpg|art-v83\/.+\.webp)$/i.test(pathname)){
+ if(/\/assets\/(?:exercises-v81\/.+\.jpg|art-v83\/.+\.webp|scenes-v84\/.+\.webp)$/i.test(pathname)){
   event.respondWith(
    caches.open(REV+"-gym").then(async cache=>{
     const offline=await cache.match(request);if(offline)return offline;
