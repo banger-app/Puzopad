@@ -221,3 +221,47 @@ test("ART REBORN wardrobe switching never locks a companion to a hero",()=>{
  assert.equal(data.coins,300);
  assert.ok(saves>=4);
 });
+
+test("v82 complete outfit sets: paid once, try-on never charges, other hero keeps clothes",()=>{
+ const data={coins:320,profile:{created:true,name:"BANGER",species:"frog",pet:"dog",petName:"Суречка"},artV82:{scene:"city"},foods:[{id:"verified",k:503}],wardrobeV73:{owned:["starter"],wear:{torso:"starter"},petItems:[],pets:["none","dog","cat","hamster"]}};
+ const window={pzActiveUserId:"account-1",addEventListener(){},dispatchEvent(){},pzArtV82:{HEROES:[{id:"frog"},{id:"robot"}]}};
+ const document={readyState:"loading",addEventListener(){},getElementById:()=>null};
+ let persists=0;
+ const code=read("wardrobe-v73.js").replace("function render(){","function render(){return;");
+ vm.runInNewContext(code,{db:data,window,document,localStorage:{getItem:()=>"ru"},Event:class Event{},persist:()=>persists++,updateDashboardV16:()=>{}});
+ const api=window.pzWardrobeV73;api.setup();
+ const street=api.SETS.find(x=>x.id==="street");
+ api.chooseSet(street);
+ assert.equal(data.coins,280);
+ assert.ok(data.wardrobeV73.owned.includes("sneakers"));
+ api.chooseSet(street);
+ assert.equal(data.coins,280,"re-equipping an owned set never charges again");
+ assert.equal(data.profile.pet,"dog");
+ assert.equal(data.profile.petName,"Суречка");
+ api.chooseHero("robot");
+ assert.equal(data.wardrobeV73.wear.torso,"starter");
+ data.coins=12;const previous=JSON.stringify(data.wardrobeV73.wear);
+ api.chooseSet(api.SETS.find(x=>x.id==="cyber"));
+ assert.equal(data.coins,12,"insufficient balance never charges");
+ assert.equal(JSON.stringify(data.wardrobeV73.wear),previous,"insufficient balance never equips");
+ assert.deepEqual(data.foods,[{id:"verified",k:503}]);
+ assert.ok(persists>=3);
+});
+test("v82 full-set preview changes composed appearance but not wallet or saved scene",()=>{
+ const d={coins:17,profile:{created:true,species:"frog",pet:"cat",petName:"Мася"},artV82:{scene:"city"},wardrobeV73:{wear:{torso:"starter"},petWear:{}}};
+ const w={pzActiveUserId:"acct-A",pzWardrobePreviewV73:{uid:"acct-A",which:"set",id:"halloween"},pzWardrobeV73:{HERO:[["pumpkincoat","torso"],["witchhat","head"],["batcape","back"],["halloweenmask","face"]],SETS:[{id:"halloween",items:["pumpkincoat","witchhat","batcape","halloweenmask"],scene:"halloween"}]},addEventListener(){}};
+ vm.runInNewContext(read("art-engine-v82.js"),{window:w,db:d,document:{readyState:"loading",addEventListener(){},getElementById:()=>null},localStorage:{getItem:()=>"ru"},setTimeout:()=>{},console});
+ const composed=w.pzArtV82.current();
+ assert.equal(composed.heroWear.torso,"pumpkincoat");
+ assert.equal(composed.scene,"halloween");
+ assert.equal(d.artV82.scene,"city");
+ assert.equal(d.wardrobeV73.wear.torso,"starter");
+ assert.equal(d.coins,17);
+});
+test("v82 interactive art gallery is safe and includes all combinable heroes and pets",()=>{
+ const p=read("gallery/v82-preview.html"),art=read("art-engine-v82.js");
+ assert.ok(p.includes("art-engine-v82.js"));
+ assert.ok(p.includes('id="chooseHero"')&&p.includes('id="choosePet"')&&p.includes('id="chooseScene"'));
+ assert.ok(art.includes("function heroArt(")&&art.includes("function petArt(")&&art.includes("function sceneArt("));
+ assert.ok(!read("index.html").includes('type="module" src="./three-studio-v72.js'));
+});
