@@ -1,7 +1,7 @@
 {
-  "build": "69",
+  "build": "70",
   "date": "2026-10-26",
   "assets": "puzopad-standalone-icon-v1",
   "stable_url": "/Puzopad/",
-  "changes": "keep-supabase-session-signed-in-and-open-hq-immediately-no-recovery-gate"
+  "changes": "8-game-arcade-hub-fullscreen-touch-shared-coins-records-audio-toggle"
 }
