@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const Q=id=>document.getElementById(id);
-const PALETTES=[["Лісовий",0],["Неоновий",20],["Океан",20],["Золотий",40]];
+const PALETTES=[[0,"Лісовий",0],[1,"Неоновий",20],[2,"Океан",20],[3,"Золотий",40]];
 const OUTFITS=[["casual","Повсякденний",0],["work","Робочий",25],["gym","Спортивний",20],["hero","Легендарний",60]];
 const PET_STYLES=[["plain","Без аксесуара",0],["bow","Бант",10],["cap","Кепка",15],["scarf","Шарф",20],["crown","Корона",50],["glasses","Окуляри",25],["backpack","Рюкзачок",35]];
 const PETS=["dog","cat","turtle","hamster","rabbit","parrot","fox","panda","crocodile","hedgehog","otter","fish","penguin","owl","dragon","none"];
