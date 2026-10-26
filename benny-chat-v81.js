@@ -159,7 +159,7 @@ document.addEventListener("keydown",event=>{if(event.key==="Escape"&&modal.class
 const statusObserver=new MutationObserver(()=>{
  const st=(statusBox.textContent||"").toLowerCase();
  if(st.includes("aborted"))statusBox.textContent="";
- if(!st.includes("⚠️")&&!st.includes("🔴")&&!st.includes("запись")&&!st.includes("слушаю"))statusBox.textContent="";
+ if(st&&!st.includes("⚠️")&&!st.includes("🔴")&&!st.includes("запись")&&!st.includes("слушаю"))statusBox.textContent="";
 });
 statusObserver.observe(statusBox,{childList:true,characterData:true,subtree:true});
 window.addEventListener("pz:unlocked",()=>{
