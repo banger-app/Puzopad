@@ -31,7 +31,7 @@ function applyGameUi(){
  const archive=document.getElementById("pz-archive");
  if(archive)archive.onclick=()=>{const fn=typeof v20ExportAll==="function"?v20ExportAll:null;if(fn)fn();else alert("Архив пока недоступен — используй раздел «Сохранения»")};
  if(!hero?.created)return;
- const petLabel={dog:"🐩 Собака",cat:"🐈 Кот",turtle:"🐢 Черепаха",crocodile:"🐊 Крокодил",none:"✨ Без компаньона"}[hero.pet]||"🐾 Компаньон";
+ const petLabel=(hero.petName||({dog:"Собака",cat:"Кіт",turtle:"Черепаха",crocodile:"Крокодил",none:"Без компаньйона"}[hero.pet]||"Компаньйон"));
  const comp=document.querySelector("#companion h2");if(comp)comp.textContent=petLabel+" · компаньон";
  const petButtons=home?.querySelectorAll("button");
  petButtons?.forEach(el=>{if(el.textContent.includes("Суречка"))el.textContent=petLabel});
@@ -49,8 +49,9 @@ function unlock(){
  const profile=typeof db!=="undefined"?db.profile:null;
  const nickname=$("pz-account-name");if(nickname)nickname.textContent=profile?.name||"Игрок";
  const pets=document.querySelectorAll(".v20-pet");
- if(profile?.pet&&profile.pet!=="dog"){pets.forEach(el=>{el.title=profile.pet;el.innerHTML="<span style='font-size:60px'>"+({cat:"🐈",turtle:"🐢",crocodile:"🐊",none:"✨"}[profile.pet]||"🐾")+"</span>"})}
+ if(profile?.pet){pets.forEach(el=>{el.title=profile.petName||profile.pet;el.innerHTML="<span class='pz-personal-pet' style='font-size:57px'>"+(window.pzPetEmoji?.(profile.pet)||"🐾")+"</span>"+"<small>"+(profile.petName||"")+"</small>"})}
  try{render();if(typeof renderDiaryRange==="function")renderDiaryRange();applyGameUi();}catch(err){console.warn("pz render",err)}
+ window.dispatchEvent(new CustomEvent("pz:unlocked",{detail:{userId:state.user?.id||null}}));
 }
 function snapshot(value){try{return JSON.stringify(value)}catch(_){return null}}
 function load(value,accountId){
@@ -130,7 +131,7 @@ function profileMade(){
  const pet=$("pz-pet-choice").value;
  const species=$("pz-species").value;
  if(!name){say("Выбери имя персонажа");return}
- const profile={created:true,name,species,pet,location:"home",outfit:"casual"};
+ const profile={created:true,name,species,pet,petName:($("pz-pet-name")?.value||"").trim().slice(0,40),location:"home",outfit:"casual"};
  db.profile=profile;
  if(species==="frog")db.characterName=name;
  if(typeof persist==="function")persist();
@@ -183,7 +184,7 @@ async function signInGoogle(){
   if(error)throw error;
  }catch(e){say("Не удалось начать вход через Google: "+e.message)}
 }
-function menu(open){$("pz-menu").hidden=!open}
+function menu(open){const el=$("pz-menu");if(!el)return;el.hidden=!open;el.style.display=open?"flex":"none";$("pz-settings")?.setAttribute("aria-expanded",String(open));}
 function setLangNav(){
  const lang=localStorage.getItem("banger_language")||"uk";
  const byid={home:["Штаб","Штаб","Home"],city:["Місто","Город","City"],diary:["Їжа","Еда","Food"],fridge:["Холодильник","Холодильник","Fridge"],drinks:["Напої","Напитки","Drinks"],sleep:["Сон","Сон","Sleep"],weight:["Вага","Вес","Weight"],charts:["Графіки","Графики","Charts"],fuel:["Гараж","Гараж","Garage"],gym:["Зал","Зал","Gym"],companion:["Компаньйон","Компаньон","Companion"],quests:["Завдання","Задания","Quests"],wardrobe:["Гардероб","Гардероб","Wardrobe"]};
@@ -204,7 +205,7 @@ function setup(){
  $("pz-old-import").onclick=fromOld;
  $("pz-old-new").onclick=newGame;
  $("pz-new-create").onclick=profileMade;
- $("pz-settings").onclick=()=>menu(!$("pz-menu").hidden);
+ $("pz-settings").onclick=e=>{e.preventDefault();e.stopPropagation();menu(!$("pz-menu").hidden)};
  $("pz-archive").onclick=()=>{if(typeof v20ExportAll==="function")v20ExportAll();else alert("Перейди в настройки резервных копий");};
  $("pz-settings-close").onclick=()=>menu(false);
  $("pz-open-account").onclick=()=>{menu(false);$("cloud31open")?.click()};
