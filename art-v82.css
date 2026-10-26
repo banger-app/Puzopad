@@ -35,3 +35,14 @@ body.pz-art-ready #v20AvatarSlot,body.pz-art-ready #v17Avatar,body.pz-art-ready 
 @media (min-width:840px){#pz73 .pz80-studio-shell{grid-template-columns:minmax(0,55fr) minmax(0,45fr);grid-template-rows:1fr;height:min(720px,75dvh)}#pz73 .pz73-species{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (max-width:380px){#pz73 .pz80-studio-shell{height:clamp(525px,calc(100dvh - 135px),790px);grid-template-rows:minmax(282px,53fr) minmax(200px,47fr)}#pz73 .pz82-hero-mini{height:77px}#pz73 .pz82-hero-choice{padding:3px}}
 @media(prefers-reduced-motion:reduce){#pz73 .pz73-card{transition:none}}
+
+#pz73 .pz82-sets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:5px 0 12px}
+#pz73 .pz82-set-card{background:linear-gradient(155deg,#2b2144,#191b2f);border:1px solid #79608d;border-radius:15px;padding:8px;min-width:0;display:grid;gap:6px}
+#pz73 .pz82-set-card.rarity-legend{border-color:#f0bc61;box-shadow:0 0 18px #e3a85525}
+#pz73 .pz82-set-card.rarity-epic{border-color:#ac6ef5}
+#pz73 .pz82-set-card strong{font-size:13px;color:#fff}
+#pz73 .pz82-set-art{height:114px;background:radial-gradient(ellipse,#6a305d,#17192c);border-radius:10px;overflow:hidden}
+#pz73 .pz82-set-art svg{width:100%;height:100%;display:block}
+#pz73 .pz82-set-actions{display:flex;gap:5px}
+#pz73 .pz82-set-actions .pz73-primary{flex:1;min-width:0;font-size:10px!important;padding:6px 4px!important;white-space:normal}
+#pz73 .pz82-set-actions .pz73-secondary{width:42px;min-width:42px;padding:5px!important}
