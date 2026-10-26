@@ -105,10 +105,16 @@ function watchWorld(){
  new MutationObserver(()=>{if(lock||!active)return;lock=true;try{identity()}finally{lock=false}}).observe(node,{childList:true,characterData:true,subtree:true});
  });
 }
-window.addEventListener("pz:unlocked",()=>{
+function startUi(){
  active=true;tweaks();watchWorld();
+ const foodStats=$("v17FoodStats");
+ if(foodStats&&!foodStats.dataset.pzObserver){foodStats.dataset.pzObserver="1";let locked=false;new MutationObserver(()=>{if(locked||!active)return;locked=true;try{macro()}finally{locked=false}}).observe(foodStats,{childList:true,characterData:true,subtree:true});}
+}
+window.addEventListener("pz:unlocked",()=>{
+ startUi();
  const macros=$("todayMacro");if(macros&&!macros.dataset.observed){macros.dataset.observed="1";new MutationObserver(()=>{if(!macros.textContent.includes("Белки")&&!macros.textContent.includes("Білки")&&!macros.textContent.includes("Protein"))macro()}).observe(macros,{childList:true,subtree:true,characterData:true})}
 });
-window.addEventListener("banger:local-save",()=>{if(active){identity();gamification()}});
+window.addEventListener("banger:local-save",()=>{if(active){identity();macro();gamification()}});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&active)tweaks()});
+if(document.body?.classList.contains("pz-unlocked"))setTimeout(startUi,0);
 })();
