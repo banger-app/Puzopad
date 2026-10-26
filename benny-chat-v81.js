@@ -46,6 +46,18 @@ function clearLog(){log.replaceChildren();log.append(node("div","bai-msg bai-ass
 function addMessage(role,text,images){
  const bubble=node("div","bai-msg bai-"+role);const message=node("div","pz81-message-text",text|| (images?.length?"📷 "+T("photos"):""));bubble.append(message);
  if(images?.length){const gallery=node("div","pz81-image-gallery");for(const src of images){const im=node("img","pz81-chat-photo");im.src=src;im.loading="lazy";im.alt=T("photos");gallery.append(im)}bubble.append(gallery)}
+ if(role==="assistant"&&text&&"speechSynthesis" in window){
+  const playback=button("🔊",()=>{try{
+   window.speechSynthesis.cancel();
+   const u=new SpeechSynthesisUtterance(String(text).slice(0,1300));
+   u.lang=lang()==="uk"?"uk-UA":lang()==="en"?"en-US":"ru-RU";
+   const voices=window.speechSynthesis.getVoices?.()||[];
+   u.voice=voices.find(v=>v.lang?.toLowerCase()===u.lang.toLowerCase())||null;
+   window.speechSynthesis.speak(u);
+  }catch(_){} },"pz83-replay");
+  playback.setAttribute("aria-label",lang()==="uk"?"Прослухати відповідь":lang()==="en"?"Play response":"Прослушать ответ");
+  bubble.append(playback);
+ }
  log.append(bubble);scrollEnd();return bubble;
 }
 function updatePreview(){
