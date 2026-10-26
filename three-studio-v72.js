@@ -191,7 +191,7 @@ function v73Gear(root,kind,h){
 }
 
 async function put(view,kind,x=0,z=0,scale=1){
- const d=store(),p=d?.profile||{},petKey=getPetKey();
+ const d=store(),p=d?.profile||{},petKey=view.kind==="home"?(p.pet||"none"):getPetKey();
  if(kind==="pet"&&petKey==="none")return;
  let obj;
  if(kind==="hero"){
