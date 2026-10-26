@@ -1,0 +1,30 @@
+name: BANGERVERSE quality gate
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout existing application
+        uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check module syntax
+        run: |
+          node --check gym-reborn-v80.js
+          node --check benny-reborn-v80.js
+          node --check wardrobe-v73.js
+          node --check three-studio-v72.js
+          node --check premium-models-v76.js
+          node --check model-sources-v77.js
+      - name: Run REBORN regressions
+        run: node --test tests/reborn.test.cjs
