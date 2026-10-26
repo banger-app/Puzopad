@@ -8,19 +8,19 @@ const read=file=>fs.readFileSync(file,"utf8");
 const html=read("index.html");
 const version=JSON.parse(read("version.json"));
 test("all v80 production scripts & styles exist and build matches",()=>{
- assert.equal(version.build,"80.3");
- for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js"]){
+ assert.equal(version.build,"81");
+ for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-v81.css"]){
   assert.ok(fs.existsSync(path),"missing "+path);
  }
  for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=80.3","./three-studio-v72.js?v=80.3","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
  assert.ok(read("onboarding-v69.js").includes("./gym-reborn-v80.js?v=80.3"));
- assert.ok(read("interface-v61.js").includes('V80.3 · '));
- assert.ok(html.includes('V80.3 · ПУЗОПАД'));
- assert.ok(read("sw.js").includes("puzopad-v803-20261026"));
+ assert.ok(read("interface-v61.js").includes('V81 · '));
+ assert.ok(html.includes('V81 · ПУЗОПАД'));
+ assert.ok(read("sw.js").includes("puzopad-v81-20261026"));
  assert.ok(html.includes('window.pzBennyContextV80?.()'));
 });
 test("classic JavaScript modules parse",()=>{
- for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js","exercise-visuals-v803.js","benny-food-v57.js"]){
+ for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-food-v57.js"]){
   assert.doesNotThrow(()=>new vm.Script(read(f),{filename:f}));
  }
 });
@@ -130,4 +130,30 @@ test("Benny string ID: delete works; calorie clarification updates only one exis
  assert.ok(d.foods.some(x=>x.id==="benny_2026-10-26_cracker_2"),"other duplicate preserved for manual choice");
  assert.ok(d.foods.some(x=>x.id===999));
  assert.ok(saves===2&&rerenders===6,"save and all diary views refreshed");
+});
+
+test("Benny v81 accepts up to five photos and keeps user's multimodal draft",()=>{
+ const src=read("benny-chat-v81.js"),index=read("index.html");
+ assert.ok(index.includes('id="bai-file" type="file" accept="image/*" multiple'));
+ assert.ok(index.includes('./benny-chat-v81.js?v=81.0'));
+ assert.ok(index.includes('./exercise-gallery-v81.js?v=81.0'));
+ assert.ok(index.includes('./benny-v81.css?v=81.0'));
+ assert.ok(!index.includes('<script id="benny-photo-preview-v55">'),"old single-photo widget must be disabled");
+ assert.ok(src.includes("const MAX_PHOTOS=5"));
+ assert.ok(src.includes("image_data_urls:urls"),"send all selected images in one API request");
+ assert.ok(src.includes('fileInput.value=""'),"allow consecutive image selections");
+ assert.ok(src.includes("selection.map(compress)"),"compress photo selection");
+ assert.ok(src.includes("sending=false"),"maintain retry flow");
+ assert.ok(src.includes("replyVoice")&&src.includes("speechSynthesis"),"optional spoken answer");
+ assert.ok(read("benny-v81.css").includes("pz81-typing span"),"animated three-dot indicator");
+});
+test("gym v81 uses verified photograph mappings and fallbacks are not required online",()=>{
+ const s=read("exercise-gallery-v81.js");
+ for(const name of ["warm","press","incline","shoulder","triceps","pulldown","row","biceps","legpress","hinge","plank","cool"]){
+  assert.ok(new RegExp(name+':"').test(s),name+" missing photo mapping");
+ }
+ assert.ok(s.includes("f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5"),"pin source images to commit");
+ assert.ok(s.includes("The Unlicense"),"retain provenance");
+ const gym=read("gym-reborn-v80.js");
+ assert.ok(gym.includes("window.pzExerciseVisuals.thumb"),"compact timeline uses thumbnails");
 });
