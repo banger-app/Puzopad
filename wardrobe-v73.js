@@ -85,11 +85,12 @@ function setup(){
  const activePet=data.profile.pet||"none";
  if(!w.petWardrobes[activePet])w.petWardrobes[activePet]={...w.petWear};
  w.petWear=w.petWardrobes[activePet];
+ const legacy=data.heroStyle||{};
  if(!w.owned.includes("starter"))w.owned.push("starter");
  if(data.profile.pet&&data.profile.petName&&!w.petNames[data.profile.pet])w.petNames[data.profile.pet]=data.profile.petName;
  for(const c of legacy.ownedPalettes||[]){const n=Number(c);if(Number.isInteger(n)&&n>=0&&n<=3&&!w.colors.includes(n))w.colors.push(n)}
  for(const p of ["none","dog","cat","hamster",data.profile.pet||"none"])if(!w.pets.includes(p))w.pets.push(p);
- const legacy=data.heroStyle||{};
+
  for(const [old,converted] of [["casual","starter"],["work","work"],["gym","gym"],["hero","knight"]])if(legacy.owned?.includes(old)&&!w.owned.includes(converted))w.owned.push(converted);
  for(const [old,converted] of [["bow","bow"],["cap","petcap"],["crown","petcrown"],["scarf","scarf"],["glasses","petglasses"],["backpack","backpack"]])if(data.profile.petOwned?.includes(old)&&!w.petItems.includes(converted))w.petItems.push(converted);
  return w;
@@ -235,7 +236,7 @@ function poop(){
  document.body.append(layer);setTimeout(()=>layer.remove(),1500);
 }
 document.addEventListener("change",e=>{if(e.target?.id!=="pz-language"&&e.target?.id!=="banger-language-select")return;if(e.target.value==="ru")poop();setTimeout(render,80)},true);
-document.addEventListener("click",e=>{const companion=e.target?.closest?.('nav button[data-tab="companion"]');if(companion){setTimeout(()=>{if(typeof go==="function")go("wardrobe");tab="pet";render()},40);return}if(e.target?.closest?.('nav button[data-tab="wardrobe"]'))setTimeout(()=>{tab="hero";render()},30)});
+document.addEventListener("click",e=>{const nav=e.target?.closest?.('nav button[data-tab="wardrobe"],nav button[data-tab="companion"]');if(nav)setTimeout(()=>{tab=nav.dataset.tab==="companion"?"pet":"hero";render()},45)});
 function watchSections(){
  for(const [id,value] of [["wardrobe","hero"],["companion","pet"]]){
   const section=el(id);if(!section)return;
