@@ -1,7 +1,7 @@
 {
-  "build": "84",
+  "build": "85",
   "date": "2026-10-27",
   "assets": "puzopad-standalone-icon-v1",
   "stable_url": "/Puzopad/",
-  "changes": "3 curated cinematic hero+pet scene presets, reusable neon navigation icons, compact one-tap Benny voice UI"
+  "changes": "Neon Glass whole-app UI; cinematic city map; hidden HP and mana; safe iPhone viewport and session resume"
 }
