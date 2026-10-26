@@ -5,6 +5,8 @@ window.pzPetEmoji=key=>PETS.find(x=>x[0]===key)?.[1]||"🐾";
 function language(){return localStorage.getItem("banger_language")||"uk"}
 const T=(u,r,e)=>language()==="uk"?u:language()==="en"?e:r;
 const bank=()=>typeof db==="undefined"?null:db;
+const PET_STYLE=[["plain","Без аксесуара","",0],["bow","Бант","🎀",10],["cap","Кепка","🧢",15],["scarf","Шарф","🧣",20],["crown","Корона","👑",50]];
+function petAccessory(d){return PET_STYLE.find(x=>x[0]===d?.profile?.petStyle)?.[2]||""}
 function save(){if(typeof persist==="function")persist()}
 function text(id,t){const el=$(id);if(el&&el.textContent!==t)el.textContent=t}
 function identity(){
@@ -21,14 +23,14 @@ function identity(){
  }
  const pett=document.querySelector(".v20-pet");if(pett){
   const label=p.petName||PETS.find(x=>x[0]===p.pet)?.[2]||"Компаньйон";
-  const key=p.pet+"|"+label;
-  if(pett.dataset.pzPet!==key){pett.innerHTML='<span style="font-size:56px;line-height:1">'+window.pzPetEmoji(p.pet)+'</span><small></small>';pett.querySelector("small").textContent=label;pett.title=label;pett.dataset.pzPet=key;}
+  const key=p.pet+"|"+label+"|"+(p.petStyle||"plain");
+  if(pett.dataset.pzPet!==key){pett.innerHTML='<span style="font-size:56px;line-height:1">'+window.pzPetEmoji(p.pet)+petAccessory(d)+'</span><small></small>';pett.querySelector("small").textContent=label;pett.title=label;pett.dataset.pzPet=key;}
  }
  const generic=["BANGER дома","BANGER ДОМА","BANGER на работе","BANGER в городе"];
  document.querySelectorAll(".v20-status,.v20-scene-label,#v20HeroName").forEach(el=>{let val=el.textContent||"";if(generic.some(g=>val.includes(g)))el.textContent=val.replace(/BANGER/gi,p.name)});
  const greeting=$("pz-hero-greeting");if(greeting)greeting.textContent=p.name+" · "+T("твоя пригода","твоё приключение","your adventure");
  const companion=document.querySelector("#companion h2");if(companion)companion.textContent=window.pzPetEmoji(p.pet)+" "+(p.petName||PETS.find(x=>x[0]===p.pet)?.[2]||"Компаньйон");
- const center=$("v23PetLook");if(center){center.innerHTML="<div class='pz-companion-bubble'>"+window.pzPetEmoji(p.pet)+"</div><p>"+(p.petName||"")+"</p>";}
+ const center=$("v23PetLook");if(center){const target="<div class='pz-companion-bubble'>"+window.pzPetEmoji(p.pet)+petAccessory(d)+"</div><p></p>";if(center.innerHTML!==target)center.innerHTML=target;const label=center.querySelector("p");if(label)label.textContent=p.petName||"";}
  const input=$("pz-pet-rename");if(input&&document.activeElement!==input)input.value=p.petName||"";
 }
 function macro(){
@@ -67,6 +69,16 @@ function companionPanel(){
  PETS.forEach(([id,emoji,name])=>{let btn=document.createElement("button");btn.type="button";btn.className="pz-pet-select"+(id===chosen?" selected":"");btn.innerHTML="<span>"+emoji+"</span><small>"+name+"</small>";
  btn.onclick=()=>{d.profile.pet=id;d.profile.petName="";save();identity();companionPanel();if(typeof render==="function")render();identity();};
  box.append(btn)});
+ d.profile.petOwned ||= ["plain"];d.profile.petStyle ||= "plain";
+ const heading=document.createElement("h3");heading.textContent="🎭 Аксесуари компаньйона · за монети";heading.style.gridColumn="1/-1";box.append(heading);
+ PET_STYLE.forEach(([key,label,icon,cost])=>{
+  const button=document.createElement("button");button.type="button";button.className="pz-pet-select";
+  const owned=d.profile.petOwned.includes(key);button.classList.toggle("selected",d.profile.petStyle===key);
+  button.textContent=(icon||"✨")+" "+label+(owned?"":" · "+cost+" 🪙");
+  button.onclick=()=>{if(!owned){if((d.coins||0)<cost){alert("Недостатньо монет. Зароби в Neon Breaker або завданнях.");return}d.coins-=cost;d.profile.petOwned.push(key)}
+    d.profile.petStyle=key;save();identity();companionPanel();gamification();if(typeof updateDashboardV16==="function")updateDashboardV16()};
+  box.append(button);
+ });
 }
 function moveMenu(){
  const top=$("pz-topbar");if(!top||top.dataset.fixed==="1")return;
