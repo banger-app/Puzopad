@@ -117,3 +117,8 @@ body.pz80-scan-open{overflow:hidden!important}
 .pz80-gym-history-row{font-size:12px;background:#242c44;padding:11px;border-radius:10px;margin:7px 0}
 #pz-gym-main .pz80-quiet{font-size:12px;padding:10px}
 @media(prefers-reduced-motion:reduce){#pz80-dock,#pz73,.pz80-scan-overlay{scroll-behavior:auto!important}}
+
+/* Reborn dashboard: only logged calorie totals and officially saved weights */
+#pz80-dock .pz80-dock-summary{display:flex;flex-wrap:wrap;gap:6px;margin:-1px 0 9px;font-variant-numeric:tabular-nums}
+#pz80-dock .pz80-dock-summary span{border:1px solid #4a5774;background:#1a2237;border-radius:9px;padding:7px 10px;color:#e4d8ef;font-size:11px}
+#pz80-stock-root .pz80-stock-actions button[disabled]{cursor:not-allowed}

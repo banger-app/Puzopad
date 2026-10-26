@@ -30,7 +30,7 @@ function scanUI(){
  const dialog=e("section","pz80-scan-card");dialog.setAttribute("role","dialog");dialog.setAttribute("aria-modal","true");dialog.setAttribute("aria-label",T("scan"));
  const head=e("div","pz80-scan-head");head.append(e("strong","",T("scan")),button("✕",closeScan,"pz80-close"));
  dialog.append(head,e("p","pz80-muted",T("intro")));
- const inp=e("input");inp.type="file";inp.accept="image/jpeg,image/png,image/webp";inp.id="pz80-stock-photo";inp.setAttribute("aria-label",T("upload"));dialog.append(inp);
+ const inp=e("input");inp.type="file";inp.accept="image/*";inp.id="pz80-stock-photo";inp.setAttribute("aria-label",T("upload"));dialog.append(inp);
  const note=labelInput("Названия или уточнения (необязательно)","");note.inp.id="pz80-stock-note";dialog.append(note.wrap);
  const preview=e("img","pz80-scan-image");preview.id="pz80-stock-image";preview.hidden=true;dialog.append(preview);
  const status=e("p","pz80-stock-status");status.id="pz80-stock-status";status.setAttribute("role","status");
@@ -140,6 +140,18 @@ function consume(item){
  save();renderStocks();renderDock();
  if(typeof renderDiaryRange==="function")renderDiaryRange();
 }
+function correctStock(item){
+ const d=data();if(!d)return;
+ const stock=d.loot?.find(x=>x.id===item.id);if(!stock)return;
+ const entered=prompt("Исправить количество "+item.name+" ("+(stock.unit||"g/ml")+")",stock.qty);
+ if(entered===null)return;const q=Number(String(entered).replace(",","."));
+ if(!Number.isFinite(q)||q<=0||q>10000){alert("Укажи корректное количество");return}
+ const unit=prompt("Единицы: g / ml / pcs",stock.unit||"g");
+ if(unit===null)return;
+ const clean=String(unit).trim().toLowerCase();
+ if(!["g","ml","pcs"].includes(clean)){alert("Выбери g, ml или pcs");return}
+ stock.qty=Math.round(q*100)/100;stock.unit=clean;save();renderStocks();renderDock();
+}
 function moveStock(item,where){
  const d=data();if(!d||!["home","work","transit"].includes(where))return;
  const row=d.loot?.find(x=>x.id===item.id);if(!row)return;
@@ -157,13 +169,31 @@ function renderStocks(){
    const card=e("article","pz80-stock-card");
    card.append(e("strong","",x.name),e("span","pz80-muted",(x.qty??"?")+" "+(x.unit==="pcs"?"шт":x.unit==="g"?"г":x.unit==="ml"?"мл":"г/мл")+" · "+(valid(x.k)?x.k+" ккал/100":T("noMacros"))));
    const actions=e("div","pz80-stock-actions");for(const to of ["home","transit","work"])if(where!==to)actions.append(button(whereToName(to),()=>moveStock(x,to),"pz80-quiet"));
-   const consumed=button("🍽 "+T("eat"),()=>consume(x),"pz80-quiet");consumed.disabled=!["g","ml"].includes(x.unit)||!valid(x.k);actions.append(consumed);card.append(actions);group.append(card);
+   const consumed=button("🍽 "+T("eat"),()=>consume(x),"pz80-quiet");consumed.disabled=!["g","ml"].includes(x.unit)||!valid(x.k);
+   actions.append(button("✎",()=>correctStock(x),"pz80-quiet"),consumed);card.append(actions);group.append(card);
   });root.append(group);
  }
 }
 function promptBenny(message){
  const open=$("bai-open"),input=$("bai-input");if(!open||!input)return;
  open.click();input.value=message;input.focus();
+}
+function gameDayOf(date,time){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(String(date||""))||!/^\d{1,2}:\d{2}/.test(String(time||"")))return null;
+ const hour=Number(time.split(":")[0]);if(hour>23)return null;
+ const midnight=new Date(date+"T12:00:00");if(Number.isNaN(midnight.getTime()))return null;
+ if(hour<18)midnight.setDate(midnight.getDate()-1);
+ return [midnight.getFullYear(),String(midnight.getMonth()+1).padStart(2,"0"),String(midnight.getDate()).padStart(2,"0")].join("-");
+}
+function currentGameDay(){
+ const now=new Date();if(now.getHours()<18)now.setDate(now.getDate()-1);
+ return [now.getFullYear(),String(now.getMonth()+1).padStart(2,"0"),String(now.getDate()).padStart(2,"0")].join("-");
+}
+function facts(d){
+ const meals=(d.foods||[]).filter(x=>gameDayOf(x.date,x.time)===currentGameDay()&&valid(x.k));
+ const kcal=meals.reduce((n,x)=>n+Number(x.k),0);
+ const weights=(d.weights||[]).filter(x=>valid(x.kg)&&Number(x.kg)!==92.9&&/^\d{4}-\d{2}-\d{2}$/.test(x.date||"")).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+ return {kcal:Math.round(kcal),meals:meals.length,weight:weights[0]?.kg??null,date:weights[0]?.date??""};
 }
 function renderDock(){
  const d=data(),home=$("home");if(!d||!home)return;
@@ -173,6 +203,10 @@ function renderDock(){
  const top=e("div","pz80-dock-title");const avatar=e("img","pz80-benny-icon");avatar.src="./icons/benny-180.png?v=1";avatar.alt="";
  top.append(avatar,e("div","pz80-dock-heading",T("title")));
  const balance=e("small","pz80-dock-balance","✦ "+(d.coins||0)+" 🪙");top.append(balance);root.append(top);
+ const info=facts(d),stats=e("div","pz80-dock-summary");
+ stats.append(e("span","","🥗 "+info.kcal+" ккал · "+info.meals+" "+(L()==="en"?"logs":"записей")));
+ if(info.weight!==null)stats.append(e("span","","⚖️ "+info.weight+" кг · "+info.date));
+ root.append(stats);
  const acts=e("div","pz80-dock-actions");
  acts.append(button(T("photo"),openScan,"pz80-dock-main"),button(T("ai"),()=>promptBenny("Бенни, помоги с моими сегодняшними продуктами и дневником. Не записывай ничего без моего подтверждения."),""),
  button(T("gym"),()=>{if(typeof go==="function")go("gym")},""),
