@@ -93,7 +93,7 @@ function thumbs(root=document){
  }catch(err){console.warn("v83 thumbnails:",err)}
 }
 const previousSync=original.sync;
-original.sync=function(){previousSync?.();thumbs()};
+original.sync=function(){previousSync?.();const home=document.getElementById("pz3d-home-stage"),frame=document.getElementById("pz73-frame");if(home)full(home);if(frame)full(frame);thumbs()};
 const prevRender=window.pzWardrobeV73?.render;
 if(typeof prevRender==="function"){
  window.pzWardrobeV73.render=function(...args){
@@ -106,6 +106,7 @@ if(typeof prevRender==="function"){
 const refresh=()=>{const a=document.getElementById("pz3d-home-stage"),b=document.getElementById("pz73-frame");if(a)full(a);if(b)full(b);thumbs()};
 window.addEventListener("pz:unlocked",()=>setTimeout(refresh,120));
 window.addEventListener("pz:style-change",()=>setTimeout(refresh,80));
+window.addEventListener("banger:local-save",()=>setTimeout(refresh,70));
 document.addEventListener("click",e=>{
  if(e.target?.closest?.("#pz73,nav button"))setTimeout(refresh,90);
 });
