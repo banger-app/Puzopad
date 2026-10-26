@@ -68,8 +68,11 @@ const $btn=(txt,fn,cls)=>{const n=$node("button",cls,txt);n.type="button";n.oncl
 function setup(){
  if(!can())return null;
  const data=d();
- if(!data.wardrobeV73)data.wardrobeV73={owned:["starter"],wear:{torso:"starter"},petItems:[],petWear:{},pets:["none","dog","cat","hamster"],petNames:{}};
- const w=data.wardrobeV73;w.owned ||= ["starter"];w.wear ||= {torso:"starter"};w.petItems ||= [];w.petWear ||= {};w.pets ||= ["none","dog","cat","hamster"];w.petNames ||= {};
+ if(!data.wardrobeV73)data.wardrobeV73={owned:["starter"],wear:{torso:"starter"},petItems:[],petWear:{},pets:["none","dog","cat","hamster"],petNames:{},petWardrobes:{}};
+ const w=data.wardrobeV73;w.owned ||= ["starter"];w.wear ||= {torso:"starter"};w.petItems ||= [];w.petWear ||= {};w.pets ||= ["none","dog","cat","hamster"];w.petNames ||= {};w.petWardrobes||={};
+ const activePet=data.profile.pet||"none";
+ if(!w.petWardrobes[activePet])w.petWardrobes[activePet]={...w.petWear};
+ w.petWear=w.petWardrobes[activePet];
  if(!w.owned.includes("starter"))w.owned.push("starter");
  if(data.profile.pet&&data.profile.petName&&!w.petNames[data.profile.pet])w.petNames[data.profile.pet]=data.profile.petName;
  for(const p of ["none","dog","cat","hamster",data.profile.pet||"none"])if(!w.pets.includes(p))w.pets.push(p);
@@ -109,14 +112,23 @@ function chooseItem(x,kind){
 function choosePet(x){
  const w=setup();if(!w)return;
  if(!w.pets.includes(x[0])){if(!spend(x[2])){message=T(17);render();return}w.pets.push(x[0])}
- d().profile.pet=x[0];d().profile.petName=x[0]==="none"?"":(w.petNames[x[0]]||petName(x));message=T(26);save();
+ const current=d().profile.pet||"none";
+ w.petNames[current]=d().profile.petName||w.petNames[current]||"";
+ w.petWardrobes[current]={...w.petWear};
+ d().profile.pet=x[0];d().profile.petName=x[0]==="none"?"":(w.petNames[x[0]]||petName(x));
+ w.petWardrobes[x[0]]||={};w.petWear=w.petWardrobes[x[0]];
+ message=T(26);save();
 }
 function root(){
  const host=el("wardrobe")?.querySelector(".panel");if(!host)return null;
  let ui=el("pz73");if(ui)return ui;
  let hero=el("pz3d-stage");if(hero)hero.remove();
  let pet=el("pz-pet3d-stage");if(pet)pet.remove();
- host.replaceChildren();ui=$node("div","pz73-app");ui.id="pz73";
+ // Keep legacy IDs in the DOM: the nutrition/weight renderer still reads these fields.
+ const legacy=$node("div","pz73-legacy");legacy.hidden=true;legacy.setAttribute("aria-hidden","true");
+ while(host.firstChild)legacy.appendChild(host.firstChild);
+ host.append(legacy);
+ ui=$node("div","pz73-app");ui.id="pz73";
  const header=$node("header","pz73-head");header.append($node("small","","PUZOPAD / CHARACTER UNIVERSE"),$node("h2","pz73-heading"));const wallet=$node("strong","pz73-wallet");wallet.id="pz73-wallet";header.append(wallet);ui.append(header);
  const tabs=$node("div","pz73-tabs");tabs.id="pz73-tabs";ui.append(tabs);
  const frame=$node("div","pz73-frame");frame.id="pz73-frame";
@@ -187,6 +199,17 @@ function poop(){
 }
 document.addEventListener("change",e=>{if(e.target?.id!=="pz-language"&&e.target?.id!=="banger-language-select")return;if(e.target.value==="ru")poop();setTimeout(render,80)},true);
 document.addEventListener("click",e=>{if(e.target?.closest?.('nav button[data-tab="wardrobe"],nav button[data-tab="companion"]'))setTimeout(render,30)});
+function enhanceCompanion(){
+ const petHost=el("companion")?.querySelector(".panel");if(!petHost)return;
+ if(!petHost.querySelector(".pz73-companion-legacy")){
+  const wrapped=$node("div","pz73-companion-legacy");wrapped.hidden=true;wrapped.setAttribute("aria-hidden","true");
+  while(petHost.firstChild)wrapped.append(petHost.firstChild);
+  petHost.append(wrapped);
+  const link=$btn("🐾 "+T(2)+" · "+T(3),()=>{tab="pet";if(typeof go==="function")go("wardrobe");render()},"pz73-primary");
+  const block=$node("div","pz73-companion-jump");block.append(link);petHost.append(block);
+ }
+}
+window.addEventListener("pz:unlocked",()=>setTimeout(enhanceCompanion,75));
 window.addEventListener("pz:unlocked",()=>setTimeout(render,40));
 window.addEventListener("banger:local-save",()=>{if(can()&&el("pz73-wallet"))el("pz73-wallet").textContent=T(16)+": "+(Number(d().coins)||0)+" 🪙"});
 window.pzWardrobeV73={render,setup,HERO,PETITEMS,PETS};
