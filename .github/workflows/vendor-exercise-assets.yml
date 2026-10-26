@@ -1,0 +1,54 @@
+name: Vendor exercise photography
+on:
+  push:
+    paths:
+      - ".github/workflows/vendor-exercise-assets.yml"
+      - "exercise-gallery-v81.js"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  vendor-images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout existing application
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Download verified public-domain exercise photos
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_SHA=f00c92c7dcf1216a928a52c3706c7ce8e2f71ed5
+          BASE="https://raw.githubusercontent.com/yuhonas/free-exercise-db/${SOURCE_SHA}/exercises"
+          slugs=(
+            Walking_Treadmill Stairmaster Chair_Upper_Body_Stretch
+            Dumbbell_Bench_Press Incline_Dumbbell_Press Seated_Dumbbell_Press
+            Triceps_Pushdown Wide-Grip_Lat_Pulldown Seated_Cable_Rows
+            Cable_Rear_Delt_Fly Dumbbell_Bicep_Curl Leg_Press
+            Romanian_Deadlift Standing_Calf_Raises Plank
+          )
+          for slug in "${slugs[@]}"; do
+            (
+              mkdir -p "assets/exercises-v81/$slug"
+              for frame in 0 1; do
+                curl --fail --location --retry 3 --connect-timeout 15 --max-time 80 --silent --show-error                   "$BASE/$slug/$frame.jpg"                   --output "assets/exercises-v81/$slug/$frame.jpg"
+              done
+            ) &
+            if (( $(jobs -rp | wc -l) >= 6 )); then wait -n; fi
+          done
+          wait
+          count=$(find assets/exercises-v81 -type f -name '*.jpg' | wc -l)
+          test "$count" -eq 30 || (echo "Incomplete photo bundle: $count/30" && exit 1)
+          cp /dev/null assets/exercises-v81/.keep
+      - name: Commit the reusable image bundle
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/exercises-v81
+          if ! git diff --cached --quiet; then
+            git commit -m "Assets: vendor 30 Unlicense exercise photos [skip ci]"
+            git push
+          fi
