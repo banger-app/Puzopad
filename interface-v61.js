@@ -70,7 +70,7 @@ function tweaks(){
  const moods=$("mood");if(moods){const h=moods.closest(".panel");if(h?.querySelector("h2")?.textContent.includes("Статус"))h.hidden=true;}
  const header=document.querySelector(".v16-headline");
  if(header)header.innerHTML=T("ТВОЯ ІСТОРІЯ.<br><em>ТВІЙ ГЕРОЙ.</em>","ТВОЯ ИСТОРИЯ.<br><em>ТВОЙ ГЕРОЙ.</em>","YOUR STORY.<br><em>YOUR HERO.</em>");
- const topbar=document.querySelector(".b29top b");if(topbar)topbar.textContent="V61 · "+(d.profile.name||"ПУЗОПАД");
+ const topbar=document.querySelector(".b29top b");if(topbar)topbar.textContent="V62 · "+(d.profile.name||"ПУЗОПАД");
  const named=$("pz-hero-rename");if(named&&document.activeElement!==named)named.value=d.profile.name||"";
  document.querySelectorAll("#nav button").forEach(el=>{if(el.dataset.tab==="arcade")el.onclick=()=>typeof go==="function"&&go("arcade")});
 }
