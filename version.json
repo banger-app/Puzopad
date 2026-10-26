@@ -1,5 +1,6 @@
 {
-  "build": "57",
+  "build": "58",
   "date": "2026-10-26",
-  "assets": "custom-puzopad-icons"
+  "assets": "puzopad-standalone-icon-v1",
+  "stable_url": "/Puzopad/"
 }
