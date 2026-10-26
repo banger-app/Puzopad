@@ -254,7 +254,7 @@ body.pz-three-ready #v20World .v20-avatar-slot{visibility:hidden!important}
 </style><script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}
 </script>
-<link rel="stylesheet" href="./studio-v72.css?v=73.0"><link rel="stylesheet" href="./wardrobe-v73.css?v=80.0"><link rel="stylesheet" href="./reborn-v80.css?v=80.1"></head><body class="pz-locked">
+<link rel="stylesheet" href="./studio-v72.css?v=73.0"><link rel="stylesheet" href="./wardrobe-v73.css?v=80.0"><link rel="stylesheet" href="./reborn-v80.css?v=80.2"></head><body class="pz-locked">
 <section id="pz-entry" aria-label="Вход и создание героя">
 <div id="pz-authbox">
 <h1>🐸 <span>ПУЗОПАД</span></h1><p>Твоя історія, твій герой. Увійди у свій акаунт — і продовжуй гру зі своїм персонажем.</p>
@@ -1092,9 +1092,11 @@ $('bai-send').onclick=async()=>{
 if(busy)return;const message=$('bai-input').value.trim(),file=$('bai-file').files[0];if(!message&&!file){status('Напиши сообщение или выбери фото');return}
 if(file&&file.size>5*1024*1024){status('Выбери фотографию до 5 МБ');return}
 busy=true;$('bai-send').disabled=true;status('⏳ Бэнни думает…');
-try{const sess=await session();let image_data_url=null;
+try{const sess=await session();
+if(window.pzActiveUserId&&sess.user?.id!==window.pzActiveUserId)throw Error("Аккаунт ещё загружается. Повтори после открытия своего Штаба.");
+let image_data_url=null;
 if(file){image_data_url=await new Promise((ok,no)=>{let r=new FileReader();r.onload=()=>ok(r.result);r.onerror=()=>no(Error('Не удалось прочитать фото'));r.readAsDataURL(file)})}
-const res=await fetch(URL+'/functions/v1/banger-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':PUB,'Authorization':'Bearer '+sess.access_token},body:JSON.stringify({message,image_data_url})});
+const res=await fetch(URL+'/functions/v1/banger-ai',{method:'POST',headers:{'Content-Type':'application/json','apikey':PUB,'Authorization':'Bearer '+sess.access_token},body:JSON.stringify({message,image_data_url,context:window.pzBennyContextV80?.()||null})});
 const out=await res.json();if(!res.ok)throw Error(out.error||'Ошибка сервера '+res.status);
 bubble('user',message||'📷 Фото',image_data_url);bubble('assistant',out.answer);const proposed=stockProposal(message,out.answer);if(proposed)stockButton(proposed);$('bai-input').value='';$('bai-file').value='';status(out.saved?'✅ Ответ и переписка сохранены в облаке':'Ответ получен, но история не сохранилась');
 }catch(e){status('⚠️ '+e.message)}finally{busy=false;$('bai-send').disabled=false}
@@ -1240,7 +1242,7 @@ if((t.startsWith('✅ Ответ')||t.startsWith('Ответ получен')) &
 <script src="./benny-food-v57.js?v=57" id="banger-meal-addon-v57"></script>
 <script id="banger-pwa-updates">
 (function(){
- const VERSION="80",KEY="bangerverse_installed_build";
+ const VERSION="80.2",KEY="bangerverse_installed_build";
  async function check(){
   try{
     const r=await fetch("./version.json?ts="+Date.now(),{cache:"no-store"});
@@ -1260,9 +1262,9 @@ if((t.startsWith('✅ Ответ')||t.startsWith('Ответ получен')) &
 })();
 </script>
 <script src="./storage-v64.js?v=64.0"></script>
-<script src="./onboarding-v69.js?v=80.0" id="pz-v64-gate"></script>
+<script src="./onboarding-v69.js?v=80.2" id="pz-v64-gate"></script>
 <script src="./interface-v61.js?v=80.0"></script>
 <script src="./arcade-v70.js?v=75.0"></script>
-<script src="./wardrobe-v73.js?v=80.0"></script><script src="./benny-reborn-v80.js?v=80.1"></script>
+<script src="./wardrobe-v73.js?v=80.0"></script><script src="./benny-reborn-v80.js?v=80.2"></script>
 <script src="./usability-v67.js?v=73.0"></script>
 <script type="module" src="./three-studio-v72.js?v=80.0"></script></body></html>

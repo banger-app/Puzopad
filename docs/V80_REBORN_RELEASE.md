@@ -16,3 +16,8 @@
 
 ## QA
 Static module integration/syntax checks, Edge Function deployment status, preview/dedup/quantity contracts and game-state safety checks. No existing weights, foods, drinks, sleep, coins or garage data deleted.
+
+## v80.2 QA patch: Benny read-only context
+When the signed-in user sends a message to Benny, the app now includes a bounded read-only snapshot of today's actually logged food (18:00 rollover), latest approved weights, known inventory locations and quantities, the current training plan and coins. The existing banger-ai function version 13 accepts this optional context; older clients are unaffected. The user's request, not the context, determines whether any food action is proposed. Purchase scan remains a distinct authenticated endpoint and requires confirmation. No background tracking, no autonomous food/weight entries.
+
+QA covered mock guided workout cycle, optional quantity rejection, imported item dedupe, location moves, explicit grams/ml consumption and null-macro protection. No signed-in browser's cloud round-trip, production model recognition accuracy, nor live iPhone visual QA was possible here.

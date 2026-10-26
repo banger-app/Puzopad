@@ -231,6 +231,15 @@ function init(){
  }
 }
 function closeBenny(){$("bai-close")?.click()}
+window.pzBennyContextV80=()=>{
+ const d=data();if(!d)return null;
+ const weight=(d.weights||[]).filter(x=>valid(x.kg)&&Number(x.kg)!==92.9&&x.date).sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,3).map(x=>({date:x.date,kg:x.kg}));
+ const foods=(d.foods||[]).filter(x=>gameDayOf(x.date,x.time)===currentGameDay()).slice(-10).map(x=>({name:String(x.name||"").slice(0,65),qty:String(x.qty||"").slice(0,28),k:valid(x.k)?Number(x.k):null}));
+ const stock=(d.loot||[]).slice(0,32).map(x=>({name:String(x.name||"").slice(0,65),qty:valid(x.qty)?Number(x.qty):null,unit:x.unit||"unknown",where:x.where||"home",k100:valid(x.k)?Number(x.k):null}));
+ const g=d.gymV80||null;
+ const plan=g?((Number(g.weekly)||3)<=2?["Full body A","Full body B"][((Number(g.rotation)||0)%2)]:["Грудь/плечи","Спина/бицепс","Ноги/корпус"][((Number(g.rotation)||0)%3)]):null;
+ return {source:"authenticated-user-game-snapshot",gameDayStartHour:18,gameDay:currentGameDay(),recentOfficialWeights:weight,todayConfirmedFoods:foods,knownInventory:stock,trainer:plan?{next:plan,weekly:g.weekly,goal:g.goal,sessionActive:!!g.session}:null,coins:Math.max(0,Number(d.coins)||0),nutritionFactsOnly:true};
+};
 window.pz80Benny={openScan,renderStocks,renderDock,init};
 window.addEventListener("pz:unlocked",init);
 window.addEventListener("banger:local-save",()=>{if(data()){renderStocks();renderDock()}});
