@@ -12,7 +12,7 @@ const GAMES=[
  {id:"slide",name:"MERGE 2048",icon:"▤",tag:"Логіка",desc:"З'єднай плитки до 512",colors:["#f7c674","#ff9f73"]}
 ];
 const WIDTH=360,HEIGHT=525,DAY_CAP=50;
-let game="",canvas,ctx,run=false,finished=false,af=0,lastT=0,ticks=0,score=0,life=3,objects=[],pad=180,keys=[],dir={x:1,y:0},nextDir={x:1,y:0},snake=[],food=null,player={},spawns=0,coinAward=0,scrollBefore="",finger=null,downX=0,downY=0,aux={},scrollRootBefore="";
+let game="",canvas,ctx,run=false,finished=false,af=0,lastT=0,ticks=0,score=0,life=3,objects=[],pad=180,keys=[],dir={x:1,y:0},nextDir={x:1,y:0},snake=[],food=null,player={},spawns=0,coinAward=0,scrollBefore="",finger=null,downX=0,downY=0,aux={},scrollRootBefore="",sessionOwner=null,soundOn=false,soundContext=null,lastNoise=0,lastPointScore=0;
 function dbx(){return typeof db!=="undefined"?db:null}
 function nowDay(){return typeof currentDay==="function"?currentDay():new Date().toISOString().slice(0,10)}
 function accountReady(){return !!(window.pzActiveUserId&&dbx()?.profile?.created)}
@@ -53,8 +53,9 @@ function hub(){
  }
  panel.append(title,intro,progress,grid);
  const overlay=document.createElement("div");overlay.id="pz-arc-overlay";overlay.hidden=true;overlay.setAttribute("role","dialog");overlay.setAttribute("aria-modal","true");overlay.setAttribute("aria-label","Мінігра");
- overlay.innerHTML='<div class="pz-arc-shell"><header class="pz-arc-shell-head"><button type="button" id="pz-arc-back" aria-label="Повернутись до вибору ігор">‹ Ігри</button><strong id="pz-arc-title">ARCADE</strong><button id="pz-arc-close" type="button" aria-label="Закрити гру">✕</button></header><div class="pz-arc-hud"><span id="pz-arc-score">Очки: 0</span><span id="pz-arc-lives">❤ 3</span></div><div class="pz-arc-playfield"><canvas id="pz-arc-board" width="360" height="525" aria-label="Ігрове поле"></canvas><div id="pz-arc-result" hidden><div id="pz-arc-result-body"></div><button type="button" id="pz-arc-again">↻ Грати ще</button><button type="button" id="pz-arc-results-close">Вибрати іншу гру</button></div></div><div id="pz-arc-controls"><div class="pz-arc-arrow-wrap"><button data-step="up">↑</button><div><button data-step="left">←</button><button data-step="down">↓</button><button data-step="right">→</button></div></div><button type="button" id="pz-arc-action">СТРИБОК ▲</button><p id="pz-arc-help">Керуй пальцем без прокручування сторінки</p></div></div>';
+ overlay.innerHTML='<div class="pz-arc-shell"><header class="pz-arc-shell-head"><button type="button" id="pz-arc-back" aria-label="Повернутись до вибору ігор">‹ Ігри</button><strong id="pz-arc-title">ARCADE</strong><button id="pz-arc-sound" type="button" aria-label="Увімкнути звуки">🔇</button><button id="pz-arc-close" type="button" aria-label="Закрити гру">✕</button></header><div class="pz-arc-hud"><span id="pz-arc-score">Очки: 0</span><span id="pz-arc-lives">❤ 3</span></div><div class="pz-arc-playfield"><canvas id="pz-arc-board" width="360" height="525" aria-label="Ігрове поле"></canvas><div id="pz-arc-result" hidden><div id="pz-arc-result-body"></div><button type="button" id="pz-arc-again">↻ Грати ще</button><button type="button" id="pz-arc-results-close">Вибрати іншу гру</button></div></div><div id="pz-arc-controls"><div class="pz-arc-arrow-wrap"><button data-step="up">↑</button><div><button data-step="left">←</button><button data-step="down">↓</button><button data-step="right">→</button></div></div><button type="button" id="pz-arc-action">СТРИБОК ▲</button><p id="pz-arc-help">Керуй пальцем без прокручування сторінки</p></div></div>';
  document.body.append(overlay);
+ soundOn=localStorage.getItem("pz_arcade_sound_v70")==="yes";soundLabel();$("pz-arc-sound").onclick=()=>{soundOn=!soundOn;localStorage.setItem("pz_arcade_sound_v70",soundOn?"yes":"no");soundLabel();if(soundOn)beep(560)};
  canvas=$("pz-arc-board");ctx=canvas.getContext("2d");
  for(const node of [$("pz-arc-back"),$("pz-arc-close"),$("pz-arc-results-close")])node.onclick=exit;
  $("pz-arc-again").onclick=()=>open(game);
@@ -79,11 +80,27 @@ function hub(){
  document.addEventListener("visibilitychange",()=>{if(document.hidden&&run)pause()});
  dashboard();
 }
+function soundLabel(){const btn=$("pz-arc-sound");if(!btn)return;btn.textContent=soundOn?"🔊":"🔇";btn.setAttribute("aria-label",soundOn?"Вимкнути звуки":"Увімкнути звуки")}
+function beep(hz){
+ if(!soundOn||Date.now()-lastNoise<95)return;
+ lastNoise=Date.now();
+ try{
+  const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;
+  if(!soundContext)soundContext=new Audio();
+  if(soundContext.state==="suspended")soundContext.resume().catch(()=>{});
+  const osc=soundContext.createOscillator(),gain=soundContext.createGain();
+  osc.type="sine";osc.frequency.value=hz;gain.gain.value=.045;
+  osc.connect(gain);gain.connect(soundContext.destination);
+  gain.gain.setValueAtTime(.045,soundContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(.001,soundContext.currentTime+.09);
+  osc.start();osc.stop(soundContext.currentTime+.1);
+ }catch(_){}
+}
 function position(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*WIDTH/r.width,y:(e.clientY-r.top)*HEIGHT/r.height}}
 function keyDown(e){if(!run)return;if(e.key==="Escape"){e.preventDefault();exit();return}const k={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"}[e.key];if(k){e.preventDefault();if(game==="slide")slide(k);else turn(k)}if((e.key===" "||e.key==="Enter")&&game==="hop"){e.preventDefault();jump()}}
 function turn(where){if(game!=="snake")return;const v={left:{x:-1,y:0},right:{x:1,y:0},up:{x:0,y:-1},down:{x:0,y:1}}[where];if(v&&!(v.x===-dir.x&&v.y===-dir.y))nextDir=v}
 function reset(type){
- game=type;score=0;life=3;ticks=0;finished=false;lastT=0;spawns=0;objects=[];pad=180;coinAward=0;keys=[];finger=null;aux={};
+ game=type;score=0;lastPointScore=0;life=3;ticks=0;finished=false;lastT=0;spawns=0;objects=[];pad=180;coinAward=0;keys=[];finger=null;aux={};
  if(type==="breaker"){for(let row=0;row<5;row++)for(let col=0;col<6;col++)objects.push({type:"brick",x:9+col*58,y:65+row*30,w:52,h:19,hp:row===0?2:1,c:["#f85aa8","#ac89ff","#55baf2","#5cf1c0","#ffd26e"][row]});player={x:180,y:415,vx:3.1,vy:-4.3}}
  if(type==="snake"){snake=[{x:6,y:11},{x:5,y:11},{x:4,y:11}];dir={x:1,y:0};nextDir={x:1,y:0};foodSnake()}
  if(type==="catch"){player={x:180};life=4}
@@ -98,7 +115,7 @@ function open(which){
  if(!accountReady()){alert("Спочатку увійди в свій акаунт");return}
  if(!GAMES.some(g=>g.id===which))return;
  if(run)exit();
- reset(which);
+ reset(which);sessionOwner=window.pzActiveUserId;
  const stage=$("pz-arc-overlay");if(!stage)return;stage.hidden=false;
  $("pz-arc-result").hidden=true;
  $("pz-arc-title").textContent=GAMES.find(g=>g.id===game).name;
@@ -111,26 +128,26 @@ function pause(){if(!run)return;run=false;cancelAnimationFrame(af);$("pz-arc-res
  $("pz-arc-result-body").textContent="Гра призупинена. Можеш зіграти знову або повернутися до вибору ігор.";
 }
 function exit(){
- run=false;cancelAnimationFrame(af);
+ run=false;sessionOwner=null;cancelAnimationFrame(af);
  const stage=$("pz-arc-overlay");if(stage)stage.hidden=true;
  document.body.classList.remove("pz-arc-playing");document.body.style.overflow=scrollBefore;document.documentElement.style.overflow=scrollRootBefore;
  dashboard();
 }
 function award(type){
- const d=dbx(),b=bank();if(!d||!b)return 0;
+ const d=dbx();if(!d||!sessionOwner||sessionOwner!==window.pzActiveUserId)return 0;const b=bank();if(!b)return 0;
  b.best[type]=Math.max(b.best[type]||0,score);
  const rates={breaker:55,snake:2,catch:35,hop:35,meteor:25,aim:22,memory:12,slide:48};const units=Math.min(16,Math.max(0,Math.floor(score/(rates[type]||40))));
  const given=Math.max(0,Math.min(DAY_CAP-b.earned,units));
  if(given>0){b.earned+=given;d.coins=Math.max(0,Number(d.coins)||0)+given}
  if(typeof persist==="function")persist();
  if(typeof updateDashboardV16==="function")updateDashboardV16();
- if(typeof pzUiRefresh==="function")pzUiRefresh();
+ if(typeof pzUiRefresh==="function")pzUiRefresh();if(typeof window.pz3dRefresh==="function")window.pz3dRefresh();
  dashboard();return given;
 }
 function finish(win,aborted){
  if(!run)return;
  run=false;cancelAnimationFrame(af);finished=true;
- coinAward=aborted?0:award(game);
+ coinAward=aborted?0:award(game);beep(win?830:270);
  paint();
  const node=$("pz-arc-result");if(node)node.hidden=false;
  const body=$("pz-arc-result-body");
@@ -139,6 +156,7 @@ function finish(win,aborted){
 function jump(){if(!run||game!=="hop")return;if(player.jumps<2){player.vy=-10.6;player.jumps++}}
 function tick(ts){
  if(!run)return;
+ if(!sessionOwner||sessionOwner!==window.pzActiveUserId||!document.body.classList.contains("pz-unlocked")){exit();return}
  const dt=Math.min(2.1,Math.max(.1,(ts-lastT)/16.667));lastT=ts;ticks+=dt;
  if(game==="breaker")tickBreaker(dt);
  else if(game==="snake")tickSnake(dt);
@@ -148,7 +166,7 @@ function tick(ts){
  else if(game==="aim")tickAim(dt);
  else if(game==="memory")tickMemory(dt);
  else if(game==="slide")tickSlide(dt);
- if(run){paint();af=requestAnimationFrame(tick)}
+ if(run){if(score>lastPointScore){lastPointScore=score;beep(500)}paint();af=requestAnimationFrame(tick)}
 }
 function tickBreaker(dt){
  const p=player;p.x+=p.vx*dt;p.y+=p.vy*dt;
@@ -341,7 +359,7 @@ function drawSlide(){
  });
 }
 
-function start(){if(!document.body.classList.contains("pz-unlocked"))return;hub();dashboard()}
+function start(){if(run&&sessionOwner!==window.pzActiveUserId)exit();if(!document.body.classList.contains("pz-unlocked"))return;hub();dashboard()}
 window.addEventListener("pz:unlocked",start);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&document.body.classList.contains("pz-unlocked"))dashboard()});
 if(document.readyState!=="loading")setTimeout(start,300);
