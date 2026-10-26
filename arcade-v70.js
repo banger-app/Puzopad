@@ -130,7 +130,7 @@ function pause(){if(!run)return;run=false;cancelAnimationFrame(af);$("pz-arc-res
 function exit(){
  run=false;sessionOwner=null;cancelAnimationFrame(af);
  const stage=$("pz-arc-overlay");if(stage)stage.hidden=true;
- document.body.classList.remove("pz-arc-playing");document.body.style.overflow=scrollBefore;document.documentElement.style.overflow=scrollRootBefore;
+ document.body.classList.remove("pz-arc-playing");document.body.style.removeProperty("overflow");document.documentElement.style.removeProperty("overflow");document.body.style.removeProperty("overscroll-behavior");document.documentElement.style.removeProperty("overscroll-behavior");
  dashboard();
 }
 function award(type){
@@ -361,6 +361,10 @@ function drawSlide(){
 
 function start(){if(run&&sessionOwner!==window.pzActiveUserId)exit();if(!document.body.classList.contains("pz-unlocked"))return;hub();dashboard()}
 window.addEventListener("pz:unlocked",start);
+window.addEventListener("pagehide",()=>{if(run||document.body.classList.contains("pz-arc-playing"))exit()});
+window.addEventListener("pageshow",()=>{if($("pz-arc-overlay")?.hidden){document.body.classList.remove("pz-arc-playing");document.body.style.removeProperty("overflow");document.documentElement.style.removeProperty("overflow")}});
+document.addEventListener("click",e=>{if(!document.body.classList.contains("pz-arc-playing"))return;if(e.target?.closest?.("#pz-arc-close,#pz-arc-back,#pz-arc-results-close"))setTimeout(()=>{document.body.style.removeProperty("overflow");document.documentElement.style.removeProperty("overflow")},25)});
+
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&document.body.classList.contains("pz-unlocked"))dashboard()});
 if(document.readyState!=="loading")setTimeout(start,300);
 else document.addEventListener("DOMContentLoaded",()=>setTimeout(start,400),{once:true});
