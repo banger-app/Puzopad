@@ -216,8 +216,8 @@ function current(){
  const prev=window.pzWardrobePreviewV73;
  const active=prev?.uid===window.pzActiveUserId?prev:null;
  let hero=p.species||"frog",pet=p.pet||"none",heroWear=w.wear||{},petWear=w.petWear||{},scenePreview=state.scene;
- if(active?.which==="species")hero=active.id;
- else if(active?.which==="pettype")pet=active.id;
+ if(active?.which==="species"){hero=active.id;heroWear=w.heroWardrobes?.[active.id]||{torso:"starter"}}
+ else if(active?.which==="pettype"){pet=active.id;petWear=w.petWardrobes?.[active.id]||{}}
  else if(active?.which==="set"){
   const set=window.pzWardrobeV73?.SETS?.find(x=>x.id===active.id);
   if(set){heroWear={...heroWear};for(const key of set.items){const item=window.pzWardrobeV73?.HERO?.find(x=>x[0]===key);if(item)heroWear[item[1]]=key}scenePreview=set.scene}
@@ -227,7 +227,7 @@ function current(){
  }else if(active?.which==="pet"){
   const item=window.pzWardrobeV73?.PETITEMS?.find(x=>x[0]===active.id);if(item)petWear={...petWear,[item[1]]:active.id}
  }
- return {hero,pet,heroWear,petWear,scene:scenePreview,level:Math.floor((Number(d.xp)||0)/100)+1,coins:d.coins||0,owner:window.pzActiveUserId,pname:p.petName||w.petNames?.[pet]||PET_INFO[pet]?.[0]||""};
+ return {hero,pet,heroWear,petWear,scene:scenePreview,level:Math.floor((Number(d.xp)||0)/100)+1,coins:d.coins||0,owner:window.pzActiveUserId,pname:active?.which==="pettype"?(w.petNames?.[pet]||PET_INFO[pet]?.[0]||""):p.petName||w.petNames?.[pet]||PET_INFO[pet]?.[0]||""};
 }
 function renderScene(target,opts={}){
  if(!target)return;
