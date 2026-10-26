@@ -23,7 +23,7 @@ const waveform=make("span","pz83-wave");waveform.innerHTML='<i></i><i></i><i></i
 const controls=make("div","pz83-rec-controls");
 const cancelButton=button("✕","pz83-rec-cancel",cancel);
 const pauseButton=button("Ⅱ","pz83-rec-pause",pauseToggle);
-const finishButton=button("✓","pz83-rec-finish",finish);
+const finishButton=button("✓","pz83-rec-finish",()=>sendRecording());
 const sendButton=button("↑","pz83-rec-send",()=>sendRecording());
 controls.append(cancelButton,pauseButton,finishButton,sendButton);
 tray.append(chip,time,waveform,controls,status);
@@ -71,7 +71,7 @@ function refresh(){
  finishButton.disabled=!rec||busy;
  sendButton.disabled=busy||(!rec&&!blob);callSend.disabled=sendButton.disabled;
  ring.classList.toggle("recording",recording);ring.classList.toggle("paused",paused);
- ring.textContent=recording?"▣":paused?"▶":busy?"⋯":"🎙";
+ ring.textContent=recording?"■":paused?"▶":busy?"···":"🎙";
  mic.classList.toggle("pz83-recording",recording);
  mic.setAttribute("aria-label",recording?T("stop"):T("record"));
  if(mode)callMessage.textContent=busy?T("trans"):reading?T("waiting"):recording?T("newTurn"):paused?T("pause"):ready?T("ready"):T("touch");
@@ -175,15 +175,19 @@ function speakAnswer(text){
 }
 function startCall(){
  if(!modal.classList.contains("open"))window.pzBennyV81.open();
- mode=true;overlay.hidden=false;cycle++;
+ mode=true;overlay.hidden=false;
+ document.body.classList.add("pz83-call-active");
  if("speechSynthesis" in window)window.speechSynthesis.cancel();
- message(T("touch"));refresh();
+ message(T("newTurn"));refresh();
+ // User-initiated microphone permission is requested on THIS tap.
+ // No second activation of the big voice orb is required.
+ begin(true);
 }
 function stopCall(){
- mode=false;expectAnswer=false;reading=false;overlay.hidden=true;overlay.classList.remove("waiting");cancel();
+ mode=false;expectAnswer=false;reading=false;overlay.hidden=true;overlay.classList.remove("waiting");document.body.classList.remove("pz83-call-active");cancel();
  if("speechSynthesis" in window)window.speechSynthesis.cancel();
 }
-mic.onclick=()=>{if(rec){finish();return}if(blob){sendRecording();return}begin(false)};
+mic.onclick=()=>{if(rec||blob){sendRecording();return}begin(false)};
 $("bai-close")?.addEventListener("click",stopCall);
 document.addEventListener("visibilitychange",()=>{if(document.hidden){if(rec)finish();if(reading&&"speechSynthesis" in window)window.speechSynthesis.cancel()}});
 window.addEventListener("pz:unlocked",()=>{if(!window.pzActiveUserId){stopCall()}});
