@@ -1,0 +1,44 @@
+name: Mobile UI visual smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - index.html
+      - "*.css"
+      - "*.js"
+      - tests/mobile-visual-smoke.mjs
+      - .github/workflows/mobile-visual-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Chromium visual test tooling
+        run: |
+          npm install --no-save --no-package-lock playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Start standalone PWA dev server
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/puzopad-smoke.log 2>&1 &
+          echo $! > /tmp/puzopad-smoke.pid
+          for n in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:8765/ >/dev/null && break
+            sleep 1
+          done
+      - name: Test responsive rendering at 320, 375, 390, 430 and 768 px
+        run: node tests/mobile-visual-smoke.mjs
+      - name: Upload screenshots (even on test failure)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v85-mobile-screenshots
+          path: visual-smoke-artifacts/
+          if-no-files-found: ignore
+          retention-days: 7
