@@ -1,6 +1,7 @@
 {
-  "build": "58",
+  "build": "59",
   "date": "2026-10-26",
   "assets": "puzopad-standalone-icon-v1",
-  "stable_url": "/Puzopad/"
+  "stable_url": "/Puzopad/",
+  "changes": "auth-gate-empty-new-accounts-onboarding"
 }
