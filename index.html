@@ -236,6 +236,7 @@ body.pz-three-ready #v20AvatarSlot{visibility:hidden!important}
 .pz-game-explainer p{font-size:13px;line-height:1.45;color:#bfc8de;margin:6px 0}.pz-game-explainer strong{font-size:14px}
 .v16-resource[hidden],.v17-hp[hidden]{display:none!important}
 .pz-macros{display:flex;flex-direction:column;gap:4px;font-size:14px;line-height:1.2}.pz-macros b{font-size:17px}
+#bai-open{display:flex!important;gap:7px;align-items:center;justify-content:center;min-width:105px!important;padding:5px 11px 5px 5px!important;border-radius:36px!important;min-height:52px}#bai-open img{width:38px;height:38px;border-radius:12px;object-fit:cover}#bai-open span{font-size:13px;white-space:nowrap}
 #pz-arc-canvas{display:block;width:100%;max-width:430px;aspect-ratio:400/520;background:#12172b;border-radius:17px;border:1px solid #814a82;touch-action:none;margin:14px auto}
 .pz-arcade>#pz-arc-start{width:100%;margin:6px 0;padding:15px}
 .pz-hero-greeting{font-size:12px;color:#f8c0e1;margin:8px 0}
@@ -979,7 +980,7 @@ $('b46input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.
 #bai-file{max-width:100%;font-size:13px}
 #bai-status{font-size:12px;color:#bec6df;min-height:18px}
 </style>
-<button id="bai-open" type="button">🎙️ БЭННИ</button>
+<button id="bai-open" type="button" aria-label="Відкрити помічника БЕННІ"><img src="./icons/benny-180.png?v=1" alt="" width="38" height="38"><span>БЕННІ</span></button>
 <div id="bai-modal" role="dialog" aria-modal="true" aria-label="БЭННИ — BANGER AI">
 <div id="bai-panel">
 <div id="bai-top"><div><b>✦ БЭННИ <span style="font-size:11px;color:#9da7bf;font-weight:400">· BANGER AI</span></b><div style="font-size:12px;color:#b6b9d3">Фото · Голос · Еда · Холодильник · Гараж</div></div><button id="bai-close" type="button">✕</button></div>
