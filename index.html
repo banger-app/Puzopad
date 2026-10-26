@@ -731,7 +731,7 @@ window.rbSlot=function(s){active=s;stylePanel(false)};
 window.rbWear=function(slot,id){look[slot]=id;saveLook();stylePanel(slot==='pet');if(slot==='pet')stylePanel(false);else stylePanel(true)};
 window.rbColor=function(slot,color){look[slot+'Color']=color;saveLook();stylePanel(slot==='pet');if(slot==='pet')stylePanel(false);else stylePanel(true)};
 function clean(){const old=document.querySelector('#wardrobe .panel');if(old){let items=old.querySelector('#wardrobeWallet');if(items)items.parentElement?.remove();old.querySelector('#v23WardrobeGuide')?.remove();old.querySelector('#wardrobeItems')?.remove();old.querySelector('#rewardHistory')?.remove()}document.querySelector('#companion #v23PetLook')?.remove()}
-clean();drinkRows();
+drinkRows();
 try{render()}catch(e){console.warn('render',e)}
 })();
 </script><script id="reborn30sleep">
@@ -1255,7 +1255,7 @@ if((t.startsWith('✅ Ответ')||t.startsWith('Ответ получен')) &
 <script src="./storage-v64.js?v=64.0"></script>
 <script src="./onboarding-v69.js?v=69.0" id="pz-v64-gate"></script>
 <script src="./interface-v61.js?v=72.0"></script>
-<script src="./arcade-v70.js?v=73.0"></script>
-<script src="./studio-shop-v72.js?v=73.0"></script><script src="./wardrobe-v73.js?v=73.0"></script>
+<script src="./arcade-v70.js?v=73.1"></script>
+<script src="./wardrobe-v73.js?v=73.1"></script>
 <script src="./usability-v67.js?v=73.0"></script>
-<script type="module" src="./three-studio-v72.js?v=73.0"></script></body></html>
+<script type="module" src="./three-studio-v72.js?v=73.1"></script></body></html>
