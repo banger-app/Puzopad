@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import {makeHero,makeHamster} from "./premium-models-v76.js";
 const $=id=>document.getElementById(id);
 const loader=new GLTFLoader();
 const PET_FILES={dog:"pet-corgi-gobkit.glb",duck:"pet-duck-gobkit.glb",hippo:"pet-hippo-gobkit.glb",rhino:"pet-rhino-gobkit.glb",platypus:"pet-platypus-gobkit.glb",shark:"pet-shark-gobkit.glb",bat:"pet-bat-gobkit.glb",cat:"pet-cat.glb",hamster:"pet-hamster.glb",rabbit:"pet-rabbit.glb",fox:"pet-fox.glb",panda:"pet-panda.glb",parrot:"pet-parrot.glb",penguin:"pet-penguin.glb",fish:"pet-fish.glb",lion:"pet-lion.glb",tiger:"pet-tiger.glb"};
@@ -16,7 +17,7 @@ function preview(kind){
  const p=window.pzShopPreview;
  return p&&p.account===window.pzActiveUserId&&p.kind===kind?p.key:null;
 }
-function src(name){return "./assets/3d/"+name+"?v=73"}
+function src(name){return "./assets/3d/"+name+"?v=76"}
 function notice(view,msg){if(!view?.host)return;const x=view.host.querySelector(".pz3d-load-status")||document.createElement("p");x.className="pz3d-load-status";x.textContent=msg;view.host.append(x)}
 function clearNotice(view){view.host?.querySelector(".pz3d-load-status")?.remove()}
 function makeViewer(spec){
@@ -24,18 +25,22 @@ function makeViewer(spec){
  host.dataset.viewer="loading";
  try{
   host.textContent="";
-  const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:"low-power",preserveDrawingBuffer:false});
-  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0x000000,0);
+  const renderer=new THREE.WebGLRenderer({alpha:false,antialias:true,powerPreference:"low-power",preserveDrawingBuffer:false});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0x101326,1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;
   renderer.domElement.style.touchAction="pan-y";renderer.domElement.setAttribute("aria-label","Об'ємна 3D-модель. Проведи пальцем для обертання");
   host.append(renderer.domElement);
-  const scene=new THREE.Scene();
-  scene.add(new THREE.HemisphereLight(0xe6f4ff,0x3a2146,3.8));
-  const key=new THREE.DirectionalLight(0xffffff,3.3);key.position.set(-2,5,6);scene.add(key);
-  const rim=new THREE.DirectionalLight(0xff67bf,2.1);rim.position.set(3,3,-3);scene.add(rim);
+  const scene=new THREE.Scene();scene.background=new THREE.Color(0x101326);
+  scene.add(new THREE.HemisphereLight(0xe6f4ff,0x3a2146,2.2));
+  const key=new THREE.DirectionalLight(0xffffff,3.0);key.position.set(-2,5,6);scene.add(key);
+  const rim=new THREE.DirectionalLight(0xff67bf,1.4);rim.position.set(3,3,-3);scene.add(rim);
   const camera=new THREE.PerspectiveCamera(36,1,.06,100);
-  camera.position.set(0,1.3,spec.kind==="home"?7.8:6.7);camera.lookAt(0,1.18,0);
-  const floor=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.85,.16,48),new THREE.MeshStandardMaterial({color:0x302640,metalness:.25,roughness:.6}));
-  floor.position.y=-.15;scene.add(floor);
+  camera.position.set(0,1.48,spec.kind==="home"?6.6:spec.kind==="pet"?4.65:5.2);camera.lookAt(0,1.20,0);
+  const floor=new THREE.Mesh(new THREE.CylinderGeometry(1.67,1.73,.23,64),new THREE.MeshStandardMaterial({color:0x292444,metalness:.45,roughness:.38}));
+  floor.position.y=-.18;scene.add(floor);
+  const edge=new THREE.Mesh(new THREE.TorusGeometry(1.67,.025,8,64),new THREE.MeshStandardMaterial({color:0xff8bc1,emissive:0x85265a,emissiveIntensity:.35}));
+  edge.rotation.x=Math.PI/2;edge.position.y=-.055;scene.add(edge);
+  const fillPink=new THREE.PointLight(0xffa8db,13,6);fillPink.position.set(-1.2,2.4,2);scene.add(fillPink);
+  const fillBlue=new THREE.PointLight(0x97cafa,9,6);fillBlue.position.set(1.5,2.3,-1.5);scene.add(fillBlue);
   const stage=new THREE.Group();scene.add(stage);
   const view={...spec,host,renderer,scene,camera,stage,serial:0,key:"",drag:false,lastX:0};
   renderer.domElement.addEventListener("pointerdown",e=>{view.drag=true;view.lastX=e.clientX;try{renderer.domElement.setPointerCapture(e.pointerId)}catch(_){}});
@@ -72,7 +77,10 @@ function placeholderPet(key){
  if(key==="owl"){for(const s of [-1,1])ball(root,s*.22,1.58,.71,.22,.24,.1,0xffe6ba)}
  return root;
 }
-function getPetKey(){return store()?.profile?.pet||"none"}
+function getPetKey(){
+ const p=window.pzWardrobePreviewV73;
+ return p?.uid===window.pzActiveUserId&&p.which==="pettype"?p.id:(store()?.profile?.pet||"none");
+}
 function getHero(){
  const d=store(),p=d?.profile||{},sp=p.species||"frog";
  const palette=Math.max(0,Math.min(3,Number(preview("palette")??d?.heroStyle?.palette)||0));
@@ -125,7 +133,7 @@ function v73Gear(root,kind,h){
  const shown={...equipped};
  if(p&&p.uid===window.pzActiveUserId&&p.which===who){
   const slots={cap:"head",helmet:"head",crown:"head",glasses:"face",visor:"face",sneakers:"feet",boots:"feet",cape:"back",wings:"back",halo:"aura",
-   bow:"head",petcap:"head",petcrown:"head",scarf:"neck",collar:"neck",petglasses:"face",backpack:"back",petwings:"back",petaura:"aura",starter:"torso",work:"torso",gym:"torso",knight:"torso",void:"torso",royal:"torso"};
+   bow:"head",petcap:"head",petcrown:"head",scarf:"neck",collar:"neck",petglasses:"face",backpack:"back",petwings:"back",petaura:"aura",petpumpkin:"head",petwitch:"head",petghost:"aura",witchhat:"head",pumpkincoat:"torso",phantom:"torso",batcape:"back",halloweenmask:"face",starter:"torso",work:"torso",gym:"torso",knight:"torso",void:"torso",royal:"torso"};
   if(slots[p.id])shown[slots[p.id]]=p.id;
  }
  const y=h||2.4;
@@ -134,7 +142,7 @@ function v73Gear(root,kind,h){
  const geo=(shape,m,x,yy,z,sx=1,sy=1,sz=1)=>{const o=new THREE.Mesh(shape,m);o.position.set(x,yy,z);o.scale.set(sx,sy,sz);root.add(o);return o};
  const sphere=(m,x,yy,z,sx,sy,sz)=>geo(new THREE.SphereGeometry(1,18,12),m,x,yy,z,sx,sy,sz);
  const head=shown.head,face=shown.face,feet=shown.feet,back=shown.back,glow=shown.aura,neck=shown.neck;
- const hy=who==="hero"?y*.92:y*.94;
+ const hy=who==="hero"?y*.94:y*.78;
  if(head==="cap"||head==="petcap"||head==="helmet"){
   geo(new THREE.CylinderGeometry(.36,.37,.2,20),head==="helmet"?silver:mag,0,hy,0);
   geo(new THREE.CylinderGeometry(.49,.49,.045,24),head==="helmet"?silver:dark,0,hy-.10,.12);
@@ -144,63 +152,77 @@ function v73Gear(root,kind,h){
   for(let i=0;i<7;i++){const t=i*2*Math.PI/7;geo(new THREE.ConeGeometry(.093,.25,5),gold,Math.sin(t)*.36,hy+.2,Math.cos(t)*.36)}
  }
  if(head==="bow"){sphere(mag,-.17,hy-.10,.44,.19,.14,.09);sphere(mag,.17,hy-.10,.44,.19,.14,.09);sphere(gold,0,hy-.10,.48,.1,.1,.09)}
+ if(head==="witchhat"||head==="petwitch"){
+  const size=head==="petwitch"?.7:1;
+  geo(new THREE.CylinderGeometry(.46*size,.46*size,.055,24),dark,0,hy+.1,0);
+  geo(new THREE.ConeGeometry(.40*size,.75*size,24),mat(0x3c235b),0,hy+.49*size,0);
+  geo(new THREE.CylinderGeometry(.30*size,.33*size,.075,24),mag,0,hy+.23*size,0);
+ }
+ if(head==="petpumpkin"){
+  sphere(mat(0xf19a3a),0,hy+.18,0,.37,.30,.30);
+  geo(new THREE.CylinderGeometry(.05,.08,.14,8),mat(0x528849),0,hy+.51,0);
+ }
  if(face==="glasses"||face==="petglasses"){
   for(const side of [-1,1])geo(new THREE.TorusGeometry(.18,.035,8,22),silver,side*.21,y*.67,.5);
   geo(new THREE.BoxGeometry(.15,.035,.05),dark,0,y*.67,.5);
  }
  if(face==="visor")geo(new THREE.BoxGeometry(.88,.25,.17),mat(0x30a6d4,0x1d6fcc),0,y*.7,.43);
+ if(face==="halloweenmask"){
+  sphere(mat(0xe4e4d9),0,y*.77,.49,.34,.28,.09);
+  for(const side of [-1,1])sphere(dark,side*.14,y*.80,.58,.09,.08,.03);
+ }
  if(feet==="sneakers"||feet==="boots")for(const side of [-1,1])sphere(feet==="boots"?silver:mag,side*.32,.12,.23,.30,feet==="boots"?.29:.16,.32);
- if(back==="cape"||back==="wings"||back==="petwings"){
+ if(back==="cape"||back==="wings"||back==="petwings"||back==="batcape"){
   if(back==="cape")geo(new THREE.ConeGeometry(.6,y*.55,5,1,true),mag,0,y*.38,-.46).rotation.x=Math.PI;
+  else if(back==="batcape")for(const side of [-1,1])geo(new THREE.ConeGeometry(.49,y*.58,3),mat(0x1d2136),side*.48,y*.48,-.32).rotation.z=side*.58;
   else for(const side of [-1,1])geo(new THREE.ConeGeometry(.34,y*.5,4),mat(0xae80ff,0x5d20dd),side*.55,y*.54,-.29).rotation.z=side*.35;
  }
  if(back==="backpack")geo(new THREE.BoxGeometry(.61,.60,.29),mat(0x9d75ed),0,y*.40,-.49);
  if(neck==="scarf"||neck==="collar")geo(new THREE.TorusGeometry(.48,.10,9,24),neck==="collar"?gold:mag,0,y*.58,.05).rotation.x=Math.PI/2;
- if(glow==="halo"||glow==="petaura")geo(new THREE.TorusGeometry(.55,.055,11,36),aura,0,y+0.32,0).rotation.x=Math.PI/2;
+ if(glow==="halo"||glow==="petaura"||glow==="petghost")geo(new THREE.TorusGeometry(.55,.055,11,36),glow==="petghost"?mat(0xc7ecff,0x7f9edd):aura,0,y+.25,0).rotation.x=Math.PI/2;
  if(who==="hero"&&shown.torso){
-  const variant={starter:0x252b49,work:0x496970,gym:0xe33a91,knight:0x809ac5,void:0x2e2452,royal:0xbf944c}[shown.torso]||0x252b49;
+  const variant={starter:0x252b49,work:0x496970,gym:0xe33a91,knight:0x809ac5,void:0x2e2452,royal:0xbf944c,pumpkincoat:0xd88635,phantom:0x7485ae}[shown.torso]||0x252b49;
   const plate=geo(new THREE.SphereGeometry(1,18,14),mat(variant),0,y*.4,.35,.49,.27,.16);
   if(shown.torso==="royal")sphere(gold,0,y*.39,.51,.14,.14,.05);
   if(shown.torso==="void")sphere(aura,0,y*.39,.51,.14,.14,.05);
+  if(shown.torso==="pumpkincoat")sphere(mat(0x182533),0,y*.4,.52,.13,.16,.04);
+  if(shown.torso==="phantom")sphere(mat(0xc2d0e8),0,y*.4,.51,.14,.15,.04);
  }
 }
 
 async function put(view,kind,x=0,z=0,scale=1){
- const d=store(),p=d?.profile||{},name=kind==="hero"?getHero():PET_FILES[getPetKey()];
- if(kind==="pet"&&getPetKey()==="none")return;
+ const d=store(),p=d?.profile||{},petKey=getPetKey();
+ if(kind==="pet"&&petKey==="none")return;
  let obj;
- if(name){
-  try{obj=await model(name)}catch(e){
-   console.warn("3D model failed",name,e);
-   if(kind==="hero")throw e;
-   obj=placeholderPet(getPetKey());
-  }
- }else obj=placeholderPet(getPetKey());
- const target=new THREE.Group();target.position.x=x;target.position.z=z;target.scale.setScalar(scale);
- const actual=normalize(obj,kind==="hero"?2.65:1.8);
+ if(kind==="hero"){
+  const previewState=window.pzWardrobePreviewV73;
+  const hue=previewState?.uid===window.pzActiveUserId&&previewState.which==="palette"?Number(previewState.id):Number(preview("palette")??d?.heroStyle?.palette)||0;
+  obj=makeHero(p.species||"frog",hue);
+ }else if(petKey==="hamster"){
+  obj=makeHamster();
+ }else{
+  const filename=PET_FILES[petKey];
+  if(filename){try{obj=await model(filename)}catch(e){console.warn("3D model failed",filename,e);obj=placeholderPet(petKey)}}
+  else obj=placeholderPet(petKey);
+ }
+ const target=new THREE.Group();target.position.set(x,0,z);target.scale.setScalar(scale);
+ const actual=normalize(obj,kind==="hero"?2.55:1.78);
  const rig=new THREE.Group();rig.add(obj);target.add(rig);
  if(d?.wardrobeV73){
-  // Single source of truth: V73 per-character equipment. Never draw legacy gear again.
-  v73Gear(target,kind,actual);
+  // No legacy layers: independently equipped pieces, preview is non-destructive.
+  const activePet=store()?.profile?.pet||"none";
+  if(kind==="hero"||petKey===activePet)v73Gear(target,kind,actual);
  }else if(kind==="pet"){
-  addAccessories(target,preview("pet")||p.petStyle||"plain",actual*scale,"pet");
- }else{
-  addAccessories(target,preview("outfit")||d?.heroStyle?.outfit||"casual",actual,"hero",[0x252b49,0x496970,0xe33a91,0x7c5ff2][["casual","work","gym","hero"].indexOf(preview("outfit")||d?.heroStyle?.outfit||"casual")]||0x252b49);
- }
- // Apply owned palette to frog model's green skin, while preserving eye white/black.
- if(kind==="hero"&&p.species!=="human"&&p.species!=="robot"){
-  const col=COLORS[Number(preview("palette")??d?.heroStyle?.palette)||0]||COLORS[0];
-  target.traverse(node=>{if(!node.isMesh||!node.material)return;
-   if(["body","head","eye_bulb","hand","foot"].includes(node.name)){node.material=node.material.clone();node.material.color.setHex(col)}
-  });
- }
+  addAccessories(target,preview("pet")||p.petStyle||"plain",actual,"pet");
+ }else addAccessories(target,preview("outfit")||d?.heroStyle?.outfit||"casual",actual,"hero",0x252b49);
  return target;
 }
+
 async function renderModels(view){
  if(!view?.host?.isConnected)return;
  const d=store(),p=d?.profile;
  if(!p?.created)return;
- const identity=[window.pzActiveUserId,p.species,p.pet,p.petStyle,p.petName,d.heroStyle?.palette,d.heroStyle?.outfit,JSON.stringify(d.wardrobeV73?.wear||{}),JSON.stringify(d.wardrobeV73?.petWear||{}),window.pzWardrobePreviewV73?.uid,window.pzWardrobePreviewV73?.id,preview("palette"),preview("outfit"),preview("pet"),view.kind].join("|");
+ const identity=[window.pzActiveUserId,p.species,p.pet,p.petStyle,p.petName,d.heroStyle?.palette,d.heroStyle?.outfit,JSON.stringify(d.wardrobeV73?.wear||{}),JSON.stringify(d.wardrobeV73?.petWear||{}),window.pzWardrobePreviewV73?.uid,window.pzWardrobePreviewV73?.which,window.pzWardrobePreviewV73?.id,preview("palette"),preview("outfit"),preview("pet"),view.kind].join("|");
  if(identity===view.key)return;
  view.key=identity;const serial=++view.serial;notice(view,"Завантажуємо справжню 3D модель…");
  try{
