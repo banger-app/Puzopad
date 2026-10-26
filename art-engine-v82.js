@@ -102,6 +102,7 @@ function outfitColors(wear,hero){
  if(torso==="void"||torso==="phantom")return {cloth:"#41215d",trim:"#b25cff",pants:"#170f2b"};
  if(torso==="royal")return {cloth:"#482b6d",trim:"#fbd76d",pants:"#27153a"};
  if(torso==="pumpkincoat")return {cloth:"#b25d24",trim:"#ffca70",pants:"#33243f"};
+ if(torso==="wintercoat")return {cloth:"#d4e5fb",trim:"#65cfff",pants:"#5077a7"};
  return {cloth:hero==="kisyusha"||hero==="luna"?"#3e183e":"#181a29",trim:"#ef4b9d",pants:"#22263a"};
 }
 function heroArt(id,wear={},mini=false){
@@ -156,7 +157,7 @@ function heroArt(id,wear={},mini=false){
   art+='<path d="M155 85L181 79 M239 85L261 80" stroke="#a9e6ff" stroke-width="5" opacity=".7"/>';
  }
  if(wear?.head==="crown")art+='<path d="M135 10L155-47L195-16L230-64L266-16L303-47L325 10Z" fill="#f2c565" stroke="#a06a2d" stroke-width="9"/>';
- if(wear?.head==="cap"||wear?.head==="witchhat")art+='<path d="M120 15Q221-66 327 10L350 31Q239 48 118 27Z" fill="'+(wear.head==="witchhat"?"#3e1a5b":"#202639")+'" stroke="#f059b6" stroke-width="7"/>';
+ if(wear?.head==="cap"||wear?.head==="witchhat"||wear?.head==="santahat")art+='<path d="M120 15Q221-66 327 10L350 31Q239 48 118 27Z" fill="'+(wear.head==="santahat"?"#d93c63":wear.head==="witchhat"?"#3e1a5b":"#202639")+'" stroke="#f059b6" stroke-width="7"/>';
  if(wear?.head==="helmet")art+='<path d="M117 63Q119-32 227-30Q328-27 337 65" fill="none" stroke="#a5b3d1" stroke-width="21"/>';
  if(wear?.back==="wings"||wear?.back==="batcape")art+='<path d="M138 231Q15 62 20 334L110 303M315 230Q442 66 443 338L340 298" fill="#8c3ed1" stroke="#ed7efb" stroke-width="10"/>';
  if(wear?.back==="cape")art+='<path d="M144 197Q47 307 101 517L169 489M309 191Q409 313 356 517L286 483" fill="#723887" stroke="#b56cb8" stroke-width="8"/>';
@@ -196,9 +197,9 @@ function petArt(key,wear={}){
  art+='<path d="M136 227Q171 241 204 227" stroke="#b46c77" stroke-width="6" fill="none"/>';
  }
  // customizable gear
- art+='<path d="M97 270Q167 299 241 269" stroke="'+(wear.neck==="collar"?"#46f5e2":"#f169b8")+'" stroke-width="13" fill="none"/>';
+ art+='<path d="M97 270Q167 299 241 269" stroke="'+(wear.neck==="collar"?"#46f5e2":wear.neck==="petwinter"?"#8bdcff":"#f169b8")+'" stroke-width="13" fill="none"/>';
  if(wear.head==="bow"||wear.head==="petpumpkin")art+='<path d="M140 76Q93 23 132 16L174 64Q223 14 244 45L187 88Z" fill="'+(wear.head==="petpumpkin"?"#ffa841":"#fc65bb")+'" stroke="#a23a83" stroke-width="7"/>';
- if(wear.head==="petcap"||wear.head==="petwitch")art+='<path d="M97 80Q170 10 254 81L271 100Q170 117 87 96Z" fill="#382343" stroke="#f765be" stroke-width="8"/>';
+ if(wear.head==="petcap"||wear.head==="petwitch"||wear.head==="petsanta")art+='<path d="M97 80Q170 10 254 81L271 100Q170 117 87 96Z" fill="#382343" stroke="#f765be" stroke-width="8"/>';
  if(wear.head==="petcrown")art+='<path d="M105 68L122 5L157 31L172-15L210 30L242 4L251 69Z" fill="#ffe185" stroke="#9a6f33" stroke-width="8"/>';
  if(wear.face==="petglasses"||key==="dog")art+='<path d="M84 128H248M91 124Q107 111 143 122L158 155Q148 182 111 170Z M180 126Q222 109 245 126L234 167Q194 182 181 154Z" fill="#171827" stroke="#9b8fa7" stroke-width="6"/>';
  if(wear.back==="backpack")art+='<rect x="245" y="223" width="67" height="81" rx="18" fill="#35385a" stroke="#ec75b4" stroke-width="9"/>';
@@ -217,6 +218,10 @@ function current(){
  let hero=p.species||"frog",pet=p.pet||"none",heroWear=w.wear||{},petWear=w.petWear||{};
  if(active?.which==="species")hero=active.id;
  else if(active?.which==="pettype")pet=active.id;
+ else if(active?.which==="set"){
+  const set=window.pzWardrobeV73?.SETS?.find(x=>x.id===active.id);
+  if(set){heroWear={...heroWear};for(const key of set.items){const item=window.pzWardrobeV73?.HERO?.find(x=>x[0]===key);if(item)heroWear[item[1]]=key}state.scene=set.scene}
+ }
  else if(active?.which==="hero"){
   const item=window.pzWardrobeV73?.HERO?.find(x=>x[0]===active.id);if(item)heroWear={...heroWear,[item[1]]:active.id}
  }else if(active?.which==="pet"){
