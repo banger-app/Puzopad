@@ -32,6 +32,8 @@ const callButton=button("◉","pz83-call-launch",startCall);
 callButton.setAttribute("aria-label",T("call"));
 callButton.title=T("call");
 composer.append(callButton);
+callButton.innerHTML='<svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg>';
+
 const overlay=make("section","pz83-call-overlay");overlay.id="pz83-call-overlay";overlay.hidden=true;
 const callTop=make("header","pz83-call-header");
 const closeCallButton=button("✕","pz83-call-close",stopCall);
