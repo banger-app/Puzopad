@@ -29,7 +29,16 @@ const HERO=[
 ["pumpkincoat","torso","rare",95,"Гарбузова броня","Тыквенная броня","Pumpkin armor","🎃","halloween"],
 ["phantom","torso","epic",165,"Примарний костюм","Призрачный костюм","Phantom suit","👻","halloween"],
 ["batcape","back","epic",135,"Крила нічного кажана","Крылья ночной летучей мыши","Night bat wings","🦇","halloween"],
-["halloweenmask","face","uncommon",45,"Маска кістяка","Маска скелета","Skeleton mask","💀","halloween"]
+["halloweenmask","face","uncommon",45,"Маска кістяка","Маска скелета","Skeleton mask","💀","halloween"],
+["wintercoat","torso","epic",140,"Сніговий худі","Снежное худи","Snow hoodie","❄️"],
+["santahat","head","rare",80,"Святкова шапка","Новогодняя шапка","Holiday hat","🎅"],
+["snowboots","feet","uncommon",45,"Зимові кросівки","Зимние кроссовки","Winter sneakers","👟"]
+];
+const SETS=[
+{id:"street",rarity:"uncommon",cost:40,ru:"Уличный BANGER",uk:"Вуличний BANGER",en:"Street BANGER",items:["starter","glasses","sneakers"],scene:"city"},
+{id:"cyber",rarity:"epic",cost:215,ru:"Киберлегенда",uk:"Кіберлегенда",en:"Cyber Legend",items:["void","visor","wings"],scene:"city"},
+{id:"halloween",rarity:"legend",cost:260,ru:"Ночь Хэллоуина",uk:"Ніч Геловіну",en:"Halloween Night",items:["pumpkincoat","witchhat","batcape","halloweenmask"],scene:"halloween"},
+{id:"winter",rarity:"epic",cost:195,ru:"Снежный король",uk:"Сніговий король",en:"Snow King",items:["wintercoat","santahat","snowboots"],scene:"winter"}
 ];
 const COLORS=[
 [0,0,"Лісовий","Лесной","Forest","#56d97b"],
@@ -49,7 +58,9 @@ const PETITEMS=[
 ["petaura","aura","legend",180,"Зоряна аура","Звёздная аура","Star aura","✦"],
 ["petpumpkin","head","uncommon",35,"Гарбузова шапочка","Тыквенная шапочка","Pumpkin cap","🎃","halloween"],
 ["petwitch","head","rare",75,"Малий капелюх відьми","Маленькая шляпа ведьмы","Little witch hat","🧙","halloween"],
-["petghost","aura","epic",125,"Примарний слід","Призрачный след","Ghost trail","👻","halloween"]
+["petghost","aura","epic",125,"Примарний слід","Призрачный след","Ghost trail","👻","halloween"],
+["petwinter","neck","rare",65,"Зимовий шарф","Зимний шарф","Winter scarf","🧣"],
+["petsanta","head","rare",85,"Святкова шапочка","Новогодняя шапочка","Festive pet hat","🎅"]
 ];
 const PETS=[
 ["none","common",0,"Без компаньйона","Без питомца","No pet","—",1],
@@ -98,7 +109,7 @@ function setup(){
  const data=d();
  if(!data.wardrobeV73)data.wardrobeV73={owned:["starter"],wear:{torso:"starter"},petItems:[],petWear:{},pets:["none","dog","cat","hamster"],petNames:{},petWardrobes:{}};
  const w=data.wardrobeV73;w.owned ||= ["starter"];w.colors ||= [0];w.wear ||= {torso:"starter"};w.petItems ||= [];w.petWear ||= {};w.pets ||= ["none","dog","cat","hamster"];w.petNames ||= {};w.petWardrobes||={};
- const heroKey=data.profile.species||"frog";w.heroWardrobes||={};if(!w.heroWardrobes[heroKey])w.heroWardrobes[heroKey]={...w.wear};w.wear=w.heroWardrobes[heroKey];
+ const heroKey=data.profile.species||"frog";w.heroWardrobes||={};w.bundles||=[];if(!w.heroWardrobes[heroKey])w.heroWardrobes[heroKey]={...w.wear};w.wear=w.heroWardrobes[heroKey];
  const activePet=data.profile.pet||"none";
  if(!w.petWardrobes[activePet])w.petWardrobes[activePet]={...w.petWear};
  w.petWear=w.petWardrobes[activePet];
@@ -149,6 +160,19 @@ function chooseItem(x,kind){
  }
  save();
 }
+function chooseSet(set){
+ const w=setup();if(!w||!set||!Array.isArray(set.items))return;
+ if(!w.bundles.includes(set.id)){
+  if(!spend(set.cost)){message=T(17);render();return}
+  w.bundles.push(set.id);
+ }
+ for(const key of set.items){
+  const item=HERO.find(x=>x[0]===key);if(!item)continue;
+  if(!w.owned.includes(key))w.owned.push(key);
+  w.wear[item[1]]=key;
+ }
+ d().artV82||={};d().artV82.scene=set.scene;message=T(27);save();
+}
 function chooseHero(kind){
  const w=setup();if(!w||!window.pzArtV82?.HEROES?.some(x=>x.id===kind))return;
  const old=d().profile.species||"frog";w.heroWardrobes||={};w.heroWardrobes[old]={...(w.wear||{})};
@@ -168,7 +192,9 @@ function choosePet(x){
  const current=d().profile.pet||"none";
  w.petNames[current]=d().profile.petName||w.petNames[current]||"";
  w.petWardrobes[current]={...w.petWear};
- d().profile.pet=x[0];d().profile.petName=x[0]==="none"?"":(w.petNames[x[0]]||petName(x));
+ d().profile.pet=x[0];
+ const special={dog:"Суречка",cat:"Мася",hamster:"Фа",panda:"Кунг-фу",robotcat:"Робокот",robodog:"Робопёс"};
+ d().profile.petName=x[0]==="none"?"":(w.petNames[x[0]]||special[x[0]]||petName(x));
  w.petWardrobes[x[0]]||={};w.petWear=w.petWardrobes[x[0]];
  message=T(26);save();
 }
@@ -267,6 +293,23 @@ function render(){
   }
   colorFold.append(colorList);content.append(colorFold);
  }
+ if(tab==="hero"){
+  content.append($node("h3","pz73-subtitle",lang()==="ru"?"Комплекты · одним нажатием":lang()==="en"?"Outfit sets · one tap":"Образи · одним натисканням"));
+  const row=$node("div","pz82-sets");
+  for(const set of SETS){
+   if(set.id==="halloween"&&!halloween()&&!w.bundles.includes(set.id))continue;
+   const own=w.bundles.includes(set.id),article=$node("article","pz82-set-card rarity-"+set.rarity);
+   const figure=$node("div","pz82-set-art");let gear={...(w.wear||{})};
+   for(const key of set.items){const item=HERO.find(x=>x[0]===key);if(item)gear[item[1]]=key}
+   figure.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 -55 440 640">'+window.pzArtV82.defs+window.pzArtV82.heroArt(d().profile.species||"frog",gear)+'</svg>';
+   article.append(figure,$node("strong","",set[lang()]||set.ru),$node("small","pz73-rarity",T(RARN[set.rarity])));
+   const actions=$node("div","pz82-set-actions");
+   actions.append($btn(own?"✓ "+T(12):set.cost+" 🪙 "+T(11),()=>chooseSet(set),"pz73-primary"));
+   actions.append($btn("👁",()=>viewPreview("set",set.id),"pz73-secondary"));
+   article.append(actions);row.append(article);
+  }
+  content.append(row);
+ }
  const list=tab==="hero"?HERO:PETITEMS,owned=tab==="hero"?w.owned:w.petItems;
  const filtered=list.filter(x=>available(x)&&(filter==="all"||x[2]===filter)&&(mode==="shop"||owned.includes(x[0])));
  const grid=$node("div","pz73-grid");for(const x of filtered)grid.append(card(x,tab,w));if(!filtered.length)grid.append($node("p","",T(25)));content.append(grid);
@@ -302,6 +345,6 @@ function watchSections(){
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watchSections,{once:true});else watchSections();
 window.addEventListener("pz:unlocked",()=>setTimeout(render,40));
 window.addEventListener("banger:local-save",()=>{if(can()&&el("pz73-wallet"))el("pz73-wallet").textContent=T(16)+": "+(Number(d().coins)||0)+" 🪙"});
-window.pzWardrobeV73={render,setup,HERO,PETITEMS,PETS,chooseHero,choosePet};
+window.pzWardrobeV73={render,setup,HERO,PETITEMS,PETS,SETS,chooseHero,choosePet,chooseSet};
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(render,700));else setTimeout(render,120);
 })();
