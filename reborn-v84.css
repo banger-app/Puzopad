@@ -1,0 +1,37 @@
+/* BANGERVERSE v84 polish: complete illustrated scenes, neon icon language and clean voice dock. */
+#pz73-frame.pz84-cinematic-stage,
+#pz3d-home-stage.pz84-cinematic-stage{display:block;position:relative;overflow:hidden;background:#0e0d22!important;isolation:isolate}
+.pz84-cinematic-stage picture{display:block;width:100%;height:100%;position:absolute;inset:0}
+.pz84-cinematic-stage .pz84-cinematic-image{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 52%;filter:contrast(1.03) saturate(1.07)}
+.pz84-cinematic-stage:after{content:"";display:block;pointer-events:none;position:absolute;inset:0;background:linear-gradient(to bottom,rgba(9,9,25,.13) 0%,transparent 35%,rgba(10,9,25,.06) 61%,#0b1026b3 100%)}
+.pz84-cinematic-stage .pz84-cinematic-overlay{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:17px 22px;display:flex;align-items:center;gap:10px}
+.pz84-cinematic-stage .pz84-cinematic-label{padding:8px 15px;border:1px solid #ff7ac4;color:#ffdeef;border-radius:15px;background:#1c1029cc;box-shadow:0 0 25px #ff39b333;font-size:13px;font-weight:850;letter-spacing:.02em}
+#pz73 .pz82-art-frame.pz84-cinematic-stage{background:#0e0d22!important}
+#pz73 .pz84-cinematic-stage{border-radius:19px}
+#nav{scrollbar-width:none}
+#nav button[data-tab]{display:inline-flex!important;align-items:center!important;justify-content:center;gap:8px;min-height:55px!important;padding:9px 14px!important;border-radius:16px!important;background:linear-gradient(145deg,#242a43,#151c34)!important;border:1px solid #4b5b82!important;color:#dfe7ff!important;box-shadow:inset 0 1px 0 #e0c0fb0b,0 5px 15px #06081455;transition:border-color .13s,transform .13s}
+#nav button[data-tab] .pz84-nav-ico{display:grid;place-items:center;width:23px;height:23px;min-width:23px;color:#85ebee;filter:drop-shadow(0 0 7px #32c2ec50)}
+#nav button[data-tab] .pz84-nav-label{font-size:13px;font-weight:750;white-space:nowrap}
+#nav button[data-tab].active,#nav button[data-tab][aria-selected=true]{background:linear-gradient(140deg,#702257,#471e62)!important;border:1px solid #ff68c2!important;color:#fff!important;box-shadow:0 0 19px #ea46ae3e!important}
+#nav button[data-tab].active .pz84-nav-ico{color:#ffc1e4;filter:drop-shadow(0 0 9px #ff79e4)}
+#nav button[data-tab]:active{transform:scale(.98)}
+#bai-form .pz83-record-tray{border-radius:28px!important;border:1px solid #66617a!important;background:linear-gradient(120deg,#262c40,#2e2642)!important;box-shadow:0 8px 25px #0b0c1955}
+#bai-form .pz83-record-label{display:none!important}
+#bai-form .pz83-rec-controls{margin-left:auto}
+#bai-form .pz83-rec-controls .pz83-rec-finish{display:none!important}
+#bai-form .pz83-rec-controls button{border-radius:50%!important}
+#bai-composer .pz83-call-launch{background:#d940ac!important;border-radius:50%!important;border:1px solid #f884d8!important;box-shadow:0 0 18px #f647d570}
+#bai-panel .pz83-call-overlay{inset:auto 8px calc(env(safe-area-inset-bottom) + 108px) 8px!important;min-height:180px;max-height:205px;height:205px;padding:10px 12px 14px!important;border-radius:28px!important;background:radial-gradient(ellipse at 60% 5%,#613258dd 0%,#191d31ed 76%)!important;box-shadow:0 0 37px #0b0b22aa,0 0 0 1px #ce6ba6aa!important;backdrop-filter:blur(22px);gap:3px!important}
+#bai-panel .pz83-call-header{padding:1px 3px!important;min-height:30px}
+#bai-panel .pz83-call-header>span{font-size:11px;color:#ffe0fa}
+#bai-panel .pz83-call-close{height:28px!important;width:28px!important;min-height:28px!important;font-size:15px!important}
+#bai-panel .pz83-call-orb{width:94px!important;height:94px!important;min-width:94px!important;min-height:94px!important;flex:0 0 94px!important;margin:0!important;font-size:34px!important;box-shadow:0 0 45px #ed4aaa76,0 0 0 9px #f175be13!important}
+#bai-panel .pz83-call-caption{font-size:11px!important;max-width:245px;min-height:20px}
+#bai-panel .pz83-call-buttons{position:absolute;left:6px;right:6px;bottom:57px;display:flex;justify-content:space-between;margin:0!important;align-items:center;pointer-events:none}
+#bai-panel .pz83-call-buttons button{pointer-events:auto;width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;font-size:17px!important;box-shadow:none}
+#bai-panel .pz83-call-buttons .pz83-call-send{margin-left:auto}
+#bai-panel .pz83-call-orb{z-index:1}
+body.pz83-call-active #bai-log{padding-bottom:110px!important}
+body.pz83-call-active #bai-form #pz83-record-tray{display:none!important}
+@media(max-width:390px){#nav button[data-tab]{min-height:51px!important;padding:8px 11px!important;gap:5px}#nav button[data-tab] .pz84-nav-label{font-size:12px}#bai-panel .pz83-call-orb{width:84px!important;height:84px!important;min-width:84px!important;min-height:84px!important;flex-basis:84px!important}}
+@media(prefers-reduced-motion:reduce){#nav button[data-tab]{transition:none}}
