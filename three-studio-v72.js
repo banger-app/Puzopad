@@ -182,11 +182,18 @@ function v73Gear(root,kind,h){
  if(glow==="halo"||glow==="petaura"||glow==="petghost")geo(new THREE.TorusGeometry(.55,.055,11,36),glow==="petghost"?mat(0xc7ecff,0x7f9edd):aura,0,y+.25,0).rotation.x=Math.PI/2;
  if(who==="hero"&&shown.torso){
   const variant={starter:0x252b49,work:0x496970,gym:0xe33a91,knight:0x809ac5,void:0x2e2452,royal:0xbf944c,pumpkincoat:0xd88635,phantom:0x7485ae}[shown.torso]||0x252b49;
-  const plate=geo(new THREE.SphereGeometry(1,18,14),mat(variant),0,y*.4,.35,.49,.27,.16);
-  if(shown.torso==="royal")sphere(gold,0,y*.39,.51,.14,.14,.05);
-  if(shown.torso==="void")sphere(aura,0,y*.39,.51,.14,.14,.05);
-  if(shown.torso==="pumpkincoat")sphere(mat(0x182533),0,y*.4,.52,.13,.16,.04);
-  if(shown.torso==="phantom")sphere(mat(0xc2d0e8),0,y*.4,.51,.14,.15,.04);
+  // Wearable upper-body coat wraps the mannequin instead of floating as a chest orb.
+  const coat=geo(new THREE.CylinderGeometry(.42,.38,.76,24),mat(variant),0,y*.48,.02);
+  coat.scale.z=.85;
+  for(const side of [-1,1]){
+   const shoulder=geo(new THREE.SphereGeometry(1,18,12),mat(variant),side*.41,y*.56,.03,.21,.19,.27);
+   const seam=geo(new THREE.BoxGeometry(.028,.52,.025),mat(0xe7c6ad),side*.24,y*.46,.36);
+  }
+  geo(new THREE.BoxGeometry(.16,.09,.045),shown.torso==="royal"?gold:silver,0,y*.55,.37);
+  if(shown.torso==="royal")sphere(gold,0,y*.42,.38,.13,.13,.045);
+  if(shown.torso==="void")sphere(aura,0,y*.42,.38,.13,.13,.045);
+  if(shown.torso==="pumpkincoat")sphere(mat(0x182533),0,y*.42,.38,.13,.13,.04);
+  if(shown.torso==="phantom")sphere(mat(0xc2d3ee),0,y*.42,.38,.13,.15,.04);
  }
 }
 
