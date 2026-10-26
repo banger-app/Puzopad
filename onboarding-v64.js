@@ -117,6 +117,10 @@ async function pushCloud(profileCreation=false){
   const prior=cloudCandidate(row);
   const remoteVersion=row?.details?.saved_at||null;
   const known=localStorage.getItem(remoteKey())||null;
+  if(row?.details?.data&&!prior&&!known){
+   say("⚠️ У хмарі є давній журнал без профілю. Автоматично його не перезаписуємо — відкрий налаштування збережень.");
+   return false;
+  }
   if(prior&&(!known||known!==remoteVersion)){
    const conflicts=JSON.stringify(prior)!==JSON.stringify(local);
    if(conflicts){say("⚠️ У хмарі є інша версія героя. Нічого не перезаписано; відкрий налаштування збережень.");return false}
@@ -146,6 +150,7 @@ async function pushCloud(profileCreation=false){
 }
 function scheduleCloud(){
  if(!state.user||!window.pzActiveUserId||!db?.profile?.created)return;
+ if(localStorage.getItem("bangerverse_autosync32_"+state.user.id)==="1")return;
  clearTimeout(state.syncTimer);state.syncTimer=setTimeout(()=>pushCloud(false),3500);
 }
 function recoverReason(message){
@@ -216,7 +221,7 @@ async function restoreFile(file){
  if(file.size>15*1024*1024){say("Файл завеликий. Максимум 15 МБ.");return}
  try{
   const parsed=JSON.parse(await file.text());
-  const payload=parsed?.details?.data||parsed?.data||parsed;
+  const payload=parsed?.details?.data||parsed?.data||parsed?.real||parsed?.save?.real||parsed?.backup?.data||parsed;
   if(!payload?.profile?.created||!payload.profile.name||!Array.isArray(payload.foods)||!Array.isArray(payload.weights))throw Error("Потрібен JSON-запис ПУЗОПАДА з героєм і журналами");
   if(!confirm("Імпортувати персонажа «"+payload.profile.name+"» в цей акаунт? Збереження на цьому пристрої буде скопійоване перед заміною."))return;
   const old=localStorage.getItem(SHARED);
@@ -227,22 +232,28 @@ async function restoreFile(file){
 }
 
 function fromOld(){
- if(!state.user)return;
- const legacy=localStorage.getItem("pz_legacy_backup_v59")||localStorage.getItem(SHARED);
- if(!legacy){say("Предыдущий прогресс не найден.");return}
- try{load(JSON.parse(legacy),state.user.id);state.hydrated=state.user.id;unlock()}
- catch(e){say("Не удалось импортировать прогресс: "+e.message)}
+ const uid=state.user?.id;if(!uid)return;
+ const oldOwner=localStorage.getItem(OWNER);
+ if(oldOwner&&oldOwner!==uid){say("Це збереження належить іншому акаунту. Скористайся імпортом JSON, якщо це твій герой.");return}
+ const backup=localStorage.getItem("pz_legacy_backup_v59");
+ const raw=(oldOwner===uid?localStorage.getItem(SHARED):null)||(!oldOwner?backup:null);
+ if(!raw){say("Попереднє збереження на цьому екрані не знайдене.");return}
+ try{
+  const data=JSON.parse(raw);
+  if(!confirm("Прив'язати попередній локальний прогрес до цього акаунта?"))return;
+  load(data,uid);state.hydrated=uid;
+  if(!db.profile?.created){state.recoveryInfo="Історію знайдено, але герой ще не мав профілю. Можеш створити ім'я, історію збережемо.";show("create")}
+  else{unlock();pushCloud(true)}
+ }catch(e){say("Не вдалося імпортувати: "+e.message)}
 }
 function newGame(){
- if(!state.user)return;
- const uid=state.user.id;
- if(!localStorage.getItem("pz_legacy_backup_v59")){
-  const old=localStorage.getItem(SHARED);
-  if(old&&old.length>80)localStorage.setItem("pz_legacy_backup_v59",old);
- }
+ const uid=state.user?.id;if(!uid)return;
+ if(!confirm("Створити НОВОГО героя для поточного акаунта? Переконайся, що старий герой не лишився в іншій установленій версії ПУЗОПАДА."))return;
+ const local=localCandidate(uid);
+ if(local)localStorage.setItem("pz_recovery_backup_v64_"+uid+"_"+Date.now(),JSON.stringify(local));
  load(EMPTY(),uid);state.hydrated=uid;show("create");
 }
-function profileMade(){
+async function profileMade(){
  if(!state.user)return;
  const name=($("pz-hero-name").value||"Герой").trim().slice(0,40);
  const pet=$("pz-pet-choice").value;
@@ -253,6 +264,7 @@ function profileMade(){
  if(species==="frog")db.characterName=name;
  if(typeof persist==="function")persist();
  state.hydrated=state.user.id;unlock();
+ await pushCloud(true);
 }
 async function signIn(email,password,signup){
  if(state.busy)return;
@@ -322,6 +334,12 @@ function setup(){
  $("pz-old-import").onclick=fromOld;
  $("pz-old-new").onclick=newGame;
  $("pz-new-create").onclick=profileMade;
+ $("pz-recover-refresh").onclick=()=>{if(!state.user)return;state.hydrated=null;state.ready=false;signedIn(state.user)};
+ $("pz-recover-cloud").onclick=restoreCloud;
+ $("pz-recover-local").onclick=restoreLocal;
+ $("pz-recover-import").onclick=()=>$("pz-recover-file").click();
+ $("pz-recover-file").onchange=e=>{const file=e.target.files?.[0];if(file)restoreFile(file)};
+ $("pz-recover-new").onclick=newGame;
  $("pz-settings").onclick=e=>{e.preventDefault();e.stopPropagation();menu(!$("pz-menu").hidden)};
  $("pz-archive").onclick=()=>{if(typeof v20ExportAll==="function")v20ExportAll();else alert("Перейди в настройки резервных копий");};
  $("pz-settings-close").onclick=()=>menu(false);
@@ -345,6 +363,8 @@ function setup(){
 }
 async function boot(){
  show("login");setup();
+ window.addEventListener("banger:local-save",scheduleCloud);
+ window.addEventListener("pagehide",()=>clearTimeout(state.syncTimer));
  checkGoogleProvider();
  if(!window.supabase?.createClient){say("Не удалось загрузить систему входа. Проверь интернет и открой сайт ещё раз.");return}
  try{
