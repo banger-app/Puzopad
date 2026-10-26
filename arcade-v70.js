@@ -228,7 +228,119 @@ function drawHop(){
  orb(66,player.y,22,"#ff5aa9");orb(59,player.y-4,4,"#fff");
  for(const a of objects){rect(a.x,a.y-a.h,a.w,a.h,"#8e8af7",6)}
 }
-/*V70_NEW_GAME_FUNCTIONS*/
+
+function tickMeteor(dt){
+ spawns+=dt;if(spawns>Math.max(9,25-ticks/360)){spawns=0;objects.push({x:20+Math.random()*320,y:-20,r:12+Math.random()*12,v:3.2+Math.random()*2.5})}
+ for(const a of objects){
+  a.y+=a.v*dt;
+  if(a.y>450&&a.y<502&&Math.abs(a.x-pad)<a.r+20){a.dead=true;life--;if(life<=0){finish(false,false);return}}
+  if(a.y>HEIGHT+25){a.dead=true;score+=10}
+ }
+ objects=objects.filter(a=>!a.dead);if(ticks>=60*45)finish(true,false);
+}
+function drawMeteor(){
+ for(const a of objects){orb(a.x,a.y,a.r,"#fb8776");orb(a.x-4,a.y-3,a.r*.4,"#ffdcc5")}
+ ctx.fillStyle="#69f1df";ctx.beginPath();ctx.moveTo(pad,451);ctx.lineTo(pad-20,494);ctx.lineTo(pad+20,494);ctx.closePath();ctx.fill();
+ ctx.font="14px system-ui";ctx.fillStyle="#c8eaf2";ctx.fillText("УХИЛЯЙСЯ · "+Math.max(0,Math.ceil(45-ticks/60))+" с",13,55);
+}
+function tickAim(dt){
+ aux.next+=dt;
+ if(aux.next>34){aux.next=0;aux.targets.push({x:30+Math.random()*300,y:85+Math.random()*335,r:18+Math.random()*8,bad:Math.random()<.28,ttl:125})}
+ for(const t of aux.targets){t.ttl-=dt;if(t.ttl<0){t.dead=true;if(!t.bad)life--}}
+ aux.targets=aux.targets.filter(t=>!t.dead);
+ if(life<=0){finish(false,false);return}if(ticks>=60*30)finish(true,false);
+}
+function tapTarget(pt){
+ if(!run||game!=="aim")return;
+ for(let i=aux.targets.length-1;i>=0;i--){
+  const t=aux.targets[i];
+  if(Math.hypot(pt.x-t.x,pt.y-t.y)<=t.r+9){
+   t.dead=true;if(t.bad){life--;score=Math.max(0,score-5)}else score+=12;
+   break;
+  }
+ }
+ aux.targets=aux.targets.filter(t=>!t.dead);if(life<=0)finish(false,false);
+}
+function drawAim(){
+ ctx.font="15px system-ui";ctx.fillStyle="#d5effb";ctx.fillText("Натискай ЗЕЛЕНІ цілі",15,54);
+ for(const t of aux.targets){orb(t.x,t.y,t.r,t.bad?"#f54b85":"#51efb2");orb(t.x,t.y,t.r*.56,t.bad?"#ffbad0":"#a3ffe1");orb(t.x,t.y,t.r*.25,t.bad?"#c52b62":"#146e5b")}
+}
+const CARD_GLYPHS=["◆","✦","♣","●","▲","☀","★","♥"];
+function memoryRect(i){return{x:15+(i%4)*86,y:100+Math.floor(i/4)*91,w:72,h:76}}
+function flipCard(pt){
+ if(!run||game!=="memory"||aux.locked)return;
+ const idx=aux.cards.findIndex((_,i)=>{const r=memoryRect(i);return pt.x>=r.x&&pt.x<=r.x+r.w&&pt.y>=r.y&&pt.y<=r.y+r.h});
+ if(idx<0||aux.open.includes(idx)||aux.matched.includes(aux.cards[idx]))return;
+ aux.open.push(idx);
+ if(aux.open.length===2){
+  aux.moves++;
+  if(aux.cards[aux.open[0]]===aux.cards[aux.open[1]]){
+   aux.matched.push(aux.cards[idx]);score+=16;aux.open=[];
+   if(aux.matched.length===8){finish(true,false);return}
+  }else{aux.locked=true;aux.turnAt=ticks+50}
+ }paint();
+}
+function tickMemory(dt){
+ if(aux.locked&&ticks>=aux.turnAt){aux.locked=false;aux.open=[]}
+ if(ticks>=60*90)finish(false,false);
+}
+function drawMemory(){
+ ctx.fillStyle="#cbbcfb";ctx.font="15px system-ui";ctx.fillText("Знайди 8 пар · "+Math.max(0,Math.ceil(90-ticks/60))+" с",15,62);
+ aux.cards.forEach((v,i)=>{
+  const r=memoryRect(i),front=aux.open.includes(i)||aux.matched.includes(v);
+  rect(r.x,r.y,r.w,r.h,front?"#d4befa":"#44305b",11);
+  ctx.font="bold 34px system-ui";ctx.textAlign="center";ctx.fillStyle=front?"#27133d":"#b38bfa";
+  ctx.fillText(front?CARD_GLYPHS[v]:"?",r.x+r.w/2,r.y+49);ctx.textAlign="left";
+ });
+}
+function spawnTile(){
+ const cells=aux.tiles?.map((n,i)=>n===0?i:-1).filter(x=>x>=0)||[];
+ if(!cells.length)return;
+ const at=cells[Math.floor(Math.random()*cells.length)];
+ aux.tiles[at]=Math.random()<.9?2:4;
+}
+function slide(where){
+ if(!run||game!=="slide")return;
+ const v=aux.tiles,next=Array(16).fill(0);let gained=0;
+ for(let line=0;line<4;line++){
+  let indices=[];
+  for(let i=0;i<4;i++){
+   const r=where==="left"||where==="right"?line:i,c=where==="left"||where==="right"?i:line;
+   indices.push(r*4+c);
+  }
+  if(where==="right"||where==="down")indices.reverse();
+  const arr=indices.map(i=>v[i]).filter(Boolean),merged=[];
+  for(let k=0;k<arr.length;k++){
+   if(k+1<arr.length&&arr[k]===arr[k+1]){const n=arr[k]*2;merged.push(n);gained+=n;k++}
+   else merged.push(arr[k]);
+  }
+  merged.forEach((x,j)=>{next[indices[j]]=x});
+ }
+ if(v.every((x,i)=>x===next[i]))return;
+ aux.tiles=next;aux.moves++;score+=gained;spawnTile();
+ if(aux.tiles.some(x=>x>=512)){finish(true,false);return}
+ if(!canSlide()){finish(false,false);return}
+ paint();
+}
+function canSlide(){
+ if(aux.tiles.some(x=>!x))return true;
+ for(let y=0;y<4;y++)for(let x=0;x<4;x++){
+  const i=y*4+x;
+  if(x<3&&aux.tiles[i]===aux.tiles[i+1])return true;
+  if(y<3&&aux.tiles[i]===aux.tiles[i+4])return true;
+ }return false;
+}
+function tickSlide(dt){}
+function drawSlide(){
+ ctx.font="15px system-ui";ctx.fillStyle="#ffe3b8";ctx.fillText("З'єднуй плитки до 512",17,75);
+ aux.tiles.forEach((n,i)=>{
+  const x=16+(i%4)*83,y=115+Math.floor(i/4)*87;
+  const colors={0:"#28304d",2:"#e9dfc4",4:"#e8c79e",8:"#f3a86e",16:"#f58376",32:"#fb6579",64:"#f950a2",128:"#b785f5",256:"#7addd2",512:"#f3d769"};
+  rect(x,y,76,78,colors[n]||"#eee",9);
+  if(n){ctx.font="bold "+(n>=128?23:29)+"px system-ui";ctx.textAlign="center";ctx.fillStyle=n>=16?"#fff":"#433243";ctx.fillText(String(n),x+38,y+48);ctx.textAlign="left"}
+ });
+}
+
 function start(){if(!document.body.classList.contains("pz-unlocked"))return;hub();dashboard()}
 window.addEventListener("pz:unlocked",start);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&document.body.classList.contains("pz-unlocked"))dashboard()});
