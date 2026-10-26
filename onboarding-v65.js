@@ -112,6 +112,33 @@ function cloudCandidate(row){
  const d=row?.details?.data;
  return d&&typeof d==="object"&&d.profile?.created&&d.profile?.name?d:null;
 }
+function hasLegacyProgress(data){
+ if(!data||typeof data!=="object"||data.profile?.created)return false;
+ return ["weights","foods","loot","water","sleep","workouts","drinks"].some(key=>Array.isArray(data[key])&&data[key].length>0)
+   ||!!data.b36garage?.cars?.length||!!data.garage?.cars?.length;
+}
+function scopedLegacy(uid){
+ const keys=[PREFIX+uid];
+ if(localStorage.getItem(OWNER)===uid)keys.push(SHARED);
+ for(const k of keys){try{const p=JSON.parse(localStorage.getItem(k)||"null");if(hasLegacyProgress(p))return p}catch(_){}}
+ return null;
+}
+function continueLegacy(uid,value,isCloud,row){
+ if(!confirm("Знайдено СТАРИЙ журнал цього акаунта без оформленого профілю. Зберегти його і підтвердити ім'я героя? Нічого не очищається."))return;
+ try{
+  const older=localStorage.getItem(PREFIX+uid);
+  if(older)localStorage.setItem("pz_legacy_before_migration_v65_"+uid+"_"+Date.now(),older);
+  if(isCloud&&row?.details){
+   localStorage.setItem("pz_cloud_before_migration_v65_"+uid,JSON.stringify(row.details));
+   localStorage.setItem(remoteKey(),row.details.saved_at||"migration_user_approved");
+  }
+  load(value,uid);state.hydrated=uid;
+  show("create");
+  const oldName=typeof value.characterName==="string"&&value.characterName!=="Игрок"?value.characterName:"";
+  $("pz-hero-name").value=oldName;
+  say("✅ Відновлено стару історію. Укажи ім'я та компаньйона; їжа, вага й речі залишаться.");
+ }catch(err){say("Відновлення не вдалось: "+err.message)}
+}
 function snapshotCloudData(){
  return JSON.parse(JSON.stringify(db));
 }
@@ -186,6 +213,14 @@ async function signedIn(user){
    load(cloud,uid);state.hydrated=uid;unlock();return;
  }
  if(local){load(local,uid);state.hydrated=uid;unlock();if(!cloudError)scheduleCloud();return}
+ if(hasLegacyProgress(row?.details?.data)){
+  state.recoveryInfo="Знайдено попередній журнал цього акаунта у хмарі. Щоб продовжити, віднови його і підтверди ім'я героя.";
+  show("recover");$("pz-recover-cloud").hidden=false;$("pz-recover-local").hidden=true;return;
+ }
+ if(scopedLegacy(uid)){
+  state.recoveryInfo="На цьому пристрої є старий журнал цього акаунта. Можна перенести без втрати даних.";
+  show("recover");$("pz-recover-local").hidden=false;$("pz-recover-cloud").hidden=true;return;
+ }
  const shared=localStorage.getItem(SHARED);
  const assigned=localStorage.getItem(OWNER);
  let oldCandidate=null;
@@ -205,6 +240,7 @@ async function restoreCloud(){
  const uid=state.user.id;
  try{
   const row=await getCloudRow(uid),found=cloudCandidate(row);
+  if(!found&&hasLegacyProgress(row?.details?.data)){continueLegacy(uid,row.details.data,true,row);return}
   if(!found){say("⚠️ У хмарі поки немає героя цього акаунта. Нічого не замінювали.");return}
   const local=localCandidate(uid);
   if(local&&JSON.stringify(local)!==JSON.stringify(found)){
@@ -221,7 +257,11 @@ function restoreLocal(){
  const uid=state.user?.id;
  if(!uid)return;
  const local=localCandidate(uid);
- if(!local){say("Локального героя цього акаунта не знайдено.");return}
+ if(!local){
+  const old=scopedLegacy(uid);
+  if(old){continueLegacy(uid,old,false,null);return}
+  say("Локального героя цього акаунта не знайдено.");return;
+ }
  load(local,uid);state.hydrated=uid;unlock();
 }
 async function restoreFile(file){
