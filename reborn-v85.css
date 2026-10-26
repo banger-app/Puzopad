@@ -178,3 +178,17 @@ body.pz-locked.pz-checking #pz-login,body.pz-locked.pz-checking #pz-import,body.
 .v17-bottomnav{background:rgba(18,16,41,.91)!important;backdrop-filter:blur(17px);
  -webkit-backdrop-filter:blur(17px);border-top:1px solid #e96dbc9e!important;box-shadow:0 -5px 30px #170a3bb3!important}
 .v17-bottomnav button.active{background:linear-gradient(135deg,#74256d,#31204d)!important}
+
+/* Mic-reactive equalizer: visualizes measured input volume, no fake stock animation. */
+#bai-panel .pz83-call-overlay{height:248px!important;max-height:248px!important;
+  bottom:calc(env(safe-area-inset-bottom) + 94px)!important;border-radius:26px!important}
+#bai-panel .pz85-call-wave{display:flex;position:absolute;left:16%;right:16%;bottom:12px;height:34px;
+ align-items:center;justify-content:center;gap:3px;overflow:hidden;pointer-events:none}
+#bai-panel .pz85-call-wavebar{flex:1;height:4px;max-width:5px;min-width:2px;
+ border-radius:8px;background:linear-gradient(180deg,#ffd6fa,#fb50cb 43%,#a352ef);
+ box-shadow:0 0 7px #ed5dd785;opacity:.55;transition:height 75ms linear}
+#bai-panel .pz83-call-buttons{bottom:58px!important}
+#bai-panel .pz83-call-orb{box-shadow:0 0 45px #ed4aaa93,0 0 0 9px #f175be24!important}
+#bai-form .pz83-wave i{animation:none!important;transition:height 75ms linear}
+@media(max-width:390px){#bai-panel .pz83-call-overlay{height:232px!important;max-height:232px!important}}
+@media(prefers-reduced-motion:reduce){#bai-panel .pz85-call-wavebar,#bai-form .pz83-wave i{transition:none}}
