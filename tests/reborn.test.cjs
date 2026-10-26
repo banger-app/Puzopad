@@ -8,15 +8,15 @@ const read=file=>fs.readFileSync(file,"utf8");
 const html=read("index.html");
 const version=JSON.parse(read("version.json"));
 test("all v80 production scripts & styles exist and build matches",()=>{
- assert.equal(version.build,"82");
+ assert.equal(version.build,"82.1");
  for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-v81.css","art-engine-v82.js","art-v82.css"]){
   assert.ok(fs.existsSync(path),"missing "+path);
  }
- for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=82.0","./art-engine-v82.js?v=82.0","./art-v82.css?v=82.0","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
+ for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=82.1","./art-engine-v82.js?v=82.1","./art-v82.css?v=82.1","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
  assert.ok(read("onboarding-v69.js").includes("./gym-reborn-v80.js?v=80.3"));
- assert.ok(read("interface-v61.js").includes('V82 · '));
- assert.ok(html.includes('V82 · ПУЗОПАД'));
- assert.ok(read("sw.js").includes("puzopad-v82-20261026"));
+ assert.ok(read("interface-v61.js").includes('V82.1 · '));
+ assert.ok(html.includes('V82.1 · ПУЗОПАД'));
+ assert.ok(read("sw.js").includes("puzopad-v821-20261026"));
  assert.ok(html.includes('window.pzBennyContextV80?.()'));
 });
 test("classic JavaScript modules parse",()=>{
