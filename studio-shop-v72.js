@@ -31,11 +31,15 @@ function saved(){
 function buy(kind,key,cost,owned,choose){
  const d=ensure();if(!d||!allowed())return notify("Спочатку увійди у свій акаунт.");
  if(!owned.includes(key)){
-  if((Number(d.coins)||0)<cost)return notify("Потрібно "+cost+" 🪙. Зіграйте в Аркаді, щоб заробити монети.");
+  if((Number(d.coins)||0)<cost){
+   window.pzShopPreview={kind,key,account:window.pzActiveUserId};
+   window.dispatchEvent(new Event("pz:style-change"));
+   return notify("👀 ПРИМІРКА: "+cost+" 🪙 потрібно для покупки. На моделі видно зразок, але предмет ще не належить тобі.");
+  }
   d.coins=Math.max(0,Number(d.coins)||0)-cost;owned.push(key);
   notify("✅ Куплено за "+cost+" 🪙. Предмет одягнено.");
  }else notify("✅ Одягнено. Вже придбані речі безкоштовні.");
- choose();saved();
+ window.pzShopPreview=null;choose();saved();
 }
 function makeItems(root,items,kind){
  if(!root)return;
@@ -54,14 +58,14 @@ function makeItems(root,items,kind){
 function showCatalog(){
  const d=ensure(),p=d?.profile;if(!p)return;
  const ownColor=d.heroStyle.ownedPalettes,ownOutfit=d.heroStyle.owned,ownPet=p.petOwned;
- const opts=(set,isOwned,getCurrent,action)=>set.map(([key,label,cost])=>({
+ const opts=(set,isOwned,getCurrent,action,kind)=>set.map(([key,label,cost])=>({
   key,label,cost,owned:isOwned.includes(key),active:getCurrent===key,
   icon:{casual:"👕",work:"🦺",gym:"🎽",hero:"🛡️",plain:"✨",bow:"🎀",cap:"🧢",scarf:"🧣",crown:"👑",glasses:"🕶️",backpack:"🎒"}[key],
-  action:()=>buy("shop",key,cost,isOwned,()=>action(key))
+  action:()=>buy(kind,key,cost,isOwned,()=>action(key))
  }));
- makeItems(Q("pz-shop-colors"),opts(PALETTES,ownColor,Number(d.heroStyle.palette||0),v=>d.heroStyle.palette=v),"palette");
- makeItems(Q("pz-shop-clothes"),opts(OUTFITS,ownOutfit,d.heroStyle.outfit||"casual",v=>d.heroStyle.outfit=v),"outfit");
- makeItems(Q("pz-shop-petwear"),opts(PET_STYLES,ownPet,p.petStyle||"plain",v=>p.petStyle=v),"pet");
+ makeItems(Q("pz-shop-colors"),opts(PALETTES,ownColor,Number(d.heroStyle.palette||0),v=>d.heroStyle.palette=v,"palette"),"palette");
+ makeItems(Q("pz-shop-clothes"),opts(OUTFITS,ownOutfit,d.heroStyle.outfit||"casual",v=>d.heroStyle.outfit=v,"outfit"),"outfit");
+ makeItems(Q("pz-shop-petwear"),opts(PET_STYLES,ownPet,p.petStyle||"plain",v=>p.petStyle=v,"pet"),"pet");
  const petKey=p.pet||"none",label=p.petName||({"dog":"Пес","cat":"Кіт","hamster":"Хом'як","rabbit":"Кролик","fox":"Лис","panda":"Панда","parrot":"Папуга","penguin":"Пінгвін","fish":"Рибка"}[petKey]||"Компаньйон");
  const wallet="🪙 "+(Number(d.coins)||0)+" монет";for(const id of ["pz-shop-wallet","pz-pet-shop-wallet"])if(Q(id))Q(id).textContent=wallet;
  if(Q("pz-current-pet"))Q("pz-current-pet").textContent="🐾 "+label+" · "+t("Екіпірування компаньйона","Экипировка питомца","Companion gear");
