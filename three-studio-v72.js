@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 const $=id=>document.getElementById(id);
 const loader=new GLTFLoader();
-const PET_FILES={dog:"pet-corgi-gobkit.glb",duck:"pet-duck-gobkit.glb",hippo:"pet-hippo-gobkit.glb",rhino:"pet-rhino-gobkit.glb",platypus:"pet-platypus-gobkit.glb",shark:"pet-shark-gobkit.glb",bat:"pet-bat-gobkit.glb",cat:"pet-cat.glb",hamster:"pet-hamster.glb",rabbit:"pet-rabbit.glb",fox:"pet-fox.glb",panda:"pet-panda.glb",parrot:"pet-parrot.glb",penguin:"pet-penguin.glb",fish:"pet-fish.glb"};
+const PET_FILES={dog:"pet-corgi-gobkit.glb",duck:"pet-duck-gobkit.glb",hippo:"pet-hippo-gobkit.glb",rhino:"pet-rhino-gobkit.glb",platypus:"pet-platypus-gobkit.glb",shark:"pet-shark-gobkit.glb",bat:"pet-bat-gobkit.glb",cat:"pet-cat.glb",hamster:"pet-hamster.glb",rabbit:"pet-rabbit.glb",fox:"pet-fox.glb",panda:"pet-panda.glb",parrot:"pet-parrot.glb",penguin:"pet-penguin.glb",fish:"pet-fish.glb",lion:"pet-lion.glb",tiger:"pet-tiger.glb"};
 const COLORS=[0x56d97b,0xff349a,0x55c5f8,0xf7c45d];
 const CLOTH=[0x252b49,0x496970,0xe33a91,0x7c5ff2];
 const VIEWS=[
