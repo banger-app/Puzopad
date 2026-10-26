@@ -144,7 +144,7 @@ function snapshotCloudData(){
 }
 async function pushCloud(profileCreation=false){
  const uid=state.user?.id;
- if(!uid||window.pzActiveUserId!==uid||state.syncing||!db?.profile?.created)return false;
+ if(!uid||window.pzActiveUserId!==uid||state.hydrated!==uid||state.syncing||!db?.profile?.created)return false;
  state.syncing=true;
  try{
   const local=snapshotCloudData(),row=await getCloudRow(uid);
@@ -184,7 +184,7 @@ async function pushCloud(profileCreation=false){
  }finally{state.syncing=false}
 }
 function scheduleCloud(){
- if(!state.user||!window.pzActiveUserId||!db?.profile?.created)return;
+ if(!state.user||state.hydrated!==state.user.id||!window.pzActiveUserId||!db?.profile?.created)return;
  if(localStorage.getItem("bangerverse_autosync32_"+state.user.id)==="1")return;
  clearTimeout(state.syncTimer);state.syncTimer=setTimeout(()=>pushCloud(false),3500);
 }
@@ -364,7 +364,7 @@ async function signInGoogle(){
 
 function snapshotBeforeSwitch(){
  const uid=state.user?.id;
- if(!uid||window.pzActiveUserId!==uid||typeof db==="undefined")return;
+ if(!uid||window.pzActiveUserId!==uid||state.hydrated!==uid||typeof db==="undefined")return;
  const payload=JSON.stringify(db);
  if(db?.profile?.created&&db.profile?.name){
   localStorage.setItem(PREFIX+uid,payload);
@@ -453,7 +453,7 @@ async function boot(){
  try{
  state.client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  state.client.auth.onAuthStateChange((event,session)=>{
-  if(event==="SIGNED_OUT"){if(state.user?.id&&window.pzActiveUserId===state.user.id&&typeof db!=="undefined"&&db?.profile?.created){try{localStorage.setItem(PREFIX+state.user.id,JSON.stringify(db))}catch(_){}}state.ready=false;state.user=null;state.hydrated=null;window.pzActiveUserId=null;show("login");}
+  if(event==="SIGNED_OUT"){if(state.user?.id&&window.pzActiveUserId===state.user.id&&state.hydrated===state.user.id&&typeof db!=="undefined"&&db?.profile?.created){try{localStorage.setItem(PREFIX+state.user.id,JSON.stringify(db))}catch(_){}}state.ready=false;state.user=null;state.hydrated=null;window.pzActiveUserId=null;show("login");}
   else if(event==="SIGNED_IN"||event==="INITIAL_SESSION"){Promise.resolve().then(()=>signedIn(session?.user||null));}
  });
  const {data,error}=await state.client.auth.getSession();if(error)throw error;
