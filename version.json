@@ -1,7 +1,7 @@
 {
-  "build": "62",
+  "build": "63",
   "date": "2026-10-26",
   "assets": "puzopad-standalone-icon-v1",
   "stable_url": "/Puzopad/",
-  "changes": "3D hero and outfits, Neon Breaker, expanded pets, account settings, interactive gym"
+  "changes": "3d-model-studio-neon-breaker-companion-shop-profile-identity-settings-macros-interactive-gym"
 }
