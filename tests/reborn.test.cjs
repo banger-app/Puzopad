@@ -303,7 +303,7 @@ test("v83: original raster image assets are checked into the app and used as ind
 });
 
 test("v84 premium scenes are limited to exact paired looks and artwork is checked in",()=>{
- const assets=["banger_surechka_city","kisyusha_masya_city","bender_robodog_city"];
+ const assets=["banger_surechka_city","kisyusha_masya_city","bender_robodog_city","banger_surechka_winter"];
  for(const filename of assets){
   const p="assets/scenes-v84/"+filename+".webp";
   assert.ok(fs.existsSync(p),p+" missing");
@@ -314,6 +314,7 @@ test("v84 premium scenes are limited to exact paired looks and artwork is checke
  assert.ok(script.includes('frog|dog|city'),"Suri and Pepe scene");
  assert.ok(script.includes('kisyusha|cat|city'),"Kisyusha Masya scene");
  assert.ok(script.includes('robot|robodog|city'),"Bender robot scene");
+ assert.ok(script.includes('frog|dog|winter'),"winter look and Surachka must map to full seasonal artwork");
  assert.ok(script.includes("if(!file)"),"all other pairs fall back to independent composer");
  assert.ok(read("nav-icons-v84.js").includes("data-tab"),"unified UI icon source");
  assert.ok(read("benny-voice-v83.js").includes('mic.onclick=()=>{if(rec||blob){sendRecording();return}begin(false)}'),"one tap starts, second sends");
