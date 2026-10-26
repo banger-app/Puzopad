@@ -51,7 +51,14 @@ function makeRecovery(){
  const body=document.createElement("p");body.textContent="Гречка (весь судочок), 2 кордон-блю та 3 яйця — ≈1035 ккал. Тільки якщо запис зник, без дублів.";
  const button=document.createElement("button");button.type="button";button.textContent="↺ Повернути з'їдене в щоденник";button.onclick=restoreMeal;
  const status=document.createElement("p");status.id="pz-fix-status";status.setAttribute("role","status");
- wrap.append(heading,body,button,status);target.prepend(wrap);
+ wrap.append(heading,body,button,status);target.prepend(wrap);syncMealPanel();
+}
+function syncMealPanel(){
+ const holder=$("pz-repair-meal");if(!holder)return;
+ const complete=typeof db!=="undefined"&&Array.isArray(db.foods)&&meal.every(item=>db.foods.some(row=>matchItem(row,item)));
+ holder.hidden=!!complete;
+ if(complete)holder.setAttribute("aria-hidden","true");
+ else holder.removeAttribute("aria-hidden");
 }
 function itemIcon(name){
  const n=String(name||"").toLowerCase();
@@ -109,10 +116,10 @@ function settings(){
  if(!btn||!menu||!top||!header||btn.dataset.pzFix)return;
  btn.dataset.pzFix="1";
  header.style.position="relative";header.style.overflow="visible";
- header.appendChild(top);
- top.style.cssText="position:absolute!important;top:10px!important;right:10px!important;z-index:2147482000!important;display:block!important;pointer-events:auto!important";
+ const bar=header.querySelector(".b29top")||header;bar.style.position="relative";bar.appendChild(top);
+ top.style.cssText="position:relative!important;top:auto!important;right:auto!important;display:flex!important;align-items:center!important;z-index:2147482000!important;pointer-events:auto!important";
  btn.style.cssText="position:relative;z-index:2147482002;pointer-events:auto;cursor:pointer";
- menu.style.cssText="position:absolute;z-index:2147482005;right:0;top:48px;width:min(320px,90vw);max-height:70vh;overflow:auto";
+ menu.style.cssText="position:absolute;z-index:2147482005;right:0;top:44px;width:min(320px,88vw);max-height:70vh;overflow:auto";
  menu.hidden=true;menu.style.display="none";
  btn.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();const opened=menu.hidden;menu.hidden=!opened;menu.style.display=opened?"flex":"none";btn.setAttribute("aria-expanded",String(opened))},true);
 }
@@ -126,12 +133,13 @@ function show3dStatus(){
 }
 function init(){
  if(!document.body.classList.contains("pz-unlocked"))return;
- makeRecovery();repairInventory();navHome();settings();
+ makeRecovery();syncMealPanel();repairInventory();navHome();settings();
  const fridge=$("fridgeItems");
  if(fridge&&!fridge.dataset.pzFix){fridge.dataset.pzFix="1";new MutationObserver(()=>repairInventory()).observe(fridge,{childList:true})}
  setTimeout(show3dStatus,3500);
 }
 window.addEventListener("pz:unlocked",init);
+window.addEventListener("banger:local-save",()=>{if($("pz-repair-meal"))syncMealPanel()});
 document.addEventListener("DOMContentLoaded",()=>setTimeout(init,700));
 if(document.readyState!=="loading")setTimeout(init,500);
 })();
