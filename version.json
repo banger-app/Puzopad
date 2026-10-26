@@ -1,7 +1,7 @@
 {
-  "build": "80.2",
+  "build": "80.3",
   "date": "2026-10-26",
   "assets": "puzopad-standalone-icon-v1",
   "stable_url": "/Puzopad/",
-  "changes": "reborn-v80-benny-context-gym-fullbody-cart-scan-inventory-ui-reviewed"
+  "changes": "single-hero-no-floating-armor-and-food-string-id-deletion-correction"
 }

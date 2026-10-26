@@ -220,7 +220,7 @@ function v73Gear(root,kind,h){
  if(back==="backpack")geo(new THREE.BoxGeometry(.61,.60,.29),mat(0x9d75ed),0,y*.40,-.49);
  if(neck==="scarf"||neck==="collar")geo(new THREE.TorusGeometry(.48,.10,9,24),neck==="collar"?gold:mag,0,y*.58,.05).rotation.x=Math.PI/2;
  if(glow==="halo"||glow==="petaura"||glow==="petghost")geo(new THREE.TorusGeometry(.55,.055,11,36),glow==="petghost"?mat(0xc7ecff,0x7f9edd):aura,0,y+.25,0).rotation.x=Math.PI/2;
- if(who==="hero"&&shown.torso){
+ if(who==="hero"&&shown.torso&&shown.torso!=="starter"){
   const variant={starter:0x252b49,work:0x496970,gym:0xe33a91,knight:0x809ac5,void:0x2e2452,royal:0xbf944c,pumpkincoat:0xd88635,phantom:0x7485ae}[shown.torso]||0x252b49;
   // Wearable upper-body coat wraps the mannequin instead of floating as a chest orb.
   const coat=geo(new THREE.CylinderGeometry(.42,.38,.76,24),mat(variant),0,y*.48,.02);
@@ -274,7 +274,7 @@ async function put(view,kind,x=0,z=0,scale=1){
  if(d?.wardrobeV73){
   // No legacy layers: independently equipped pieces, preview is non-destructive.
   const activePet=store()?.profile?.pet||"none";
-  if(kind==="hero"||petKey===activePet)v73Gear(target,kind,actual);
+  if((kind==="hero"&&!PREMIUM_HERO[heroKey])||(kind==="pet"&&petKey===activePet))v73Gear(target,kind,actual);
  }else if(kind==="pet"){
   addAccessories(target,preview("pet")||p.petStyle||"plain",actual,"pet");
  }else addAccessories(target,preview("outfit")||d?.heroStyle?.outfit||"casual",actual,"hero",0x252b49);
@@ -292,7 +292,7 @@ async function renderModels(view){
   const hero=view.kind!=="pet"?await put(view,"hero",view.kind==="home"?-.72:0,0,view.kind==="home"?.95:1):null;
   const pet=view.kind!=="hero"?await put(view,"pet",view.kind==="home"?.90:0,0,view.kind==="home"?.78:1):null;
   if(serial!==view.serial||window.pzActiveUserId!==identity.split("|")[0])return;
-  view.stage.clear();view.mixers=[];if(hero){view.stage.add(hero);if(hero.userData.mixer)view.mixers.push(hero.userData.mixer)}if(pet){view.stage.add(pet);if(pet.userData.mixer)view.mixers.push(pet.userData.mixer)}
+  view.mixers=[];for(const old of view.stage.children.slice())view.stage.remove(old);if(hero){view.stage.add(hero);if(hero.userData.mixer)view.mixers.push(hero.userData.mixer)}if(pet){view.stage.add(pet);if(pet.userData.mixer)view.mixers.push(pet.userData.mixer)}
   fitCamera(view);
   if(view.kind==="home"&&hero){document.body.classList.add("pz-three-ready");}
   clearNotice(view);view.host.dataset.viewer="loaded";
