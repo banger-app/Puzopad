@@ -1,4 +1,4 @@
-const REV="puzopad-v74-20261026";
+const REV="puzopad-v75-20261026";
 self.addEventListener("install",()=>self.skipWaiting());
 self.addEventListener("activate",event=>event.waitUntil(self.clients.claim()));
 self.addEventListener("fetch",event=>{

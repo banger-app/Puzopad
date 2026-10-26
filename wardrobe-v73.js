@@ -2,9 +2,9 @@
 "use strict";
 const el=id=>document.getElementById(id);
 const TEXT={
-uk:["Гардероб 2.0","Герой","Компаньйон","Магазин","Інвентар","Звичайний","Незвичайний","Рідкісний","Епічний","Легендарний","Всі","Купити","Одягнути","Одягнено","Приміряти","Куплено","Монети","Недостатньо монет. Зіграй в Аркаді.","Компаньйони","Відкрити","Обрано","Ім'я","Зберегти","Скинути примірку","Це лише косметичні речі. Записи здоров'я не змінюються.","Немає придбаних речей","Відкрито!","Збережено!","3D-модель скоро","Аксесуари"],
-ru:["Гардероб 2.0","Герой","Компаньон","Магазин","Инвентарь","Обычный","Необычный","Редкий","Эпический","Легендарный","Все","Купить","Надеть","Надето","Примерить","Куплено","Монеты","Не хватает монет. Играй в Аркадах.","Питомцы","Открыть","Выбрано","Имя","Сохранить","Сбросить примерку","Это косметические вещи. Данные здоровья не меняются.","Нет купленных вещей","Открыто!","Сохранено!","3D-модель скоро","Аксессуары"],
-en:["Wardrobe 2.0","Hero","Companion","Shop","Inventory","Common","Uncommon","Rare","Epic","Legendary","All","Buy","Equip","Equipped","Try on","Owned","Coins","Not enough coins. Play Arcade.","Companions","Unlock","Selected","Name","Save","Reset try-on","Cosmetics only. No impact on health data.","No purchased items","Unlocked!","Saved!","3D model coming","Accessories"]
+uk:["Гардероб 2.0","Герой","Компаньйон","Магазин","Інвентар","Звичайний","Незвичайний","Рідкісний","Епічний","Легендарний","Всі","Купити","Одягнути","Одягнено","Приміряти","Куплено","Монети","Недостатньо монет. Зіграй в Аркаді.","Компаньйони","Відкрити","Обрано","Ім'я","Зберегти","Скинути примірку","Це лише косметичні речі. Записи здоров'я не змінюються.","Немає придбаних речей","Відкрито!","Збережено!","3D-модель скоро","Аксесуари","Зняти","Відкритих компаньйонів ще немає"],
+ru:["Гардероб 2.0","Герой","Компаньон","Магазин","Инвентарь","Обычный","Необычный","Редкий","Эпический","Легендарный","Все","Купить","Надеть","Надето","Примерить","Куплено","Монеты","Не хватает монет. Играй в Аркадах.","Питомцы","Открыть","Выбрано","Имя","Сохранить","Сбросить примерку","Это косметические вещи. Данные здоровья не меняются.","Нет купленных вещей","Открыто!","Сохранено!","3D-модель скоро","Аксессуары","Снять","Открытых питомцев пока нет"],
+en:["Wardrobe 2.0","Hero","Companion","Shop","Inventory","Common","Uncommon","Rare","Epic","Legendary","All","Buy","Equip","Equipped","Try on","Owned","Coins","Not enough coins. Play Arcade.","Companions","Unlock","Selected","Name","Save","Reset try-on","Cosmetics only. No impact on health data.","No purchased items","Unlocked!","Saved!","3D model coming","Accessories","Unequip","No unlocked companions yet"]
 };
 const RAR=["common","uncommon","rare","epic","legend"];
 const RARN={common:5,uncommon:6,rare:7,epic:8,legend:9};
@@ -111,16 +111,25 @@ function viewPreview(which,id){preview={which,id,uid:window.pzActiveUserId};wind
 function chooseItem(x,kind){
  const w=setup();if(!w)return;
  const list=kind==="hero"?w.owned:w.petItems,wear=kind==="hero"?w.wear:w.petWear;
- if(!list.includes(x[0])){
-  if(!spend(x[3])){viewPreview(kind,x[0]);message=T(17);render();return}
-  list.push(x[0]);
+ const removing=wear[x[1]]===x[0];
+ if(removing){
+  delete wear[x[1]];
+ }else{
+  if(!list.includes(x[0])){
+   if(!spend(x[3])){viewPreview(kind,x[0]);message=T(17);render();return}
+   list.push(x[0]);
+  }
+  wear[x[1]]=x[0];
  }
- wear[x[1]]=x[0];message=T(26);
+ message=removing?T(30):T(27);
  if(kind==="hero"&&x[1]==="torso"){
   d().heroStyle ||= {};
-  d().heroStyle.outfit={starter:"casual",work:"work",gym:"gym",knight:"hero",void:"hero",royal:"hero"}[x[0]]||"casual";
+  d().heroStyle.outfit=removing?"casual":({starter:"casual",work:"work",gym:"gym",knight:"hero",void:"hero",royal:"hero"}[x[0]]||"casual");
  }
- if(kind==="pet"){const style={bow:"bow",petcap:"cap",petcrown:"crown",scarf:"scarf",petglasses:"glasses",backpack:"backpack"}[x[0]];if(style)d().profile.petStyle=style}
+ if(kind==="pet"){
+  const style={bow:"bow",petcap:"cap",petcrown:"crown",scarf:"scarf",petglasses:"glasses",backpack:"backpack"}[x[0]];
+  d().profile.petStyle=removing?"plain":(style||"plain");
+ }
  save();
 }
 function chooseColor(x){
@@ -178,7 +187,7 @@ function card(x,kind,w){
  if(kind==="pettype"&&!x[7])n.append($node("small","pz73-model-note",T(28)));
  const info=$node("div","pz73-price",worn?T(13):owned?T(15):(cost+" 🪙"));n.append(info);
  const row=$node("div","pz73-card-buttons");
- const main=$btn(worn?T(20):owned?T(12):kind==="pettype"?T(19):T(11),()=>{if(kind==="pettype")choosePet(x);else chooseItem(x,kind)},"pz73-primary");
+ const main=$btn(worn?(kind==="pettype"?T(20):T(30)):owned?T(12):kind==="pettype"?T(19):T(11),()=>{if(kind==="pettype")choosePet(x);else chooseItem(x,kind)},"pz73-primary");
  if(kind==="pettype"&&!x[7]&&!owned){main.disabled=true;main.title=T(28)}
  row.append(main);
  if(kind!=="pettype"&&!owned)row.append($btn(T(14),()=>viewPreview(kind,key),"pz73-secondary"));
@@ -191,7 +200,7 @@ function render(){
  const ui=root();if(!ui)return;
  ui.querySelector(".pz73-heading").textContent=T(0);
  el("pz73-wallet").textContent=T(16)+": "+(Number(d().coins)||0)+" 🪙";
- const tabs=el("pz73-tabs");tabs.replaceChildren();for(const kind of ["hero","pet"])tabs.append($btn((kind==="hero"?"◈ ":"🐾 ")+T(kind==="hero"?1:2),()=>{tab=kind;filter="all";mode="shop";if(typeof go==="function")go(kind==="pet"?"companion":"wardrobe");render()},"pz73-tab"+(tab===kind?" selected":"")));
+ const tabs=el("pz73-tabs");tabs.replaceChildren();for(const kind of ["hero","pet"])tabs.append($btn((kind==="hero"?"◈ ":"🐾 ")+T(kind==="hero"?1:2),()=>{tab=kind;filter="all";mode="shop";preview=null;window.pzWardrobePreviewV73=null;if(typeof go==="function")go(kind==="pet"?"companion":"wardrobe");render()},"pz73-tab"+(tab===kind?" selected":"")));
  const stage=tab==="hero"?ui._hero:ui._pet,other=tab==="hero"?ui._pet:ui._hero,frame=el("pz73-frame");
  if(stage.parentElement!==frame){frame.replaceChildren(stage);el("pz73-hidden").append(other);window.pz3dRefresh?.()}
  const content=el("pz73-content");content.replaceChildren();
@@ -204,7 +213,7 @@ function render(){
  const nav=$node("div","pz73-switch");for(const a of ["shop","bag"])nav.append($btn(a==="shop"?"🛒 "+T(3):"🎒 "+T(4),()=>{mode=a;render()},"pz73-tab"+(mode===a?" selected":"")));content.append(nav);
  if(tab==="pet"){
   content.append($node("h3","pz73-subtitle",T(18)));
-  const chooser=$node("div","pz73-grid");for(const x of PETS)if(filter==="all"||x[1]===filter)chooser.append(card(x,"pettype",w));content.append(chooser);
+  const chooser=$node("div","pz73-grid");for(const x of PETS)if((mode==="shop"||w.pets.includes(x[0]))&&(filter==="all"||x[1]===filter))chooser.append(card(x,"pettype",w));if(!chooser.childElementCount)chooser.append($node("p","pz73-empty",T(31)));content.append(chooser);
  }
  const rarityBar=$node("div","pz73-filters");for(const r of ["all",...RAR])rarityBar.append($btn(T(r==="all"?10:RARN[r]),()=>{filter=r;render()},"pz73-chip"+(filter===r?" selected":"")));content.append(rarityBar);
  content.append($node("h3","pz73-subtitle",tab==="hero"?T(1):T(29)));
@@ -229,8 +238,10 @@ function render(){
  content.append(label,input,$btn(T(22),()=>{const name=input.value.trim().slice(0,40);if(!name)return;if(tab==="hero"){d().profile.name=name;d().characterName=name;d().profile.provisional=false}else {d().profile.petName=name;w.petNames[d().profile.pet]=name}message=T(27);save()},"pz73-primary"));
  content.append($node("p","pz73-tip",T(24)));el("pz73-notice").textContent=message;
 }
+let lastPoop=0;
 function poop(){
  if(window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches)return;
+ if(Date.now()-lastPoop<1200)return;lastPoop=Date.now();
  const layer=$node("div","pz73-poop-overlay");layer.setAttribute("aria-hidden","true");
  for(let i=0;i<18;i++){const a=$node("span","pz73-splat","💩");a.style.left=(Math.random()*90+4)+"%";a.style.setProperty("--y",(Math.random()*65+18)+"vh");a.style.setProperty("--delay",(i*28)+"ms");layer.append(a)}
  document.body.append(layer);setTimeout(()=>layer.remove(),1500);
@@ -242,7 +253,7 @@ function watchSections(){
   const section=el(id);if(!section)return;
   new MutationObserver(()=>{
    if(section.classList.contains("active")&&tab!==value){
-    tab=value;mode="shop";filter="all";render();
+    tab=value;mode="shop";filter="all";preview=null;window.pzWardrobePreviewV73=null;render();
    }
   }).observe(section,{attributes:true,attributeFilter:["class"]});
  }

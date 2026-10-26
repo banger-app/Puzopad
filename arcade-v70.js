@@ -12,7 +12,7 @@ const GAMES=[
  {id:"slide",name:"MERGE 2048",icon:"▤",tag:"Логіка",desc:"З'єднай плитки до 512",colors:["#f7c674","#ff9f73"]}
 ];
 const WIDTH=360,HEIGHT=525,DAY_CAP=50;
-let game="",canvas,ctx,run=false,finished=false,af=0,lastT=0,ticks=0,score=0,life=3,objects=[],pad=180,keys=[],dir={x:1,y:0},nextDir={x:1,y:0},snake=[],food=null,player={},spawns=0,coinAward=0,scrollBefore="",finger=null,downX=0,downY=0,aux={},scrollRootBefore="",sessionOwner=null,soundOn=false,soundContext=null,lastNoise=0,lastPointScore=0;
+let game="",canvas,ctx,run=false,finished=false,af=0,lastT=0,ticks=0,score=0,life=3,objects=[],pad=180,keys=[],dir={x:1,y:0},nextDir={x:1,y:0},snake=[],food=null,player={},spawns=0,coinAward=0,scrollBefore="",scrollYBefore=0,finger=null,downX=0,downY=0,aux={},scrollRootBefore="",sessionOwner=null,soundOn=false,soundContext=null,lastNoise=0,lastPointScore=0;
 function dbx(){return typeof db!=="undefined"?db:null}
 function nowDay(){return typeof currentDay==="function"?currentDay():new Date().toISOString().slice(0,10)}
 function accountReady(){return !!(window.pzActiveUserId&&dbx()?.profile?.created)}
@@ -121,7 +121,7 @@ function open(which){
  $("pz-arc-title").textContent=GAMES.find(g=>g.id===game).name;
  $("pz-arc-controls").dataset.game=game;
  setText("pz-arc-help",game==="snake"?"Свайп або стрілки":game==="slide"?"Свайп або кнопки зі стрілками":game==="memory"?"Знайди пари, торкаючись карток":game==="aim"?"Тисни зелені цілі":game==="meteor"?"Веди корабель пальцем":game==="hop"?"Натискай для стрибка":"Рухай платформу пальцем, сторінка не прокручується.");
- scrollBefore=document.body.style.overflow;scrollRootBefore=document.documentElement.style.overflow;document.body.style.overflow="hidden";document.documentElement.style.overflow="hidden";document.body.classList.add("pz-arc-playing");
+ scrollBefore=document.body.style.overflow;scrollRootBefore=document.documentElement.style.overflow;scrollYBefore=window.scrollY||0;document.body.style.overflow="hidden";document.documentElement.style.overflow="hidden";document.body.classList.add("pz-arc-playing");
  run=true;lastT=performance.now();paint();af=requestAnimationFrame(tick);
 }
 function pause(){if(!run)return;run=false;cancelAnimationFrame(af);$("pz-arc-result").hidden=false;
@@ -130,8 +130,8 @@ function pause(){if(!run)return;run=false;cancelAnimationFrame(af);$("pz-arc-res
 function exit(){
  run=false;sessionOwner=null;cancelAnimationFrame(af);
  const stage=$("pz-arc-overlay");if(stage)stage.hidden=true;
- document.body.classList.remove("pz-arc-playing");document.body.style.removeProperty("overflow");document.documentElement.style.removeProperty("overflow");document.body.style.removeProperty("overscroll-behavior");document.documentElement.style.removeProperty("overscroll-behavior");
- dashboard();
+ document.body.classList.remove("pz-arc-playing");document.body.style.overflow=scrollBefore;document.documentElement.style.overflow=scrollRootBefore;document.body.style.removeProperty("overscroll-behavior");document.documentElement.style.removeProperty("overscroll-behavior");
+ window.requestAnimationFrame(()=>window.scrollTo(0,scrollYBefore));dashboard();
 }
 function award(type){
  const d=dbx();if(!d||!sessionOwner||sessionOwner!==window.pzActiveUserId)return 0;const b=bank();if(!b)return 0;

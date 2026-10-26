@@ -63,3 +63,9 @@
 .pz73-color small{font-size:11px;color:#ffe1a3;margin-left:auto;line-height:1.1}
 .pz73-primary:disabled{opacity:.55;filter:grayscale(.7);cursor:not-allowed}
 #companion>.panel>#v23PetLook,#companion>.panel>#pz-pets-v61{display:none!important}
+
+/* v75: touch, inventory and accessibility */
+#pz73 .pz73-empty{padding:14px;grid-column:1/-1;text-align:center;color:#c9cce0;border:1px dashed #69758e;border-radius:14px}
+#pz73 .pz73-card-buttons .pz73-primary{touch-action:manipulation}
+#pz73 button:focus-visible{outline:3px solid #ffe29a;outline-offset:2px}
+@media(max-width:380px){#pz73 .pz73-card{min-height:203px}#pz73 .pz73-card-buttons button{font-size:11px!important;padding:8px 6px!important}}

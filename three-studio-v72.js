@@ -75,7 +75,8 @@ function placeholderPet(key){
 function getPetKey(){return store()?.profile?.pet||"none"}
 function getHero(){
  const d=store(),p=d?.profile||{},sp=p.species||"frog";
- return sp==="human"?"hero-human.glb":sp==="robot"?"hero-robot.glb":"hero-frog-0-0.glb";
+ const palette=Math.max(0,Math.min(3,Number(preview("palette")??d?.heroStyle?.palette)||0));
+ return sp==="human"?"hero-human.glb":sp==="robot"?"hero-robot.glb":"hero-frog-0-"+palette+".glb";
 }
 function normalize(modelNode,height){
  const bounds=new THREE.Box3().setFromObject(modelNode);
@@ -209,7 +210,7 @@ async function renderModels(view){
   view.stage.clear();if(hero)view.stage.add(hero);if(pet)view.stage.add(pet);
   if(view.kind==="home"&&hero){document.body.classList.add("pz-three-ready");}
   clearNotice(view);view.host.dataset.viewer="loaded";
- }catch(e){view.host.dataset.viewer="failed";notice(view,"3D поки не завантажилось: "+String(e.message||e)+". Перевір інтернет і перезавантаж сторінку.");}
+ }catch(e){view.key="";view.host.dataset.viewer="failed";notice(view,"3D поки не завантажилось: "+String(e.message||e)+". Перевір інтернет і перезавантаж сторінку.");}
 }
 function update(){
  if(!document.body.classList.contains("pz-unlocked")||!store()?.profile?.created)return;
