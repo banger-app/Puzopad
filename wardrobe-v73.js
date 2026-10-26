@@ -26,6 +26,12 @@ const HERO=[
 ["wings","back","legend",210,"Неонові крила","Неоновые крылья","Neon wings","✧"],
 ["halo","aura","epic",130,"Магічна аура","Магическая аура","Magic aura","◌"]
 ];
+const COLORS=[
+[0,0,"Лісовий","Лесной","Forest","#56d97b"],
+[1,25,"Неоновий","Неоновый","Neon","#ff349a"],
+[2,40,"Океан","Океан","Ocean","#55c5f8"],
+[3,70,"Золотий","Золотой","Golden","#f7c45d"]
+];
 const PETITEMS=[
 ["bow","head","common",10,"Бант","Бант","Bow","∞"],
 ["petcap","head","uncommon",25,"Кепка","Кепка","Cap","▱"],
@@ -75,12 +81,13 @@ function setup(){
  if(!can())return null;
  const data=d();
  if(!data.wardrobeV73)data.wardrobeV73={owned:["starter"],wear:{torso:"starter"},petItems:[],petWear:{},pets:["none","dog","cat","hamster"],petNames:{},petWardrobes:{}};
- const w=data.wardrobeV73;w.owned ||= ["starter"];w.wear ||= {torso:"starter"};w.petItems ||= [];w.petWear ||= {};w.pets ||= ["none","dog","cat","hamster"];w.petNames ||= {};w.petWardrobes||={};
+ const w=data.wardrobeV73;w.owned ||= ["starter"];w.colors ||= [0];w.wear ||= {torso:"starter"};w.petItems ||= [];w.petWear ||= {};w.pets ||= ["none","dog","cat","hamster"];w.petNames ||= {};w.petWardrobes||={};
  const activePet=data.profile.pet||"none";
  if(!w.petWardrobes[activePet])w.petWardrobes[activePet]={...w.petWear};
  w.petWear=w.petWardrobes[activePet];
  if(!w.owned.includes("starter"))w.owned.push("starter");
  if(data.profile.pet&&data.profile.petName&&!w.petNames[data.profile.pet])w.petNames[data.profile.pet]=data.profile.petName;
+ for(const c of legacy.ownedPalettes||[]){const n=Number(c);if(Number.isInteger(n)&&n>=0&&n<=3&&!w.colors.includes(n))w.colors.push(n)}
  for(const p of ["none","dog","cat","hamster",data.profile.pet||"none"])if(!w.pets.includes(p))w.pets.push(p);
  const legacy=data.heroStyle||{};
  for(const [old,converted] of [["casual","starter"],["work","work"],["gym","gym"],["hero","knight"]])if(legacy.owned?.includes(old)&&!w.owned.includes(converted))w.owned.push(converted);
@@ -114,6 +121,14 @@ function chooseItem(x,kind){
  }
  if(kind==="pet"){const style={bow:"bow",petcap:"cap",petcrown:"crown",scarf:"scarf",petglasses:"glasses",backpack:"backpack"}[x[0]];if(style)d().profile.petStyle=style}
  save();
+}
+function chooseColor(x){
+ const w=setup();if(!w)return;
+ if(!w.colors.includes(x[0])){
+  if(!spend(x[1])){message=T(17);render();return}
+  w.colors.push(x[0]);
+ }
+ d().heroStyle ||= {};d().heroStyle.palette=x[0];message=T(26);save();
 }
 function choosePet(x){
  const w=setup();if(!w)return;
@@ -192,6 +207,19 @@ function render(){
  }
  const rarityBar=$node("div","pz73-filters");for(const r of ["all",...RAR])rarityBar.append($btn(T(r==="all"?10:RARN[r]),()=>{filter=r;render()},"pz73-chip"+(filter===r?" selected":"")));content.append(rarityBar);
  content.append($node("h3","pz73-subtitle",tab==="hero"?T(1):T(29)));
+ if(tab==="hero"){
+  content.append($node("h3","pz73-subtitle",lang()==="en"?"Character colors":lang()==="ru"?"Расцветки персонажа":"Кольори персонажа"));
+  const colorList=$node("div","pz73-colors");
+  for(const col of COLORS){
+   const color=$node("button","pz73-color"+(Number(d().heroStyle?.palette||0)===col[0]?" selected":""));
+   color.type="button";
+   const dot=$node("span","pz73-color-dot");dot.style.background=col[5];
+   const title=$node("span","",col[lang()==="uk"?2:lang()==="ru"?3:4]);
+   const price=$node("small","",w.colors.includes(col[0])?T(15):col[1]+" 🪙");
+   color.append(dot,title,price);color.onclick=()=>chooseColor(col);colorList.append(color);
+  }
+  content.append(colorList);
+ }
  const list=tab==="hero"?HERO:PETITEMS,owned=tab==="hero"?w.owned:w.petItems;
  const filtered=list.filter(x=>(filter==="all"||x[2]===filter)&&(mode==="shop"||owned.includes(x[0])));
  const grid=$node("div","pz73-grid");for(const x of filtered)grid.append(card(x,tab,w));if(!filtered.length)grid.append($node("p","",T(25)));content.append(grid);
