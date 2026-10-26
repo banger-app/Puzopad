@@ -181,12 +181,15 @@ function root(){
  // Legacy IDs remain in concealed original panels for the main diary renderer.
  ui=$node("div","pz73-app");ui.id="pz73";
  const header=$node("header","pz73-head");header.append($node("small","","PUZOPAD / CHARACTER UNIVERSE"),$node("h2","pz73-heading"));const wallet=$node("strong","pz73-wallet");wallet.id="pz73-wallet";header.append(wallet);ui.append(header);
- const tabs=$node("div","pz73-tabs");tabs.id="pz73-tabs";ui.append(tabs);
+ const shell=$node("div","pz80-studio-shell");
+ const showcase=$node("div","pz80-showcase"),catalogue=$node("div","pz80-market");
+ ui.append(shell);shell.append(showcase,catalogue);
+ const tabs=$node("div","pz73-tabs");tabs.id="pz73-tabs";showcase.append(tabs);
  const frame=$node("div","pz73-frame");frame.id="pz73-frame";
  hero ||= $node("div","","");hero.id="pz3d-stage";
  pet ||= $node("div","","");pet.id="pz-pet3d-stage";
  const hidden=$node("div","");hidden.hidden=true;hidden.id="pz73-hidden";hidden.append(hero,pet);
- ui.append(frame);
+ showcase.append(frame);
  const controls=$node("div","pz78-view-controls");
  controls.append(
   $btn("−",()=>window.pz3dZoom?.(tab,-1),"pz73-secondary"),
@@ -194,9 +197,9 @@ function root(){
   $btn("⟲",()=>window.pz3dReset?.(tab),"pz73-secondary")
  );
  controls.setAttribute("aria-label","3D viewer controls");
- ui.append(controls,hidden);ui._hero=hero;ui._pet=pet;
- const content=$node("div","pz73-content");content.id="pz73-content";ui.append(content);
- const note=$node("p","pz73-notice");note.id="pz73-notice";note.setAttribute("role","status");ui.append(note);host.append(ui);
+ showcase.append(controls);ui.append(hidden);ui._hero=hero;ui._pet=pet;
+ const content=$node("div","pz73-content");content.id="pz73-content";catalogue.append(content);
+ const note=$node("p","pz73-notice");note.id="pz73-notice";note.setAttribute("role","status");catalogue.append(note);host.append(ui);
  return ui;
 }
 function card(x,kind,w){
@@ -237,17 +240,18 @@ function render(){
    option.append($btn("👁",()=>viewPreview("species",kind),"pz73-secondary"));
    species.append(option);
   }
-  content.append($node("h3","pz73-subtitle",lang()==="en"?"Choose your 3D character":lang()==="ru"?"Выбери 3D-персонажа":"Обери 3D-персонажа"),species);
+  const fold=$node("details","pz80-fold");fold.append($node("summary","",lang()==="en"?"Choose a hero":lang()==="ru"?"Изменить персонажа":"Змінити героя"),species);content.append(fold);
  }
- const nav=$node("div","pz73-switch");for(const a of ["shop","bag"])nav.append($btn(a==="shop"?"🛒 "+T(3):"🎒 "+T(4),()=>{mode=a;render()},"pz73-tab"+(mode===a?" selected":"")));content.append(nav);
+ const nav=$node("div","pz73-switch");for(const a of ["shop","bag"])nav.append($btn(a==="shop"?"🛒 "+T(3):"🎒 "+T(4),()=>{mode=a;render()},"pz73-tab"+(mode===a?" selected":"")));content.prepend(nav);
  if(tab==="pet"){
   content.append($node("h3","pz73-subtitle",T(18)));
-  const chooser=$node("div","pz73-grid");for(const x of PETS)if((mode==="shop"||w.pets.includes(x[0]))&&(filter==="all"||x[1]===filter))chooser.append(card(x,"pettype",w));if(!chooser.childElementCount)chooser.append($node("p","pz73-empty",T(31)));content.append(chooser);
+  const chooser=$node("div","pz73-grid");for(const x of PETS)if((mode==="shop"||w.pets.includes(x[0]))&&(filter==="all"||x[1]===filter))chooser.append(card(x,"pettype",w));if(!chooser.childElementCount)chooser.append($node("p","pz73-empty",T(31)));
+  const petsFold=$node("details","pz80-fold");petsFold.append($node("summary","",lang()==="ru"?"Выбрать питомца":lang()==="en"?"Choose a companion":"Обрати компаньйона"),chooser);content.append(petsFold);
  }
  const rarityBar=$node("div","pz73-filters");for(const r of ["all",...RAR])rarityBar.append($btn(T(r==="all"?10:RARN[r]),()=>{filter=r;render()},"pz73-chip"+(filter===r?" selected":"")));content.append(rarityBar);
  content.append($node("h3","pz73-subtitle",tab==="hero"?T(1):T(29)));
  if(tab==="hero"){
-  content.append($node("h3","pz73-subtitle",lang()==="en"?"Character colors":lang()==="ru"?"Расцветки персонажа":"Кольори персонажа"));
+  const colorFold=$node("details","pz80-fold");colorFold.append($node("summary","",lang()==="en"?"Skin color":lang()==="ru"?"Цвет персонажа":"Колір персонажа"));
   const colorList=$node("div","pz73-colors");
   for(const col of COLORS){
    const color=$node("button","pz73-color"+(Number(d().heroStyle?.palette||0)===col[0]?" selected":""));
@@ -258,7 +262,7 @@ function render(){
    color.append(dot,title,price);color.onclick=()=>chooseColor(col);
    const group=$node("div","pz76-color-row");group.append(color,$btn("👁",()=>viewPreview("palette",String(col[0])),"pz73-secondary"));colorList.append(group);
   }
-  content.append(colorList);
+  colorFold.append(colorList);content.append(colorFold);
  }
  const list=tab==="hero"?HERO:PETITEMS,owned=tab==="hero"?w.owned:w.petItems;
  const filtered=list.filter(x=>available(x)&&(filter==="all"||x[2]===filter)&&(mode==="shop"||owned.includes(x[0])));
