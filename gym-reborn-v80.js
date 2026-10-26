@@ -34,7 +34,7 @@ const state=()=>{
 function store(){if(typeof persist==="function")persist()}
 function clock(){
  const x=$("pz80-gym-clock"),g=state();if(!x||!g?.session)return;
- let s=g.session,duration=Math.max(0,Math.floor(((s.startedAt&&Date.now())||Date.now()-Date.now())-s.startedAt)/1000);
+ const s=g.session;let duration=Math.max(0,Math.floor((Date.now()-Number(s.startedAt||Date.now()))/1000));
  if(!Number.isFinite(duration)||duration<0)duration=0;
  x.textContent=[Math.floor(duration/3600),Math.floor(duration/60)%60,duration%60].map(v=>String(v).padStart(2,"0")).join(":");
 }
@@ -137,7 +137,7 @@ function boot(){
 }
 window.addEventListener("pz:unlocked",boot);
 window.addEventListener("banger:local-save",()=>{if(data()&&window.pzActiveUserId!==lastUid)boot()});
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&data()?.gymV80?.session)clock()});
+document.addEventListener("visibilitychange",()=>{if(document.hidden)stopTicker();else if(data()?.gymV80?.session)ticker()});
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(boot,150));
 else setTimeout(boot,150);
 })();
