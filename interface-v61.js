@@ -10,11 +10,19 @@ function text(id,t){const el=$(id);if(el&&el.textContent!==t)el.textContent=t}
 function identity(){
  const d=bank(),p=d?.profile;if(!p?.created)return;
  text("pz-account-name",p.name||"Герой");
- const where=$("v20Where");if(where)where.textContent=(window.pzPetEmoji(p.pet)||"🐾")+" "+p.name+" · "+({home:T("Вдома","Дома","At home"),work:T("На роботі","На работе","At work"),shop:T("У місті","В городе","In town"),gym:T("У залі","В зале","At gym")}[d.location||"home"]||"");
+ const where=$("v20Where");
+ const locationLabel=({home:T("Вдома","Дома","At home"),work:T("На роботі","На работе","At work"),shop:T("У місті","В городе","In town"),gym:T("У залі","В зале","At gym")}[d.location||"home"]||"");
+ if(where)text("v20Where","👤 "+p.name+" · "+locationLabel);
+ const worldStatus=$("v20Status");
+ if(worldStatus){
+  const name=String(p.name||T("Герой","Герой","Hero"));
+  const message=({home:T("відпочиває вдома","отдыхает дома","is at home"),work:T("на роботі","на работе","is at work"),shop:T("у місті","в городе","is in town"),gym:T("у спортзалі","в зале","is at the gym")}[d.location||"home"]||"");
+  text("v20Status",name+" · "+message+" · "+T("вибери дію","выбери действие","choose an action"));
+ }
  const pett=document.querySelector(".v20-pet");if(pett){
   const label=p.petName||PETS.find(x=>x[0]===p.pet)?.[2]||"Компаньйон";
-  pett.innerHTML='<span style="font-size:56px;line-height:1">'+window.pzPetEmoji(p.pet)+'</span><small></small>';
-  pett.querySelector("small").textContent=label; pett.title=label;
+  const key=p.pet+"|"+label;
+  if(pett.dataset.pzPet!==key){pett.innerHTML='<span style="font-size:56px;line-height:1">'+window.pzPetEmoji(p.pet)+'</span><small></small>';pett.querySelector("small").textContent=label;pett.title=label;pett.dataset.pzPet=key;}
  }
  const generic=["BANGER дома","BANGER ДОМА","BANGER на работе","BANGER в городе"];
  document.querySelectorAll(".v20-status,.v20-scene-label,#v20HeroName").forEach(el=>{let val=el.textContent||"";if(generic.some(g=>val.includes(g)))el.textContent=val.replace(/BANGER/gi,p.name)});
@@ -29,6 +37,20 @@ function macro(){
  const result=value.match(/^([\d.,]+)\s*\/\s*([\d.,]+)\s*\/\s*([\d.,]+)\s*г?$/i);
  if(result)el.innerHTML='<span class="pz-macros"><span>'+T("Білки","Белки","Protein")+': <b>'+result[1]+' г</b></span><span>'+T("Жири","Жиры","Fat")+': <b>'+result[2]+' г</b></span><span>'+T("Вуглеводи","Углеводы","Carbs")+': <b>'+result[3]+' г</b></span></span>';
  const parent=el.parentElement;if(parent?.firstChild?.nodeType===3&&/Б\s*\/\s*Ж\s*\/\s*У/.test(parent.firstChild.textContent))parent.firstChild.textContent=T("Білки, жири та вуглеводи","Белки, жиры и углеводы","Macros");
+ const balance=$("v17FoodStats");
+ if(balance){
+  const summary=balance.querySelector("p");
+  if(summary&&/ккал\s*[·•]\s*Б\s*[\d.,—]+\s*г\s*[·•]\s*Ж\s*[\d.,—]+\s*г\s*[·•]\s*У\s*[\d.,—]+\s*г/.test(summary.textContent)){
+   const raw=summary.textContent;
+   summary.textContent=raw.replace(/Б\s*([\d.,—]+)\s*г\s*[·•]\s*Ж\s*([\d.,—]+)\s*г\s*[·•]\s*У\s*([\d.,—]+)\s*г/,(_,p,f,c)=>T("Білки","Белки","Protein")+" "+p+" г · "+T("Жири","Жиры","Fat")+" "+f+" г · "+T("Вуглеводи","Углеводы","Carbs")+" "+c+" г");
+  }
+ }
+ document.querySelectorAll("#foodRows details p").forEach(node=>{
+   const raw=node.textContent||"";
+   if(/^Б\s*[\d.,—]+\s*г\s*[·•]\s*Ж\s*[\d.,—]+\s*г\s*[·•]\s*У\s*[\d.,—]+\s*г/.test(raw)){
+     node.textContent=raw.replace(/^Б\s*([\d.,—]+)\s*г\s*[·•]\s*Ж\s*([\d.,—]+)\s*г\s*[·•]\s*У\s*([\d.,—]+)\s*г/,(_,p,f,c)=>T("Білки","Белки","Protein")+" "+p+" г · "+T("Жири","Жиры","Fat")+" "+f+" г · "+T("Вуглеводи","Углеводы","Carbs")+" "+c+" г");
+   }
+ });
  const entries=document.querySelectorAll("#foodRows .fooddetail");
  entries.forEach(x=>{if(x.dataset.expanded==="1")return;
  x.innerHTML=x.innerHTML.replace(/Б\s*([\d.,—]+)\s*\/\s*Ж\s*([\d.,—]+)\s*\/\s*У\s*([\d.,—]+)/g,(m,a,b,c)=>T("Білки","Белки","Protein")+" "+a+" г · "+T("Жири","Жиры","Fat")+" "+b+" г · "+T("Вуглеводи","Углеводы","Carbs")+" "+c+" г");x.dataset.expanded="1"});
@@ -76,8 +98,15 @@ function tweaks(){
 }
 let active=false;
 window.pzUiRefresh=()=>{if(!active)return;identity();macro();gamification()};
+function watchWorld(){
+ ["v20Where","v20Status"].forEach(id=>{
+ const node=$(id);if(!node||node.dataset.pzObserved)return;node.dataset.pzObserved="1";
+ let lock=false;
+ new MutationObserver(()=>{if(lock||!active)return;lock=true;try{identity()}finally{lock=false}}).observe(node,{childList:true,characterData:true,subtree:true});
+ });
+}
 window.addEventListener("pz:unlocked",()=>{
- active=true;tweaks();
+ active=true;tweaks();watchWorld();
  const macros=$("todayMacro");if(macros&&!macros.dataset.observed){macros.dataset.observed="1";new MutationObserver(()=>{if(!macros.textContent.includes("Белки")&&!macros.textContent.includes("Білки")&&!macros.textContent.includes("Protein"))macro()}).observe(macros,{childList:true,subtree:true,characterData:true})}
 });
 window.addEventListener("banger:local-save",()=>{if(active){identity();gamification()}});
