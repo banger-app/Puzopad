@@ -12,7 +12,8 @@ const base=engine.renderScene.bind(engine);
 const scenes={
  "frog|dog|city":"banger_surechka_city.webp",
  "kisyusha|cat|city":"kisyusha_masya_city.webp",
- "robot|robodog|city":"bender_robodog_city.webp"
+ "robot|robodog|city":"bender_robodog_city.webp",
+ "frog|dog|winter":"banger_surechka_winter.webp"
 };
 const label=(state)=>{
  const pets={dog:"Суречка",cat:"Мася",robodog:"Робопёс"};
@@ -28,7 +29,19 @@ const qualify=(state,opts={})=>{
  const modifiedGear=Object.entries(gear).some(([slot,id])=>
   id&&id!=="starter"&&id!=="none"&&!(slot==="torso"&&id==="starter"));
  const modifiedPet=Object.values(petGear).some(id=>id&&id!=="none");
- if(modifiedGear||modifiedPet)return null;
+ const isWinter=key==="frog|dog|winter";
+ if(isWinter){
+  // This painting is the dedicated complete winter look, not a neutral outfit.
+  if(gear.torso!=="wintercoat")return null;
+  return file;
+ }
+ const looksLikeStreet=key==="frog|dog|city"
+  && (!gear.torso||gear.torso==="starter")
+  && (!gear.face||gear.face==="glasses")
+  && (!gear.feet||gear.feet==="sneakers")
+  && !gear.head&&!gear.back&&!gear.aura
+  && Object.entries(petGear).every(([slot,id])=>!id||slot==="face"&&id==="petglasses");
+ if(!looksLikeStreet&&(modifiedGear||modifiedPet))return null;
  if(window.pzWardrobePreviewV73?.uid===window.pzActiveUserId)return null;
  return file;
 };
