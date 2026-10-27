@@ -134,14 +134,57 @@ function voiceSpeak(text){
   window.speechSynthesis.speak(utterance);
  }catch(_){}
 }
+
+/* v85.4: recognized weight entries bypass food AI; require signed-in profile. */
+function extractOfficialWeight(message){
+ const raw=String(message||"");
+ if(/(?:не\s+(?:записывай|сохраняй)|не\s+(?:записуй|зберігай)|(?:^|[^\p{L}])(?:если|завтра|вчера|позавчера|учора|позавчора|yesterday)(?![\p{L}])|планир|планую|цел[ьи]|мета\s*[-:]|хочу\s+(?:весить|важити)|сколько\s+буду)/iu.test(raw))return null;
+ const mark=/(?<![\p{L}\p{N}])(?:вес|весил|вешу|взвес\p{L}*|взвешив\p{L}*|зваж\p{L}*|вага|важу|weight|weighed)(?![\p{L}])/iu.exec(raw);
+ if(!mark)return null;
+ const after=raw.slice(mark.index+mark[0].length,mark.index+mark[0].length+70);
+ const match=/(?<!\d)(\d{2,3}(?:[.,]\d{1,2})?)(?!\d)/u.exec(after);
+ if(!match)return null;
+ const trailing=after.slice(match.index+match[0].length);
+ if(/^\s+\d{1,2}[.,]\d/u.test(trailing))return null; // ambiguous ASR: "90 1,8"
+ if(/^\s*(?:г|гр|грамм\p{L}*|g)(?![\p{L}])/iu.test(trailing))return null;
+ const kg=Number(match[1].replace(",","."));
+ return Number.isFinite(kg)&&kg>=20&&kg<=350?Math.round(kg*100)/100:null;
+}
+function storeOfficialWeight(kg,owner){
+ if(!owner||window.pzActiveUserId!==owner)throw Error("Сначала открой свой профиль БЕНГЕРА");
+ if(typeof db==="undefined"||!Array.isArray(db.weights)||typeof persist!=="function"||typeof stamp!=="function")throw Error("Журнал веса ещё не загрузился");
+ if(typeof testMode!=="undefined"&&testMode)throw Error("Отключи тестовый режим для настоящего взвешивания");
+ const date=stamp().date;
+ const old=db.weights.find(x=>x.date===date);
+ const kgText=String(kg).replace(".",",");
+ if(old&&Math.abs(Number(old.kg)-kg)<.001)return "✅ Вес "+kgText+" кг уже записан за "+date+". Дубль не создаю.";
+ const before=db.weights.map(x=>({...x}));
+ try{
+  db.weights=db.weights.filter(x=>x.date!==date);
+  db.weights.push({date,kg});
+  db.weights.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  persist();
+  const snapshot=JSON.parse(localStorage.getItem("pz_private_v59_"+owner)||"null");
+  if(!snapshot?.weights?.some(x=>x.date===date&&Number(x.kg)===kg))throw Error("Локальное хранилище не подтвердило запись");
+ }catch(error){db.weights=before;try{persist()}catch(_){}throw error}
+ try{if(typeof render==="function")render()}catch(e){console.warn("Weight UI refresh",e)}
+ return "✅ Вес "+kgText+" кг записан за "+date+" в дневник. График обновлён. Облачная копия синхронизируется отдельно.";
+}
+
 async function deliver(){
  if(sending)return;
  const text=input.value.trim(),selection=draft.slice();
+ const directWeight=selection.length?null:extractOfficialWeight(text);
  if(!text&&!selection.length){input.focus();return}
  sending=true;loading(true);let payload;
  try{
   const {auth}=await session(),owner=auth.user.id;
   if(uid&&uid!==owner)throw Error("Аккаунт изменился — сообщение не отправлено");
+  if(directWeight!==null){
+   const receipt=storeOfficialWeight(directWeight,owner);
+   loading(false);addMessage("user",text,[]);addMessage("assistant",receipt,[]);
+   input.value="";sizeComposer();statusBox.textContent="";return;
+  }
   const urls=await Promise.all(selection.map(compress));
   if(urls.reduce((n,x)=>n+x.length,0)>15500000)throw Error("Общий размер фото слишком большой");
   payload={message:text,image_data_urls:urls,context:window.pzBennyContextV80?.()||null};
@@ -168,9 +211,19 @@ send.onclick=deliver;
 input.addEventListener("keydown",event=>{if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();deliver()}});
 $("bai-open").onclick=()=>{
  modal.classList.add("open");document.body.classList.add("pz81-benny-open");$("bai-status").textContent="";
- if(!historyLoaded){clearLog();loadHistory()}input.focus();
+ if(!historyLoaded){clearLog();loadHistory()}
+ // Never focus the bottom input on open: iOS otherwise scrolls the top controls offscreen.
+ if(document.activeElement instanceof HTMLElement&&document.activeElement!==document.body)document.activeElement.blur();
 };
-$("bai-close").onclick=()=>{modal.classList.remove("open");document.body.classList.remove("pz81-benny-open");if("speechSynthesis" in window)window.speechSynthesis.cancel()};
+function exitBenny(){
+ modal.classList.remove("open");document.body.classList.remove("pz81-benny-open");
+ input.blur();if("speechSynthesis" in window)window.speechSynthesis.cancel();
+ window.pzBennyVoiceV83?.stopCall?.();
+}
+$("bai-close").onclick=exitBenny;
+const exitBack=button("←",exitBenny,"pz854-back");
+exitBack.id="pz854-benny-back";exitBack.setAttribute("aria-label","Назад в Штаб");
+top?.insertBefore(exitBack,top.firstChild);
 modal.addEventListener("click",event=>{if(event.target===modal)$("bai-close").click()});
 document.addEventListener("keydown",event=>{if(event.key==="Escape"&&modal.classList.contains("open"))$("bai-close").click()});
 const statusObserver=new MutationObserver(()=>{
