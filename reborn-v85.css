@@ -197,3 +197,64 @@ body.pz-locked.pz-checking #pz-login,body.pz-locked.pz-checking #pz-import,body.
 #bai-composer #bai-input{font-size:16px!important;line-height:22px!important;min-height:42px!important;min-width:0!important}
 #bai-composer{width:100%;max-width:100%;box-sizing:border-box}
 #bai-form{max-width:100%;box-sizing:border-box}
+
+/* v85.3 — hard layout boundaries on small-screen Safari.
+   Unlike viewport zoom disabling, this retains user-accessibility zoom controls. */
+html{
+ background:#090d1e!important;
+ width:100%!important;
+ max-width:100%!important;
+ min-width:0!important;
+ overflow-x:hidden!important;
+ overscroll-behavior-x:none;
+}
+body{
+ width:100%!important;
+ max-width:100%!important;
+ min-width:0!important;
+ min-height:100dvh;
+ margin:0!important;
+ overflow-x:hidden!important;
+ background-color:#090d1e!important;
+}
+html,body{box-sizing:border-box}
+body>main, main, #pz-topbar, #nav, #home, #city, #wardrobe, #companion, #store{
+ box-sizing:border-box;
+ max-width:100%!important;
+ min-width:0!important;
+}
+main{
+ width:100%!important;
+ margin-inline:auto!important;
+ overflow-x:clip;
+}
+#nav{
+ width:100%!important;
+ max-width:100%!important;
+ overflow-x:auto!important;
+ overflow-y:hidden!important;
+ -webkit-overflow-scrolling:touch;
+}
+#nav button{flex-shrink:0!important}
+.section{
+ max-width:100%!important;
+ min-width:0!important;
+ overflow-wrap:anywhere;
+}
+.section .panel, .section .v16-dashboard, .section .v20-scene-art{
+ box-sizing:border-box;
+ max-width:100%!important;
+ min-width:0!important;
+}
+#pz73, #pz73 .pz80-studio-shell, #pz73 .pz80-showcase, #pz73 .pz80-market,
+#v20World, #v20World .v20-scene-art, #pz3d-home-stage{
+ max-width:100%!important;
+ min-width:0!important;
+ box-sizing:border-box;
+}
+#bai-modal,#bai-panel{max-width:100vw!important}
+#bai-modal.open{width:100vw!important}
+#bai-form,#bai-composer{box-sizing:border-box;max-width:100%!important}
+#bai-input,input[type="text"],input[type="search"],input[type="number"],input[type="email"],textarea{
+ font-size:max(16px,1em)!important;
+}
