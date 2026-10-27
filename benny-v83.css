@@ -60,3 +60,28 @@
 @keyframes pz83-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
 @media(max-width:380px){#bai-composer{gap:1px;padding:4px!important}#bai-composer #bai-mic,#bai-composer #bai-attach{flex-basis:33px;min-width:33px;width:33px}#bai-form .pz83-rec-controls{width:100%;justify-content:flex-end}}
 @media(prefers-reduced-motion:reduce){#bai-form .pz83-wave i,#bai-panel .pz83-call-orb.recording{animation:none}}
+
+
+/* v85.4 · iPhone fullscreen header, dedicated back, round controls */
+body.pz81-benny-open{overflow:hidden!important;overscroll-behavior:none!important}
+#bai-modal.open{position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;max-height:100dvh!important;padding:0!important;overflow:hidden!important;display:flex!important;align-items:stretch!important;justify-content:stretch!important}
+#bai-modal #bai-panel{position:relative!important;flex:1 1 100%!important;height:100%!important;min-height:0!important;max-height:100dvh!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+#bai-modal #bai-top{position:relative!important;z-index:25!important;display:flex!important;align-items:center!important;visibility:visible!important;opacity:1!important;transform:none!important;flex:0 0 auto!important;min-height:64px!important;gap:8px!important}
+#bai-modal #bai-top .pz81-brand,#bai-modal #bai-top .pz81-identity{min-width:0!important}
+#bai-modal #bai-top #bai-close,#bai-modal #bai-top #pz854-benny-back{position:relative!important;flex:0 0 42px!important;width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important;max-height:42px!important;display:grid!important;place-items:center!important;border-radius:50%!important;box-sizing:border-box!important;color:white!important;z-index:30!important;touch-action:manipulation!important}
+#bai-modal #bai-top #pz854-benny-back{border:1px solid #48526c!important;background:#20283b!important;font-size:25px!important;font-weight:600!important;padding:0!important}
+#bai-modal #bai-log{position:relative!important;flex:1 1 auto!important;min-height:0!important;overflow-x:hidden!important;overflow-y:auto!important}
+#bai-modal #bai-form{position:relative!important;z-index:26!important;flex:0 0 auto!important;min-height:0!important}
+#bai-modal #bai-composer #bai-mic,#bai-modal #bai-composer #bai-send,#bai-modal #bai-composer .pz83-call-launch{
+ flex:0 0 42px!important;box-sizing:border-box!important;
+ width:42px!important;min-width:42px!important;max-width:42px!important;
+ height:42px!important;min-height:42px!important;max-height:42px!important;
+ aspect-ratio:1/1!important;border-radius:50%!important;padding:0!important;
+ display:grid!important;place-items:center!important;align-self:center!important;
+ grid-column:auto!important;grid-row:auto!important;line-height:1!important;
+}
+#bai-modal #bai-composer #bai-send:after{display:none!important}
+#bai-modal #bai-composer #bai-input{font-size:16px!important;flex:1 1 auto!important;min-width:0!important}
+@supports (-webkit-touch-callout: none){
+ #bai-modal #bai-top{padding-top:max(calc(env(safe-area-inset-top) + 10px),58px)!important;padding-bottom:10px!important}
+}
