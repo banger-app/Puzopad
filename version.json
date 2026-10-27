@@ -1,7 +1,7 @@
 {
-  "build": "85.3",
+  "build": "85.4",
   "date": "2026-10-27",
   "assets": "puzopad-standalone-icon-v1",
   "stable_url": "/Puzopad/",
-  "changes": "Stable iPhone viewport; native scroll with pinch-gesture protection and responsive layout"
+  "changes": "Benny: direct verified weight log, reliable exit and visible iPhone header, perfectly round voice/send controls"
 }
