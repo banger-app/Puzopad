@@ -14,6 +14,24 @@ try{
   page.on("pageerror",error=>{if(/Invalid regular expression|Unexpected token|SyntaxError/.test(error.message))failures.push(width+" app syntax: "+error.message)});
   await page.route(/^https:\/\/(?!127\.0\.0\.1).+/,route=>route.abort()).catch(()=>{});
   await page.goto(base,{waitUntil:"domcontentloaded",timeout:30000});
+  const gestures=await page.evaluate(()=>{
+    const sample=(type,count)=>{
+      const event=new Event(type,{bubbles:true,cancelable:true});
+      if(type.startsWith("touch"))Object.defineProperty(event,"touches",{value:Array.from({length:count},()=>({}))});
+      document.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    const single=sample("touchstart",1);
+    const pinch=sample("touchstart",2);
+    const moving=sample("touchmove",2);
+    sample("touchend",0);
+    const native=sample("gesturestart",2);
+    return {single,pinch,moving,native,locked:window.pzViewportLockV853?.getMultiTouch()};
+  });
+  console.log("Mobile gestures",width,JSON.stringify(gestures));
+  if(gestures.single||!gestures.pinch||!gestures.moving||!gestures.native||gestures.locked){
+    failures.push(width+"px gesture guard failed: "+JSON.stringify(gestures));
+  }
   async function view(section,modal=false){
    await page.evaluate(({section,modal})=>{
     document.body.classList.remove("pz-locked","pz-checking");
