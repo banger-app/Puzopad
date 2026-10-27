@@ -8,19 +8,19 @@ const read=file=>fs.readFileSync(file,"utf8");
 const html=read("index.html");
 const version=JSON.parse(read("version.json"));
 test("all v80 production scripts & styles exist and build matches",()=>{
- assert.equal(version.build,"85.2");
- for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-v81.css","art-engine-v82.js","art-v82.css","art-raster-v83.js","art-v83.css","benny-voice-v83.js","benny-v83.css","art-cinema-v84.js","reborn-v84.css","nav-icons-v84.js","reborn-v85.js","reborn-v85.css"]){
+ assert.equal(version.build,"85.3");
+ for(const path of ["reborn-v80.css","benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","three-studio-v72.js","model-sources-v77.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-v81.css","art-engine-v82.js","art-v82.css","art-raster-v83.js","art-v83.css","benny-voice-v83.js","benny-v83.css","art-cinema-v84.js","reborn-v84.css","nav-icons-v84.js","reborn-v85.js","reborn-v85.css","viewport-lock-v853.js"]){
   assert.ok(fs.existsSync(path),"missing "+path);
  }
- for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=82.1","./art-engine-v82.js?v=82.1","./art-v82.css?v=82.1","./art-raster-v83.js?v=84.0","./art-v83.css?v=83.0","./benny-voice-v83.js?v=85.1","./benny-v83.css?v=83.0","./art-cinema-v84.js?v=84.0","./reborn-v84.css?v=84.0","./nav-icons-v84.js?v=84.0","./reborn-v85.js?v=85.0","./reborn-v85.css?v=85.2","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
+ for(const ref of ["./reborn-v80.css?v=80.31","./benny-reborn-v80.js?v=80.3","./onboarding-v69.js?v=80.3","./wardrobe-v73.js?v=82.1","./art-engine-v82.js?v=82.1","./art-v82.css?v=82.1","./art-raster-v83.js?v=84.0","./art-v83.css?v=83.0","./benny-voice-v83.js?v=85.1","./benny-v83.css?v=83.0","./art-cinema-v84.js?v=84.0","./reborn-v84.css?v=84.0","./nav-icons-v84.js?v=84.0","./reborn-v85.js?v=85.0","./reborn-v85.css?v=85.3","./viewport-lock-v853.js?v=85.3","./exercise-visuals-v803.js?v=80.3","./benny-food-v57.js?v=80.3"])assert.ok(html.includes(ref),"missing index ref "+ref);
  assert.ok(read("onboarding-v69.js").includes("./gym-reborn-v80.js?v=80.3"));
- assert.ok(read("interface-v61.js").includes('V85.2 · '));
- assert.ok(html.includes('V85.2 · ПУЗОПАД'));
- assert.ok(read("sw.js").includes("puzopad-v852-20261027"));
+ assert.ok(read("interface-v61.js").includes('V85.3 · '));
+ assert.ok(html.includes('V85.3 · ПУЗОПАД'));
+ assert.ok(read("sw.js").includes("puzopad-v853-20261027"));
  assert.ok(html.includes('window.pzBennyContextV80?.()'));
 });
 test("classic JavaScript modules parse",()=>{
- for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-food-v57.js","art-engine-v82.js","art-raster-v83.js","benny-voice-v83.js","art-cinema-v84.js","nav-icons-v84.js","reborn-v85.js"]){
+ for(const f of ["benny-reborn-v80.js","gym-reborn-v80.js","wardrobe-v73.js","onboarding-v69.js","interface-v61.js","arcade-v70.js","sw.js","exercise-visuals-v803.js","exercise-gallery-v81.js","benny-chat-v81.js","benny-food-v57.js","art-engine-v82.js","art-raster-v83.js","benny-voice-v83.js","art-cinema-v84.js","nav-icons-v84.js","reborn-v85.js","viewport-lock-v853.js"]){
   assert.doesNotThrow(()=>new vm.Script(read(f),{filename:f}));
  }
 });
@@ -350,4 +350,14 @@ test("v85.2 concise Benny chat composer",()=>{
  assert.ok(html.includes("Привет! Я Бенни. Чем помочь?"));
  assert.ok(b.includes("Спроси Бенни…")&&b.includes("Запитай Бенні…"));
  assert.ok(read("reborn-v85.css").includes("#bai-composer #bai-input{font-size:16px"));
+});
+
+test("v85.3 multi-touch viewport guard preserves normal scroll",()=>{
+ const html=read("index.html"),js=read("viewport-lock-v853.js"),css=read("reborn-v85.css");
+ assert.ok(html.includes('viewport-fit=cover'));
+ assert.ok(!html.includes('user-scalable=no'));
+ assert.ok(js.includes('"gesturestart"')&&js.includes('"gesturechange"'));
+ assert.ok(js.includes('e.touches.length>1')&&js.includes('passive:false'));
+ assert.ok(css.includes('background:#090d1e!important')&&css.includes('overflow-x:hidden!important'));
+ assert.ok(html.includes('./viewport-lock-v853.js?v=85.3'));
 });
